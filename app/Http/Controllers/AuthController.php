@@ -22,14 +22,14 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
-            // Redirect based on role
             if (Auth::user()->role === 'admin') {
                 return redirect()->route('admin.dashboard');
             }
-            return redirect('/dashboard'); // For staff later
+            
+            return redirect()->route('staff.dashboard');
         }
 
-        return back()->withErrors(['email' => 'The provided credentials do not match our records.']);
+        return back()->withErrors(['email' => 'Invalid email or password.']);
     }
 
     public function logout(Request $request)
