@@ -36,23 +36,38 @@
             background:#3498db; color:white; cursor:pointer; transition:.3s;
         }
         button:hover { background:#2980b9; }
-        button:disabled { background:#95a5a6; cursor:not-allowed; }
+        button.danger { background:#e74c3c; }
+        button.danger:hover { background:#c0392b; }
 
         ul.errors { background:#ffecec; color:#c0392b; padding:15px 20px; margin-bottom:20px; border-left:5px solid #e74c3c; border-radius:5px; }
         .success-msg { background:#eafaf1; color:#27ae60; padding:12px; border-left:5px solid #27ae60; border-radius:5px; margin-bottom:20px; }
-        .soon { color:#888; font-style:italic; }
+        
+        .card { background:white; padding:20px; border-radius:8px; max-width:600px; box-shadow:0 1px 3px rgba(0,0,0,.08); margin-bottom: 20px; }
 
-        .card { background:white; padding:20px; border-radius:8px; max-width:600px; box-shadow:0 1px 3px rgba(0,0,0,.08); }
-
+        /* Cam Box */
         .cam-box { display:flex; gap:15px; align-items:flex-start; flex-wrap:wrap; }
         video, canvas, #idPreview { width:240px; height:180px; background:#000; border-radius:6px; object-fit:cover; }
         canvas { display:none; }
         #idPreview { display:none; border:2px solid #27ae60; }
 
-        .room-result { padding:10px; border:1px solid #ddd; border-radius:5px; margin-top:8px; background:#f8f9fb; }
-        .room-result.none { color:#c0392b; }
-        
-        /* Payment Visuals */
+        /* Search Results Styles */
+        .search-container { position: relative; width: 100%; max-width: 320px; }
+        .search-results { 
+            position: absolute; background: white; border: 1px solid #ddd; width: 100%; 
+            z-index: 100; border-radius: 0 0 5px 5px; max-height: 200px; overflow-y: auto; display:none;
+        }
+        .search-item { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; }
+        .search-item:hover { background: #f4f6f9; }
+
+        /* Checkout Detail Styles */
+        .detail-grid { display: grid; grid-template-columns: 150px 1fr; gap: 20px; margin-top: 20px; }
+        .detail-photo { width: 150px; height: 110px; border-radius: 8px; object-fit: cover; border: 1px solid #ddd; }
+        .info-row { margin-bottom: 8px; font-size: 14px; }
+        .info-label { color: #888; font-weight: bold; width: 120px; display: inline-block; }
+        .alert-box { padding: 10px; border-radius: 5px; margin-top: 10px; font-weight: bold; }
+        .alert-danger { background: #ffecec; color: #c0392b; border-left: 4px solid #e74c3c; }
+        .alert-success { background: #eafaf1; color: #27ae60; border-left: 4px solid #27ae60; }
+
         .price-line { font-weight:bold; color:#2c3e50; margin-top:10px; padding: 10px; background: #eef2f7; border-radius: 5px; }
         .remaining-line { font-weight:bold; margin-top:5px; padding: 10px; border-radius: 5px; }
         .bal-red { background: #fdf2f2; color: #c0392b; }
@@ -97,17 +112,13 @@
         <!-- CHECK IN PANEL -->
         <div id="panel-checkin" class="panel">
             <h1>Check In Guest</h1>
-
             <form action="{{ route('staff.checkin.store') }}" method="POST" id="checkinForm" class="card">
                 @csrf
-
                 <h3>Guest Details</h3>
                 <label>Full Name</label>
                 <input type="text" name="fullname" required>
-
                 <label>Phone Number</label>
                 <input type="text" name="phone_no" required>
-
                 <label>ID Type</label>
                 <select name="id_type" required>
                     <option value="national_id">National ID</option>
@@ -130,7 +141,6 @@
                 <h3>Stay Details</h3>
                 <label>Check-in Date</label>
                 <input type="date" name="check_in_date" id="check_in_date" required>
-
                 <label>Check-out Date</label>
                 <input type="date" name="check_out_date" id="check_out_date" required>
 
@@ -142,8 +152,7 @@
                     @endforeach
                 </select>
                 <button type="button" id="findRoomsBtn">Find Available Rooms</button>
-
-                <div id="roomResults" class="room-result" style="display:none;"></div>
+                <div id="roomResults" class="room-result" style="display:none; padding:10px; border:1px solid #ddd; margin-top:10px;"></div>
 
                 <label>Selected Room</label>
                 <select name="room_id" id="room_id" required>
@@ -159,26 +168,52 @@
                     <option value="bank_transfer">Bank Transfer</option>
                     <option value="pos">POS</option>
                 </select>
-
                 <label>Payment Way</label>
-                <select name="payment_way" id="payment_way" required>
+                <select name="payment_way" id="payment_way_checkin" required>
                     <option value="full">Full Payment</option>
                     <option value="partial">Partial Payment</option>
                 </select>
-
                 <label>Amount Paid</label>
-                <input type="number" step="0.01" name="amount_paid" id="amount_paid" placeholder="0.00" required>
-
-                <div class="remaining-line" id="remainingLine" style="display:none;"></div>
+                <input type="number" step="0.01" name="amount_paid" id="amount_paid_checkin" required>
+                <div class="remaining-line" id="remainingLineCheckin" style="display:none;"></div>
 
                 <button type="submit">Check In</button>
             </form>
         </div>
 
-        <!-- COMING SOON PANELS -->
+        <!-- CHECK OUT PANEL -->
         <div id="panel-checkout" class="panel">
-            <h1>Check Out</h1>
-            <p class="soon">Coming soon.</p>
+            <h1>Check Out Guest</h1>
+            <div class="card">
+                <label>Search Guest (Name or Phone)</label>
+                <div class="search-container">
+                    <input type="text" id="co-search" placeholder="Type name..." autocomplete="off">
+                    <div id="co-results" class="search-results"></div>
+                </div>
+
+                <div id="checkout-details" style="display:none; margin-top:30px;">
+                    <hr>
+                    <div class="detail-grid">
+                        <img id="co-img" src="" class="detail-photo" alt="Guest ID">
+                        <div>
+                            <div class="info-row"><span class="info-label">Full Name:</span> <span id="co-name"></span></div>
+                            <div class="info-row"><span class="info-label">Phone:</span> <span id="co-phone"></span></div>
+                            <div class="info-row"><span class="info-label">Room:</span> <span id="co-room"></span></div>
+                            <div class="info-row"><span class="info-label">Check-in:</span> <span id="co-in"></span></div>
+                            <div class="info-row"><span class="info-label">Expected Out:</span> <span id="co-out"></span></div>
+                        </div>
+                    </div>
+
+                    <div id="co-overstay-msg" class="alert-box"></div>
+                    <div id="co-payment-msg" class="alert-box"></div>
+
+                    <form action="{{ route('staff.checkout.process') }}" method="POST" onsubmit="return confirm('Confirm guest checkout?')">
+                        @csrf
+                        <input type="hidden" name="reservation_id" id="co-res-id">
+                        <button type="submit" class="danger">Confirm Check Out</button>
+                    </form>
+                </div>
+            </div>
         </div>
 
         <div id="panel-reservation" class="panel">
@@ -230,14 +265,11 @@
             canvas.getContext('2d').drawImage(video, 0, 0);
             const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
             idPhotoInput.value = dataUrl;
-
             idPreview.src = dataUrl;
             idPreview.style.display = 'block';
             video.style.display = 'none';
-
             captureBtn.style.display = 'none';
             retakeBtn.style.display = 'inline-block';
-
             if (camStream) camStream.getTracks().forEach(t => t.stop());
         });
 
@@ -250,129 +282,124 @@
             startCamBtn.click();
         });
 
-        // ---- Available rooms lookup ----
-        const findRoomsBtn = document.getElementById('findRoomsBtn');
+        // ---- Check-in Logic (Keep existing) ----
         const roomTypeSelect = document.getElementById('room_type_id');
-        const roomResults = document.getElementById('roomResults');
         const roomSelect = document.getElementById('room_id');
         const priceLine = document.getElementById('priceLine');
-        const remainingLine = document.getElementById('remainingLine');
-        const amountPaidInput = document.getElementById('amount_paid');
-        const paymentWaySelect = document.getElementById('payment_way');
-        
+        const amtPaidInp = document.getElementById('amount_paid_checkin');
+        const payWaySelect = document.getElementById('payment_way_checkin');
+        const remLineCheckin = document.getElementById('remainingLineCheckin');
         let roomPrices = {};
         let currentTotal = 0;
 
-        findRoomsBtn.addEventListener('click', async () => {
-            const roomTypeId = roomTypeSelect.value;
-            if (!roomTypeId) {
-                alert('Select a room type first.');
-                return;
-            }
-
-            roomResults.style.display = 'block';
-            roomResults.textContent = 'Searching...';
-            roomResults.classList.remove('none');
-
-            try {
-                const res = await fetch(`{{ route('staff.rooms.available') }}?room_type_id=${roomTypeId}`);
-                const rooms = await res.json();
-
-                roomSelect.innerHTML = '';
-                roomPrices = {};
-
-                if (rooms.length === 0) {
-                    roomResults.textContent = 'No available rooms of this type right now.';
-                    roomResults.classList.add('none');
-                    roomSelect.innerHTML = '<option value="">-- none available --</option>';
-                    priceLine.style.display = 'none';
-                    return;
-                }
-
-                roomResults.textContent = `${rooms.length} room(s) available.`;
-
-                roomSelect.innerHTML = '<option value="">-- select a room --</option>';
-                rooms.forEach(r => {
-                    roomPrices[r.id] = parseFloat(r.price_per_night);
-                    const opt = document.createElement('option');
-                    opt.value = r.id;
-                    opt.textContent = `Room ${r.room_number} — ${r.price_per_night} ETB/night`;
-                    roomSelect.appendChild(opt);
-                });
-            } catch (err) {
-                roomResults.textContent = 'Error fetching rooms.';
-                roomResults.classList.add('none');
-            }
+        document.getElementById('findRoomsBtn').addEventListener('click', async () => {
+            const rtId = roomTypeSelect.value;
+            if(!rtId) return alert('Select type');
+            const res = await fetch(`{{ route('staff.rooms.available') }}?room_type_id=${rtId}`);
+            const rooms = await res.json();
+            roomSelect.innerHTML = '<option value="">-- select --</option>';
+            roomPrices = {};
+            rooms.forEach(r => {
+                roomPrices[r.id] = parseFloat(r.price_per_night);
+                roomSelect.innerHTML += `<option value="${r.id}">Room ${r.room_number} (${r.price_per_night} ETB)</option>`;
+            });
         });
 
-        // ---- Price & Balance Calculation ----
-        function updatePrice() {
-            const roomId = roomSelect.value;
-            const checkIn = document.getElementById('check_in_date').value;
-            const checkOut = document.getElementById('check_out_date').value;
-
-            if (!roomId || !checkIn || !checkOut || !roomPrices[roomId]) {
-                priceLine.style.display = 'none';
-                remainingLine.style.display = 'none';
-                currentTotal = 0;
-                return;
-            }
-
-            const d1 = new Date(checkIn);
-            const d2 = new Date(checkOut);
+        function updateCheckinPrice() {
+            const rid = roomSelect.value;
+            const d1 = new Date(document.getElementById('check_in_date').value);
+            const d2 = new Date(document.getElementById('check_out_date').value);
+            if(!rid || isNaN(d1) || isNaN(d2)) return;
             let nights = Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
-            if (nights < 1) nights = 1;
-
-            currentTotal = nights * roomPrices[roomId];
-            priceLine.innerHTML = `Summary: ${nights} night(s) x ${roomPrices[roomId]} ETB = <strong>${currentTotal.toFixed(2)} ETB total</strong>`;
+            if(nights < 1) nights = 1;
+            currentTotal = nights * roomPrices[rid];
+            priceLine.innerHTML = `Total: ${currentTotal.toFixed(2)} ETB (${nights} nights)`;
             priceLine.style.display = 'block';
-
-            // If "Full Payment" is selected, auto-fill and lock the amount paid input
-            if (paymentWaySelect.value === 'full') {
-                amountPaidInput.value = currentTotal.toFixed(2);
-                amountPaidInput.readOnly = true;
+            if(payWaySelect.value === 'full') {
+                amtPaidInp.value = currentTotal.toFixed(2);
+                amtPaidInp.readOnly = true;
             } else {
-                amountPaidInput.readOnly = false;
+                amtPaidInp.readOnly = false;
             }
-            
-            calculateBalance();
+            calcBal();
         }
-
-        function calculateBalance() {
-            const paid = parseFloat(amountPaidInput.value) || 0;
-            const remaining = currentTotal - paid;
-
-            if (currentTotal <= 0) {
-                remainingLine.style.display = 'none';
-                return;
-            }
-
-            remainingLine.style.display = 'block';
-            if (remaining <= 0) {
-                remainingLine.textContent = "Balance: Fully Paid";
-                remainingLine.className = "remaining-line bal-green";
-            } else {
-                remainingLine.textContent = `Remaining Balance: ${remaining.toFixed(2)} ETB`;
-                remainingLine.className = "remaining-line bal-red";
-            }
+        function calcBal() {
+            const paid = parseFloat(amtPaidInp.value) || 0;
+            const rem = currentTotal - paid;
+            remLineCheckin.style.display = 'block';
+            remLineCheckin.textContent = rem <= 0 ? "Fully Paid" : `Remaining: ${rem.toFixed(2)} ETB`;
+            remLineCheckin.className = rem <= 0 ? "remaining-line bal-green" : "remaining-line bal-red";
         }
+        roomSelect.onchange = updateCheckinPrice;
+        amtPaidInp.oninput = calcBal;
+        payWaySelect.onchange = updateCheckinPrice;
 
-        roomSelect.addEventListener('change', updatePrice);
-        document.getElementById('check_in_date').addEventListener('change', updatePrice);
-        document.getElementById('check_out_date').addEventListener('change', updatePrice);
-        
-        paymentWaySelect.addEventListener('change', function() {
-            if (this.value === 'full') {
-                amountPaidInput.value = currentTotal.toFixed(2);
-                amountPaidInput.readOnly = true;
+        // ---- CHECK OUT LOGIC (NEW) ----
+        const coSearch = document.getElementById('co-search');
+        const coResults = document.getElementById('co-results');
+        const coDetails = document.getElementById('checkout-details');
+
+        coSearch.addEventListener('input', async () => {
+            const q = coSearch.value;
+            if(q.length < 2) { coResults.style.display = 'none'; return; }
+            const res = await fetch(`{{ route('staff.checkout.search') }}?query=${q}`);
+            const data = await res.json();
+            coResults.innerHTML = '';
+            if(data.length > 0) {
+                coResults.style.display = 'block';
+                data.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'search-item';
+                    div.textContent = `${item.guest.fullname} (Room ${item.room.room_number})`;
+                    div.onclick = () => selectGuestForCheckout(item);
+                    coResults.appendChild(div);
+                });
             } else {
-                amountPaidInput.readOnly = false;
+                coResults.style.display = 'none';
             }
-            calculateBalance();
         });
 
-        amountPaidInput.addEventListener('input', calculateBalance);
-    </script>
+        function selectGuestForCheckout(res) {
+            coResults.style.display = 'none';
+            coSearch.value = res.guest.fullname;
+            coDetails.style.display = 'block';
 
+            // Fill details
+            document.getElementById('co-res-id').value = res.id;
+            document.getElementById('co-img').src = res.guest.id_photo || '';
+            document.getElementById('co-name').textContent = res.guest.fullname;
+            document.getElementById('co-phone').textContent = res.guest.phone_no;
+            document.getElementById('co-room').textContent = res.room.room_number;
+            document.getElementById('co-in').textContent = res.check_in_date.split('T')[0];
+            document.getElementById('co-out').textContent = res.check_out_date.split('T')[0];
+
+            // Overstay Logic
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const outDate = new Date(res.check_out_date);
+            const overstayMsg = document.getElementById('co-overstay-msg');
+            
+            if (today > outDate) {
+                const diffTime = Math.abs(today - outDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                overstayMsg.textContent = `ALERT: Overstayed by ${diffDays} day(s)!`;
+                overstayMsg.className = "alert-box alert-danger";
+            } else {
+                overstayMsg.textContent = "Stay duration is within schedule.";
+                overstayMsg.className = "alert-box alert-success";
+            }
+
+            // Payment Logic
+            const payMsg = document.getElementById('co-payment-msg');
+            const rem = parseFloat(res.payment.remaining_amount);
+            if (rem > 0) {
+                payMsg.textContent = `PAYMENT DUE: ${rem.toFixed(2)} ETB must be collected.`;
+                payMsg.className = "alert-box alert-danger";
+            } else {
+                payMsg.textContent = "Payment Status: Fully Paid.";
+                payMsg.className = "alert-box alert-success";
+            }
+        }
+    </script>
 </body>
 </html>

@@ -34,4 +34,7 @@ Route::middleware(['auth'])->prefix('staff')->group(function () {
     Route::get('/dashboard', [StaffController::class, 'dashboard'])->name('staff.dashboard');
     Route::get('/rooms/available', [StaffController::class, 'availableRooms'])->name('staff.rooms.available');
     Route::post('/checkin', [StaffController::class, 'checkinStore'])->name('staff.checkin.store');
-});
+
+Route::get('/checkout/search', [StaffController::class, 'checkoutSearch'])->name('staff.checkout.search');
+Route::post('/checkout/process', [StaffController::class, 'checkoutProcess'])->name('staff.checkout.process');
+    });

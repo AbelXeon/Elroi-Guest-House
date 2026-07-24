@@ -98,4 +98,39 @@ class StaffController extends Controller
         return redirect()->route('staff.dashboard')
             ->with('success', "Checked in {$guest->fullname} — Room {$room->room_number}.");
     }
+
+    public function checkoutSearch(Request $request)
+{
+    $query = $request->get('query');
+    
+    // Find active reservations where guest name matches query
+    $reservations = Reservation::with(['guest', 'room', 'payment'])
+        ->where('status', 'checked_in')
+        ->whereHas('guest', function($q) use ($query) {
+            $q->where('fullname', 'LIKE', "%{$query}%")
+              ->orWhere('phone_no', 'LIKE', "%{$query}%");
+        })
+        ->get();
+
+    return response()->json($reservations);
+}
+
+public function checkoutProcess(Request $request)
+{
+    $request->validate(['reservation_id' => 'required|exists:reservations,id']);
+    
+    $res = Reservation::findOrFail($request->reservation_id);
+    
+    // 1. Mark Reservation as checked out
+    $res->update([
+        'status' => 'checked_out',
+        'actual_check_out_date' => now()
+    ]);
+
+    // 2. Make the room available again
+    Room::where('id', $res->room_id)->update(['status' => 'available']);
+
+    return back()->with('success', 'Guest checked out successfully and room is now available.');
+}
+
 }
