@@ -14,7 +14,6 @@ class Guest extends Model
         'fullname', 
         'phone_no', 
         'id_type', 
-        'id_number', 
         'id_photo', 
         'status'
     ];

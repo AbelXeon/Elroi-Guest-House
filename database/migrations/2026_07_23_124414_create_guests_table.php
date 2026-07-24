@@ -23,8 +23,6 @@ return new class extends Migration
             'passport',
             'kebele_id'
         ]);
-
-        $table->string('id_number');
         $table->longText('id_photo')->nullable();
 
         $table->enum('status',[

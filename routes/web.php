@@ -27,3 +27,11 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::put('/rooms/{room}', [RoomController::class, 'update'])->name('rooms.update');
     Route::delete('/rooms/{room}', [RoomController::class, 'destroy'])->name('rooms.destroy');
 });
+
+
+
+Route::middleware(['auth'])->prefix('staff')->group(function () {
+    Route::get('/dashboard', [StaffController::class, 'dashboard'])->name('staff.dashboard');
+    Route::get('/rooms/available', [StaffController::class, 'availableRooms'])->name('staff.rooms.available');
+    Route::post('/checkin', [StaffController::class, 'checkinStore'])->name('staff.checkin.store');
+});
