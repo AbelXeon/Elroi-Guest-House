@@ -16,14 +16,14 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 
-
 Route::middleware(['auth'])->prefix('admin')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+
+    Route::post('/staff', [AdminController::class, 'staffStore'])->name('staff.store');
+    Route::delete('/staff/{staff}', [AdminController::class, 'staffDestroy'])->name('staff.destroy');
+
     Route::get('/rooms', [RoomController::class, 'index'])->name('rooms.index');
     Route::post('/rooms/batch', [RoomController::class, 'batchStore'])->name('rooms.batchStore');
     Route::put('/rooms/{room}', [RoomController::class, 'update'])->name('rooms.update');
     Route::delete('/rooms/{room}', [RoomController::class, 'destroy'])->name('rooms.destroy');
-});
-
-Route::middleware(['auth'])->prefix('admin')->group(function () {
-    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
 });
