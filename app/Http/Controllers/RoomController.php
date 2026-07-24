@@ -17,7 +17,6 @@ class RoomController extends Controller
         return view('admin.rooms', compact('rooms', 'roomTypes'));
     }
 
-    // Batch generator: start/end room number + type + price
     public function batchStore(Request $request)
     {
         $validated = $request->validate([
@@ -56,10 +55,43 @@ class RoomController extends Controller
             'status'      => "$created rooms created" . (count($skipped) ? ', skipped existing: ' . implode(',', $skipped) : ''),
         ]);
 
-        return back()->with('success', "$created rooms created." . (count($skipped) ? ' Already existed: ' . implode(', ', $skipped) : ''));
+        return redirect()->route('admin.dashboard', [
+            'panel'       => 'rooms',
+            'rooms_page'  => $request->input('return_page', 1),
+            'room_q'      => $request->input('return_q'),
+            'room_status' => $request->input('return_status'),
+        ])->with('success', "$created rooms created." . (count($skipped) ? ' Already existed: ' . implode(', ', $skipped) : ''));
     }
 
-    // Edit a single room (type / price / status)
+    // Bulk price update: every room, or every room of one type
+    public function bulkPriceUpdate(Request $request)
+    {
+        $validated = $request->validate([
+            'scope'           => 'required|in:all,type',
+            'room_type_id'    => 'nullable|required_if:scope,type|exists:room_types,id',
+            'price_per_night' => 'required|numeric|min:0',
+        ]);
+
+        $query = Room::query();
+        if ($validated['scope'] === 'type') {
+            $query->where('room_type_id', $validated['room_type_id']);
+        }
+        $count = $query->update(['price_per_night' => $validated['price_per_night']]);
+
+        AdminAction::create([
+            'user_id'     => auth()->id(),
+            'action_type' => 'edited_rooms',
+            'status'      => "Bulk price update: {$count} room(s) set to {$validated['price_per_night']}",
+        ]);
+
+        return redirect()->route('admin.dashboard', [
+            'panel'       => 'rooms',
+            'rooms_page'  => $request->input('return_page', 1),
+            'room_q'      => $request->input('return_q'),
+            'room_status' => $request->input('return_status'),
+        ])->with('success', "{$count} room(s) updated.");
+    }
+
     public function update(Request $request, Room $room)
     {
         $validated = $request->validate([
@@ -76,12 +108,23 @@ class RoomController extends Controller
             'status'      => "Room {$room->room_number} updated",
         ]);
 
-        return back()->with('success', 'Room updated.');
+        return redirect()->route('admin.dashboard', [
+            'panel'       => 'rooms',
+            'rooms_page'  => $request->input('return_page', 1),
+            'room_q'      => $request->input('return_q'),
+            'room_status' => $request->input('return_status'),
+        ])->with('success', 'Room updated.');
     }
 
-    public function destroy(Room $room)
+    public function destroy(Request $request, Room $room)
     {
         $room->delete();
-        return back()->with('success', 'Room deleted.');
+
+        return redirect()->route('admin.dashboard', [
+            'panel'       => 'rooms',
+            'rooms_page'  => $request->input('return_page', 1),
+            'room_q'      => $request->input('return_q'),
+            'room_status' => $request->input('return_status'),
+        ])->with('success', 'Room deleted.');
     }
 }

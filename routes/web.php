@@ -24,10 +24,10 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 
     Route::get('/rooms', [RoomController::class, 'index'])->name('rooms.index');
     Route::post('/rooms/batch', [RoomController::class, 'batchStore'])->name('rooms.batchStore');
+    Route::post('/rooms/bulk-price', [RoomController::class, 'bulkPriceUpdate'])->name('rooms.bulkPrice');
     Route::put('/rooms/{room}', [RoomController::class, 'update'])->name('rooms.update');
     Route::delete('/rooms/{room}', [RoomController::class, 'destroy'])->name('rooms.destroy');
 });
-
 
 
 Route::middleware(['auth'])->prefix('staff')->group(function () {
@@ -35,13 +35,10 @@ Route::middleware(['auth'])->prefix('staff')->group(function () {
     Route::get('/rooms/available', [StaffController::class, 'availableRooms'])->name('staff.rooms.available');
     Route::post('/checkin', [StaffController::class, 'checkinStore'])->name('staff.checkin.store');
 
-Route::get('/checkout/search', [StaffController::class, 'checkoutSearch'])->name('staff.checkout.search');
-Route::post('/checkout/process', [StaffController::class, 'checkoutProcess'])->name('staff.checkout.process');
-   
-Route::post('/reservation/store', [StaffController::class, 'reservationStore'])->name('staff.reservation.store');
-Route::get('/reservation/list/search', [StaffController::class, 'reservationSearch'])->name('staff.reservation.search');
-Route::post('/reservation/complete', [StaffController::class, 'reservationComplete'])->name('staff.reservation.complete');
+    Route::get('/checkout/search', [StaffController::class, 'checkoutSearch'])->name('staff.checkout.search');
+    Route::post('/checkout/process', [StaffController::class, 'checkoutProcess'])->name('staff.checkout.process');
 
-
-
+    Route::post('/reservation/store', [StaffController::class, 'reservationStore'])->name('staff.reservation.store');
+    Route::get('/reservation/list/search', [StaffController::class, 'reservationSearch'])->name('staff.reservation.search');
+    Route::post('/reservation/complete', [StaffController::class, 'reservationComplete'])->name('staff.reservation.complete');
 });
