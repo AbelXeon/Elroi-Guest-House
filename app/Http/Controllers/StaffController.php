@@ -133,4 +133,89 @@ public function checkoutProcess(Request $request)
     return back()->with('success', 'Guest checked out successfully and room is now available.');
 }
 
+public function reservationStore(Request $request)
+{
+    $validated = $request->validate([
+        'fullname' => 'required|string',
+        'phone_no' => 'required|string',
+        'room_id'  => 'required|exists:rooms,id',
+        'check_in_date' => 'required|date',
+        'check_out_date'=> 'required|date|after:check_in_date',
+        'amount_paid'   => 'required|numeric',
+    ]);
+
+    $room = Room::findOrFail($validated['room_id']);
+
+    // Create Guest
+    $guest = Guest::create([
+        'fullname' => $validated['fullname'],
+        'phone_no' => $validated['phone_no'],
+        'id_type'  => 'national_id', // Default, will update on arrival
+        'status'   => 'active'
+    ]);
+
+    $checkIn  = \Carbon\Carbon::parse($validated['check_in_date']);
+    $checkOut = \Carbon\Carbon::parse($validated['check_out_date']);
+    $nights   = max(1, $checkIn->diffInDays($checkOut));
+    $total    = $nights * $room->price_per_night;
+
+    // Create Reservation as 'checked_in' but we will track it by room status
+    // Or you can add a 'reserved' status to your reservation enum if you wish. 
+    // Using 'checked_in' for now to keep your DB schema safe.
+    $res = Reservation::create([
+        'guest_id' => $guest->id,
+        'user_id'  => auth()->id(),
+        'room_id'  => $room->id,
+        'booked_date' => now(),
+        'check_in_date' => $checkIn,
+        'check_out_date' => $checkOut,
+        'total_price' => $total,
+        'status' => 'checked_in' 
+    ]);
+
+    Payment::create([
+        'reservation_id' => $res->id,
+        'payment_type' => 'cash',
+        'payment_way' => 'partial',
+        'total_amount' => $total,
+        'amount_paid' => $validated['amount_paid'],
+        'remaining_amount' => $total - $validated['amount_paid'],
+        'status' => 'remaining'
+    ]);
+
+    $room->update(['status' => 'reserved']);
+
+    return back()->with('success', 'Room reserved successfully.');
+}
+
+public function reservationSearch(Request $request)
+{
+    // Search for guests in rooms that are currently 'reserved'
+    $res = Reservation::with(['guest', 'room', 'payment'])
+        ->whereHas('room', function($q){ $q->where('status', 'reserved'); })
+        ->whereHas('guest', function($q) use ($request){
+            $q->where('fullname', 'LIKE', "%{$request->query('query')}%");
+        })->get();
+    return response()->json($res);
+}
+
+public function reservationComplete(Request $request)
+{
+    $request->validate([
+        'reservation_id' => 'required',
+        'id_type' => 'required',
+        'id_photo' => 'required'
+    ]);
+
+    $res = Reservation::findOrFail($request->reservation_id);
+    $res->guest->update([
+        'id_type' => $request->id_type,
+        'id_photo' => $request->id_photo
+    ]);
+
+    $res->room->update(['status' => 'booked']);
+
+    return back()->with('success', 'Reservation converted to full Check-in!');
+}
+
 }

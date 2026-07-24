@@ -37,4 +37,11 @@ Route::middleware(['auth'])->prefix('staff')->group(function () {
 
 Route::get('/checkout/search', [StaffController::class, 'checkoutSearch'])->name('staff.checkout.search');
 Route::post('/checkout/process', [StaffController::class, 'checkoutProcess'])->name('staff.checkout.process');
-    });
+   
+Route::post('/reservation/store', [StaffController::class, 'reservationStore'])->name('staff.reservation.store');
+Route::get('/reservation/list/search', [StaffController::class, 'reservationSearch'])->name('staff.reservation.search');
+Route::post('/reservation/complete', [StaffController::class, 'reservationComplete'])->name('staff.reservation.complete');
+
+
+
+});
