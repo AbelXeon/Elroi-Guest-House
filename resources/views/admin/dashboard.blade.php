@@ -740,7 +740,7 @@
                     <div class="item-card">
                         <div class="staff-avatar">{{ strtoupper(substr($member->fullname, 0, 1)) }}</div>
                         <div class="staff-name">{{ $member->fullname }}</div>
-                        <div class="staff-username">@{{ $member->username }}</div>
+                        <div class="staff-username">{{ '@' . $member->username }}</div>
                         <form action="{{ route('staff.destroy', $member->id) }}" method="POST">
                             @csrf
                             @method('DELETE')
