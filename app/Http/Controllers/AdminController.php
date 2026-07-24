@@ -3,33 +3,28 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Room;
+use App\Models\RoomType;
+use App\Models\AdminAction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+
 
 class AdminController extends Controller
 {
-     public function dashboard()
+   public function dashboard()
     {
-        // Get all staff members to show in a list
-        $staffMembers = User::where('role', 'staff')->get();
-        return view('admin.dashboard', compact('staffMembers'));
-    }
+        $rooms = Room::with('roomType')->orderBy('room_number')->get();
+        $roomTypes = RoomType::all();
+        $staffCount = User::where('role', 'staff')->count();
+        $roomStats = [
+            'total'       => $rooms->count(),
+            'available'   => $rooms->where('status', 'available')->count(),
+            'booked'      => $rooms->where('status', 'booked')->count(),
+            'maintenance' => $rooms->where('status', 'maintenance')->count(),
+        ];
 
-    public function createStaff(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6',
-        ]);
-
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => 'staff',
-        ]);
-
-        return back()->with('success', 'Staff member created successfully!');
+        return view('admin.dashboard', compact('rooms', 'roomTypes', 'staffCount', 'roomStats'));
     }
 }

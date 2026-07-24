@@ -2,18 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Guest;
-use App\Models\Room;
 use App\Models\Reservation;
+use App\Models\Room;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth; 
+
 
 class StaffController extends Controller
 {
-    public function dashboard()
-    {
-        $totalGuests = Guest::count();
-        $availableRooms = Room::where('status', 'available')->count();
-        $activeReservations = Reservation::where('status', 'checked_in')->get();
-
-        return view('staff.dashboard', compact('totalGuests', 'availableRooms', 'activeReservations'));
+ public function index() {
+        // Security check: ensure only staff (or admin) can enter
+        if (Auth::user()->role !== 'staff' && Auth::user()->role !== 'admin') {
+            return redirect('/login');
+        }
+        return view('staff.dashboard');
     }
 }

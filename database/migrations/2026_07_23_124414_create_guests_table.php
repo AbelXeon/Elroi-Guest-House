@@ -13,15 +13,27 @@ return new class extends Migration
     {
         Schema::create('guests', function (Blueprint $table) {
             $table->id();
-    $table->string('full_name');
-    $table->string('id_type'); 
-    $table->string('id_number');
-    $table->enum('status', ['active', 'blacklisted'])->default('active');
-    $table->string('phone_no');
-    $table->longText('id_photo')->nullable(); 
-    $table->text('address')->nullable();
-    $table->timestamps();
-        });
+
+        $table->string('fullname');
+        $table->string('phone_no');
+
+        $table->enum('id_type',[
+            'driving_license',
+            'national_id',
+            'passport',
+            'kebele_id'
+        ]);
+
+        $table->string('id_number');
+        $table->longText('id_photo')->nullable();
+
+        $table->enum('status',[
+            'active',
+            'blacklisted'
+        ])->default('active');
+
+        $table->timestamps();
+    });
     }
 
     /**

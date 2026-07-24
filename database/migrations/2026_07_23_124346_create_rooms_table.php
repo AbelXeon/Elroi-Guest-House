@@ -12,13 +12,24 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('rooms', function (Blueprint $table) {
-            $table->id();
-    $table->string('room_number')->unique();
-    $table->string('room_type'); 
-    $table->decimal('price_per_night', 10, 2);
-    $table->enum('status', ['available', 'occupied', 'cleaning', 'maintenance'])->default('available');
-    $table->timestamps();
-        });
+              $table->id();
+        $table->string('room_number')->unique();
+        $table->foreignId('room_type_id')
+              ->constrained()
+              ->cascadeOnDelete();
+$table->unsignedInteger('floor_number')->nullable();
+        $table->decimal('price_per_night',10,2);
+
+        $table->enum('status',[
+            'available',
+            'booked',
+            'reserved',
+            'maintenance',
+            'cleaning'
+        ])->default('available');
+
+        $table->timestamps();
+    });
     }
 
     /**

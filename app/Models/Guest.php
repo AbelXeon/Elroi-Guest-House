@@ -9,7 +9,17 @@ class Guest extends Model
 {
     /** @use HasFactory<\Database\Factories\GuestsFactory> */
     use HasFactory;
-    protected $fillable = [
-    'full_name', 'id_type', 'id_number', 'status', 'phone_no', 'id_photo', 'address'
-];
+    
+     protected $fillable = [
+        'fullname', 
+        'phone_no', 
+        'id_type', 
+        'id_number', 
+        'id_photo', 
+        'status'
+    ];
+
+    public function reservations() {
+        return $this->hasMany(Reservation::class);
+    }
 }
