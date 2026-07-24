@@ -51,7 +51,12 @@
 
         .room-result { padding:10px; border:1px solid #ddd; border-radius:5px; margin-top:8px; background:#f8f9fb; }
         .room-result.none { color:#c0392b; }
-        .price-line { font-weight:bold; color:#2c3e50; margin-top:10px; }
+        
+        /* Payment Visuals */
+        .price-line { font-weight:bold; color:#2c3e50; margin-top:10px; padding: 10px; background: #eef2f7; border-radius: 5px; }
+        .remaining-line { font-weight:bold; margin-top:5px; padding: 10px; border-radius: 5px; }
+        .bal-red { background: #fdf2f2; color: #c0392b; }
+        .bal-green { background: #f2fdf5; color: #27ae60; }
     </style>
 </head>
 <body>
@@ -162,7 +167,9 @@
                 </select>
 
                 <label>Amount Paid</label>
-                <input type="number" step="0.01" name="amount_paid" id="amount_paid" required>
+                <input type="number" step="0.01" name="amount_paid" id="amount_paid" placeholder="0.00" required>
+
+                <div class="remaining-line" id="remainingLine" style="display:none;"></div>
 
                 <button type="submit">Check In</button>
             </form>
@@ -249,7 +256,12 @@
         const roomResults = document.getElementById('roomResults');
         const roomSelect = document.getElementById('room_id');
         const priceLine = document.getElementById('priceLine');
+        const remainingLine = document.getElementById('remainingLine');
+        const amountPaidInput = document.getElementById('amount_paid');
+        const paymentWaySelect = document.getElementById('payment_way');
+        
         let roomPrices = {};
+        let currentTotal = 0;
 
         findRoomsBtn.addEventListener('click', async () => {
             const roomTypeId = roomTypeSelect.value;
@@ -293,7 +305,7 @@
             }
         });
 
-        // ---- Price calculation ----
+        // ---- Price & Balance Calculation ----
         function updatePrice() {
             const roomId = roomSelect.value;
             const checkIn = document.getElementById('check_in_date').value;
@@ -301,6 +313,8 @@
 
             if (!roomId || !checkIn || !checkOut || !roomPrices[roomId]) {
                 priceLine.style.display = 'none';
+                remainingLine.style.display = 'none';
+                currentTotal = 0;
                 return;
             }
 
@@ -309,22 +323,55 @@
             let nights = Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
             if (nights < 1) nights = 1;
 
-            const total = nights * roomPrices[roomId];
-            priceLine.textContent = `${nights} night(s) x ${roomPrices[roomId]} ETB = ${total.toFixed(2)} ETB total`;
+            currentTotal = nights * roomPrices[roomId];
+            priceLine.innerHTML = `Summary: ${nights} night(s) x ${roomPrices[roomId]} ETB = <strong>${currentTotal.toFixed(2)} ETB total</strong>`;
             priceLine.style.display = 'block';
 
-            if (document.getElementById('payment_way').value === 'full') {
-                document.getElementById('amount_paid').value = total.toFixed(2);
+            // If "Full Payment" is selected, auto-fill and lock the amount paid input
+            if (paymentWaySelect.value === 'full') {
+                amountPaidInput.value = currentTotal.toFixed(2);
+                amountPaidInput.readOnly = true;
+            } else {
+                amountPaidInput.readOnly = false;
+            }
+            
+            calculateBalance();
+        }
+
+        function calculateBalance() {
+            const paid = parseFloat(amountPaidInput.value) || 0;
+            const remaining = currentTotal - paid;
+
+            if (currentTotal <= 0) {
+                remainingLine.style.display = 'none';
+                return;
+            }
+
+            remainingLine.style.display = 'block';
+            if (remaining <= 0) {
+                remainingLine.textContent = "Balance: Fully Paid";
+                remainingLine.className = "remaining-line bal-green";
+            } else {
+                remainingLine.textContent = `Remaining Balance: ${remaining.toFixed(2)} ETB`;
+                remainingLine.className = "remaining-line bal-red";
             }
         }
 
         roomSelect.addEventListener('change', updatePrice);
         document.getElementById('check_in_date').addEventListener('change', updatePrice);
         document.getElementById('check_out_date').addEventListener('change', updatePrice);
-
-        document.getElementById('payment_way').addEventListener('change', function () {
-            if (this.value === 'full') updatePrice();
+        
+        paymentWaySelect.addEventListener('change', function() {
+            if (this.value === 'full') {
+                amountPaidInput.value = currentTotal.toFixed(2);
+                amountPaidInput.readOnly = true;
+            } else {
+                amountPaidInput.readOnly = false;
+            }
+            calculateBalance();
         });
+
+        amountPaidInput.addEventListener('input', calculateBalance);
     </script>
 
 </body>
