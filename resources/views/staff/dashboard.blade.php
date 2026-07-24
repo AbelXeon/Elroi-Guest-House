@@ -170,7 +170,7 @@
             <div class="card">
                 <label>Search Guest Name or Room</label>
                 <div class="search-container">
-                    <input type="text" id="co-search" placeholder="Search..." oninput="searchCheckout()">
+                    <input type="text" id="co-search" placeholder="Search name or room..." oninput="searchCheckout()">
                     <div id="co-results" class="search-results"></div>
                 </div>
 
@@ -236,9 +236,9 @@
         <div id="panel-reservationlist" class="panel">
             <h1>Reservation Arrivals</h1>
             <div class="card">
-                <label>Search Reserved Guest</label>
+                <label>Search Reserved Guest (Name or Phone)</label>
                 <div class="search-container">
-                    <input type="text" id="rl-search" placeholder="Name..." oninput="searchReservation()">
+                    <input type="text" id="rl-search" placeholder="Search Name or Phone..." oninput="searchReservation()">
                     <div id="rl-results" class="search-results"></div>
                 </div>
 
@@ -420,29 +420,36 @@
             }
         }
 
-        // RESERVATION SEARCH
+        // RESERVATION SEARCH (Updated to show Phone in list)
         async function searchReservation() {
             const q = document.getElementById('rl-search').value;
-            if(q.length < 2) return;
+            if(q.length < 2) return document.getElementById('rl-results').style.display = 'none';
+            
             const res = await fetch(`{{ route('staff.reservation.search') }}?query=${q}`);
             const data = await res.json();
             const results = document.getElementById('rl-results');
             results.innerHTML = '';
-            results.style.display = 'block';
-            data.forEach(r => {
-                const div = document.createElement('div');
-                div.className = 'search-item';
-                div.textContent = `${r.guest.fullname} - Room ${r.room.room_number}`;
-                div.onclick = () => {
-                    results.style.display = 'none';
-                    document.getElementById('rl-box').style.display = 'block';
-                    document.getElementById('rl-res-id').value = r.id;
-                    document.getElementById('rl-title').textContent = "Arriving: " + r.guest.fullname;
-                    document.getElementById('rl-room').textContent = r.room.room_number;
-                    document.getElementById('rl-deposit').textContent = r.payment.amount_paid;
-                };
-                results.appendChild(div);
-            });
+            
+            if(data.length > 0) {
+                results.style.display = 'block';
+                data.forEach(r => {
+                    const div = document.createElement('div');
+                    div.className = 'search-item';
+                    // Added phone number to the display string
+                    div.textContent = `${r.guest.fullname} (${r.guest.phone_no}) - Room ${r.room.room_number}`;
+                    div.onclick = () => {
+                        results.style.display = 'none';
+                        document.getElementById('rl-box').style.display = 'block';
+                        document.getElementById('rl-res-id').value = r.id;
+                        document.getElementById('rl-title').textContent = "Arriving: " + r.guest.fullname;
+                        document.getElementById('rl-room').textContent = r.room.room_number;
+                        document.getElementById('rl-deposit').textContent = r.payment.amount_paid;
+                    };
+                    results.appendChild(div);
+                });
+            } else {
+                results.style.display = 'none';
+            }
         }
     </script>
 </body>

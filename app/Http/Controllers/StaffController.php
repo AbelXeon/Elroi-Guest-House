@@ -190,14 +190,20 @@ public function reservationStore(Request $request)
 
 public function reservationSearch(Request $request)
 {
-    // Search for guests in rooms that are currently 'reserved'
+    $query = $request->query('query');
     $res = Reservation::with(['guest', 'room', 'payment'])
-        ->whereHas('room', function($q){ $q->where('status', 'reserved'); })
-        ->whereHas('guest', function($q) use ($request){
-            $q->where('fullname', 'LIKE', "%{$request->query('query')}%");
+        ->whereHas('room', function($q){ 
+            $q->where('status', 'reserved'); 
+        })
+        ->whereHas('guest', function($q) use ($query){
+            $q->where('fullname', 'LIKE', "%{$query}%")
+              ->orWhere('phone_no', 'LIKE', "%{$query}%"); // This line enables phone search
         })->get();
+        
     return response()->json($res);
 }
+
+   
 
 public function reservationComplete(Request $request)
 {
@@ -217,5 +223,7 @@ public function reservationComplete(Request $request)
 
     return back()->with('success', 'Reservation converted to full Check-in!');
 }
+
+
 
 }
