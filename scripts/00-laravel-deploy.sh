@@ -8,4 +8,4 @@ php artisan route:cache
 php artisan view:cache
 
 echo "Running migrations..."
-php artisan migrate --force
+php artisan migrate --force --seed
