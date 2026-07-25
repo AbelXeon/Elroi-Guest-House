@@ -6,7 +6,7 @@ use App\Models\Reservation;
 use App\Models\Room;
 use App\Models\RoomType;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth; 
+use Illuminate\Support\Facades\Auth;
 use App\Models\Guest;
 use App\Models\Payment;
 use Carbon\Carbon;
@@ -14,10 +14,33 @@ use Carbon\Carbon;
 
 class StaffController extends Controller
 {
- public function dashboard()
+    public function dashboard()
     {
         $roomTypes = RoomType::all();
-        return view('staff.dashboard', compact('roomTypes'));
+
+        // Guests currently staying (for the Check Out default list)
+        $activeStays = Reservation::with(['guest', 'room', 'payment'])
+            ->where('status', 'checked_in')
+            ->whereNull('actual_check_out_date')
+            ->whereHas('room', fn($q) => $q->where('status', 'booked'))
+            ->orderByDesc('check_in_date')
+            ->get();
+
+        // Phone reservations waiting to arrive (room already marked 'reserved')
+        $pendingArrivals = Reservation::with(['guest', 'room', 'payment'])
+            ->whereHas('room', fn($q) => $q->where('status', 'reserved'))
+            ->orderByDesc('booked_date')
+            ->get();
+
+        // Simple stat counts for the dashboard overview
+        $dashStats = [
+            'active_guests'    => $activeStays->count(),
+            'available_rooms'  => Room::where('status', 'available')->count(),
+            'pending_arrivals' => $pendingArrivals->count(),
+            'checked_in_today' => Reservation::whereDate('check_in_date', today())->count(),
+        ];
+
+        return view('staff.dashboard', compact('roomTypes', 'activeStays', 'pendingArrivals', 'dashStats'));
     }
 
     // AJAX: returns available rooms for a given room type
@@ -100,130 +123,118 @@ class StaffController extends Controller
     }
 
     public function checkoutSearch(Request $request)
-{
-    $query = $request->get('query');
-    
-    // Find active reservations where guest name matches query
-    $reservations = Reservation::with(['guest', 'room', 'payment'])
-        ->where('status', 'checked_in')
-        ->whereHas('guest', function($q) use ($query) {
-            $q->where('fullname', 'LIKE', "%{$query}%")
-              ->orWhere('phone_no', 'LIKE', "%{$query}%");
-        })
-        ->get();
+    {
+        $query = $request->get('query');
 
-    return response()->json($reservations);
-}
+        $reservations = Reservation::with(['guest', 'room', 'payment'])
+            ->where('status', 'checked_in')
+            ->whereHas('guest', function($q) use ($query) {
+                $q->where('fullname', 'LIKE', "%{$query}%")
+                  ->orWhere('phone_no', 'LIKE', "%{$query}%");
+            })
+            ->get();
 
-public function checkoutProcess(Request $request)
-{
-    $request->validate(['reservation_id' => 'required|exists:reservations,id']);
-    
-    $res = Reservation::findOrFail($request->reservation_id);
-    
-    // 1. Mark Reservation as checked out
-    $res->update([
-        'status' => 'checked_out',
-        'actual_check_out_date' => now()
-    ]);
+        return response()->json($reservations);
+    }
 
-    // 2. Make the room available again
-    Room::where('id', $res->room_id)->update(['status' => 'available']);
+    public function checkoutProcess(Request $request)
+    {
+        $request->validate(['reservation_id' => 'required|exists:reservations,id']);
 
-    return back()->with('success', 'Guest checked out successfully and room is now available.');
-}
+        $res = Reservation::findOrFail($request->reservation_id);
 
-public function reservationStore(Request $request)
-{
-    $validated = $request->validate([
-        'fullname' => 'required|string',
-        'phone_no' => 'required|string',
-        'room_id'  => 'required|exists:rooms,id',
-        'check_in_date' => 'required|date',
-        'check_out_date'=> 'required|date|after:check_in_date',
-        'amount_paid'   => 'required|numeric',
-    ]);
+        $res->update([
+            'status' => 'checked_out',
+            'actual_check_out_date' => now()
+        ]);
 
-    $room = Room::findOrFail($validated['room_id']);
+        Room::where('id', $res->room_id)->update(['status' => 'available']);
 
-    // Create Guest
-    $guest = Guest::create([
-        'fullname' => $validated['fullname'],
-        'phone_no' => $validated['phone_no'],
-        'id_type'  => 'national_id', // Default, will update on arrival
-        'status'   => 'active'
-    ]);
+        return back()->with('success', 'Guest checked out successfully and room is now available.');
+    }
 
-    $checkIn  = \Carbon\Carbon::parse($validated['check_in_date']);
-    $checkOut = \Carbon\Carbon::parse($validated['check_out_date']);
-    $nights   = max(1, $checkIn->diffInDays($checkOut));
-    $total    = $nights * $room->price_per_night;
+    public function reservationStore(Request $request)
+    {
+        $validated = $request->validate([
+            'fullname' => 'required|string',
+            'phone_no' => 'required|string',
+            'room_id'  => 'required|exists:rooms,id',
+            'check_in_date' => 'required|date',
+            'check_out_date'=> 'required|date|after:check_in_date',
+            'amount_paid'   => 'required|numeric',
+        ]);
 
-    // Create Reservation as 'checked_in' but we will track it by room status
-    // Or you can add a 'reserved' status to your reservation enum if you wish. 
-    // Using 'checked_in' for now to keep your DB schema safe.
-    $res = Reservation::create([
-        'guest_id' => $guest->id,
-        'user_id'  => auth()->id(),
-        'room_id'  => $room->id,
-        'booked_date' => now(),
-        'check_in_date' => $checkIn,
-        'check_out_date' => $checkOut,
-        'total_price' => $total,
-        'status' => 'checked_in' 
-    ]);
+        $room = Room::findOrFail($validated['room_id']);
 
-    Payment::create([
-        'reservation_id' => $res->id,
-        'payment_type' => 'cash',
-        'payment_way' => 'partial',
-        'total_amount' => $total,
-        'amount_paid' => $validated['amount_paid'],
-        'remaining_amount' => $total - $validated['amount_paid'],
-        'status' => 'remaining'
-    ]);
+        $guest = Guest::create([
+            'fullname' => $validated['fullname'],
+            'phone_no' => $validated['phone_no'],
+            'id_type'  => 'national_id',
+            'status'   => 'active'
+        ]);
 
-    $room->update(['status' => 'reserved']);
+        $checkIn  = Carbon::parse($validated['check_in_date']);
+        $checkOut = Carbon::parse($validated['check_out_date']);
+        $nights   = max(1, $checkIn->diffInDays($checkOut));
+        $total    = $nights * $room->price_per_night;
 
-    return back()->with('success', 'Room reserved successfully.');
-}
+        $res = Reservation::create([
+            'guest_id' => $guest->id,
+            'user_id'  => auth()->id(),
+            'room_id'  => $room->id,
+            'booked_date' => now(),
+            'check_in_date' => $checkIn,
+            'check_out_date' => $checkOut,
+            'total_price' => $total,
+            'status' => 'checked_in'
+        ]);
 
-public function reservationSearch(Request $request)
-{
-    $query = $request->query('query');
-    $res = Reservation::with(['guest', 'room', 'payment'])
-        ->whereHas('room', function($q){ 
-            $q->where('status', 'reserved'); 
-        })
-        ->whereHas('guest', function($q) use ($query){
-            $q->where('fullname', 'LIKE', "%{$query}%")
-              ->orWhere('phone_no', 'LIKE', "%{$query}%"); // This line enables phone search
-        })->get();
-        
-    return response()->json($res);
-}
+        Payment::create([
+            'reservation_id' => $res->id,
+            'payment_type' => 'cash',
+            'payment_way' => 'partial',
+            'total_amount' => $total,
+            'amount_paid' => $validated['amount_paid'],
+            'remaining_amount' => $total - $validated['amount_paid'],
+            'status' => 'remaining'
+        ]);
 
-   
+        $room->update(['status' => 'reserved']);
 
-public function reservationComplete(Request $request)
-{
-    $request->validate([
-        'reservation_id' => 'required',
-        'id_type' => 'required',
-        'id_photo' => 'required'
-    ]);
+        return back()->with('success', 'Room reserved successfully.');
+    }
 
-    $res = Reservation::findOrFail($request->reservation_id);
-    $res->guest->update([
-        'id_type' => $request->id_type,
-        'id_photo' => $request->id_photo
-    ]);
+    public function reservationSearch(Request $request)
+    {
+        $query = $request->query('query');
+        $res = Reservation::with(['guest', 'room', 'payment'])
+            ->whereHas('room', function($q){
+                $q->where('status', 'reserved');
+            })
+            ->whereHas('guest', function($q) use ($query){
+                $q->where('fullname', 'LIKE', "%{$query}%")
+                  ->orWhere('phone_no', 'LIKE', "%{$query}%");
+            })->get();
 
-    $res->room->update(['status' => 'booked']);
+        return response()->json($res);
+    }
 
-    return back()->with('success', 'Reservation converted to full Check-in!');
-}
+    public function reservationComplete(Request $request)
+    {
+        $request->validate([
+            'reservation_id' => 'required',
+            'id_type' => 'required',
+            'id_photo' => 'required'
+        ]);
 
+        $res = Reservation::findOrFail($request->reservation_id);
+        $res->guest->update([
+            'id_type' => $request->id_type,
+            'id_photo' => $request->id_photo
+        ]);
 
+        $res->room->update(['status' => 'booked']);
 
+        return back()->with('success', 'Reservation converted to full Check-in!');
+    }
 }

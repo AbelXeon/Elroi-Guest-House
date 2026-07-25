@@ -1,183 +1,390 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>Staff Dashboard - Elroi Guest House</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Staff Dashboard — Elroi Guest House</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family:Arial, Helvetica, sans-serif; }
-        body { background:#f4f6f9; color:#333; display:flex; height:100vh; overflow:hidden; }
-
-        /* Sidebar */
-        .sidebar {
-            width:220px; background:#2c3e50; color:white; flex-shrink:0;
-            padding:20px 0; height:100vh; display:flex; flex-direction:column; overflow-y:auto;
+        :root{
+            --ink:#1c2b29; --panel:#20342f; --accent:#3f6b52; --accent-light:#57876a;
+            --accent-soft:#e7efe9; --bg:#f6f5f2; --card-bg:#ffffff; --border:#e0ded7;
+            --text:#26312e; --muted:#6b756f; --error:#b3413a; --error-bg:#fbeceb;
+            --warn:#c98a2c; --warn-bg:#fdf1de; --shadow:0 2px 12px rgba(28,43,41,0.06);
         }
-        .sidebar h2 { padding:0 20px 20px; font-size:18px; border-bottom:1px solid #34495e; margin-bottom:10px; }
-        .sidebar a { display:block; padding:12px 20px; color:#bdc3c7; text-decoration:none; cursor:pointer; }
-        .sidebar a.active, .sidebar a:hover { background:#34495e; color:white; }
+        *{ margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
+        html,body{ height:100%; }
+        body{ background:var(--bg); color:var(--text); display:flex; height:100vh; overflow:hidden; }
+        h1,h2,h3{ font-family:'Fraunces', serif; font-weight:500; color:var(--ink); }
 
-        /* Main Area */
-        .main { flex:1; padding:30px; height:100vh; overflow-y:auto; }
-        h1 { margin-bottom:20px; color:#2c3e50; }
-        h3 { margin:15px 0 10px; color:#34495e; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-        
-        .panel { display:none; }
-        .panel.active { display:block; }
+        /* ===== Sidebar ===== */
+        .sidebar{ width:230px; flex-shrink:0; background:linear-gradient(160deg, var(--ink) 0%, var(--panel) 100%);
+            color:#f4f2ec; display:flex; flex-direction:column; padding:26px 0; height:100vh; overflow-y:auto; }
+        .brand{ display:flex; align-items:center; gap:10px; padding:0 22px 22px;
+            border-bottom:1px solid rgba(244,242,236,0.1); margin-bottom:14px; }
+        .brand span{ font-family:'Fraunces', serif; font-weight:600; font-size:15px; }
+        .nav-link{ display:flex; align-items:center; gap:11px; padding:11px 22px; color:#c7cec8;
+            text-decoration:none; cursor:pointer; font-size:13.5px; border-left:3px solid transparent;
+            transition:background .15s, color .15s; }
+        .nav-link svg{ flex-shrink:0; opacity:.85; }
+        .nav-link.active, .nav-link:hover{ background:rgba(244,242,236,0.06); color:#fff; border-left-color:var(--accent-light); }
+        .sidebar-footer{ margin-top:auto; padding:0 22px; }
+        .logout-btn{ width:100%; padding:11px; background:rgba(179,65,58,0.15); border:1px solid rgba(179,65,58,0.35);
+            border-radius:8px; color:#f2a9a4; font-size:13px; font-weight:600; cursor:pointer; }
+        .logout-btn:hover{ background:rgba(179,65,58,0.28); }
 
-        /* Forms & UI */
-        .card { background:white; padding:20px; border-radius:8px; max-width:700px; box-shadow:0 1px 3px rgba(0,0,0,.08); margin-bottom: 20px; }
-        label { display:block; margin-top:12px; margin-bottom:5px; font-weight:bold; font-size: 14px; }
-        input, select {
-            width:100%; max-width:350px; padding:10px;
-            border:1px solid #ccc; border-radius:5px; font-size:14px;
+        /* ===== Main ===== */
+        .main{ flex:1; height:100vh; overflow-y:auto; padding:30px 34px 100px; }
+        .topline{ margin-bottom:20px; }
+        .topline h1{ font-size:24px; }
+        .success-msg{ background:var(--accent-soft); color:var(--accent); padding:12px 16px; border-left:4px solid var(--accent);
+            border-radius:7px; margin-bottom:18px; font-size:14px; }
+        ul.errors{ background:var(--error-bg); color:var(--error); padding:14px 18px; border-left:4px solid var(--error);
+            border-radius:7px; margin-bottom:18px; list-style:none; font-size:14px; }
+
+        .panel{ display:none; }
+        .panel.active{ display:block; }
+
+        /* ===== Stat cards ===== */
+        .stat-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:14px; margin-bottom:26px; }
+        .stat-card{ background:var(--card-bg); border:1px solid var(--border); border-radius:12px; padding:18px; box-shadow:var(--shadow); }
+        .stat-card .icon-badge{ width:34px; height:34px; border-radius:9px; background:var(--accent-soft); color:var(--accent);
+            display:flex; align-items:center; justify-content:center; margin-bottom:10px; }
+        .stat-card .label{ font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:6px; }
+        .stat-card .value{ font-family:'Fraunces', serif; font-size:24px; color:var(--ink); font-weight:600; }
+
+        .empty-panel{ background:var(--card-bg); border:1px dashed var(--border); border-radius:12px; padding:40px 24px;
+            text-align:center; color:var(--muted); }
+        .empty-panel h3{ margin-bottom:6px; color:var(--text); }
+
+        /* ===== Cards / forms ===== */
+        .card{ background:var(--card-bg); border:1px solid var(--border); border-radius:12px; padding:26px;
+            box-shadow:var(--shadow); max-width:640px; margin-bottom:20px; }
+        label{ display:block; font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:0 0 6px; }
+        input, select{ width:100%; padding:11px 12px; font-size:14px; color:var(--text); background:#fff;
+            border:1px solid var(--border); border-radius:8px; outline:none; transition:border-color .15s; }
+        input:focus, select:focus{ border-color:var(--accent); }
+        .field{ margin-bottom:16px; }
+        .field-row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+        button{ padding:11px 18px; background:var(--accent); border:none; border-radius:8px; color:#fff;
+            font-weight:600; font-size:13.5px; cursor:pointer; transition:background .15s; }
+        button:hover{ background:var(--accent-light); }
+        button.danger{ background:var(--error); }
+        button.danger:hover{ background:#c65750; }
+        button.success{ background:var(--accent); }
+        button.ghost{ background:transparent; border:1px solid var(--border); color:var(--text); }
+        button.ghost:hover{ background:#f1f0ec; }
+        button:disabled{ opacity:.5; cursor:not-allowed; }
+
+        /* ===== Wizard steps ===== */
+        .steps-nav{ display:flex; align-items:center; gap:8px; margin-bottom:22px; }
+        .step-dot{ display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted); }
+        .step-dot .circle{ width:24px; height:24px; border-radius:50%; background:#eceae4; color:var(--muted);
+            display:flex; align-items:center; justify-content:center; font-size:11.5px; font-weight:700; transition:.2s; }
+        .step-dot.active .circle{ background:var(--accent); color:#fff; }
+        .step-dot.active{ color:var(--text); font-weight:600; }
+        .step-line{ flex:1; height:1px; background:var(--border); }
+
+        .step-panel{ display:none; }
+        .step-panel.active{ display:block; animation:fadeIn .25s ease; }
+        @keyframes fadeIn{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:translateY(0); } }
+
+        .step-actions{ display:flex; justify-content:space-between; margin-top:20px; }
+
+        /* ===== Nights quick chips ===== */
+        .chip-row{ display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 2px; }
+        .chip{ padding:7px 13px; border-radius:20px; border:1px solid var(--border); background:#fff;
+            font-size:12.5px; color:var(--text); cursor:pointer; transition:.15s; }
+        .chip:hover{ border-color:var(--accent); color:var(--accent); }
+
+        /* ===== Camera ===== */
+        .cam-box{ display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap; margin-bottom:10px; }
+        video, .preview-img{ width:220px; height:165px; background:#0e1a17; border-radius:10px; object-fit:cover; border:1px solid var(--border); }
+        .cam-actions{ display:flex; gap:8px; }
+        canvas{ display:none; }
+
+        /* ===== Info boxes ===== */
+        .price-line{ font-weight:600; color:var(--ink); margin-top:12px; padding:12px 14px; background:var(--accent-soft);
+            border-radius:8px; border-left:4px solid var(--accent); font-size:13.5px; }
+        .bal-box{ font-weight:600; margin-top:10px; padding:12px 14px; border-radius:8px; border-left:4px solid; font-size:13.5px; }
+        .bal-red{ background:var(--error-bg); color:var(--error); border-color:var(--error); }
+        .bal-green{ background:var(--accent-soft); color:var(--accent); border-color:var(--accent); }
+
+        /* ===== Search + lists ===== */
+        .search-container{ position:relative; max-width:420px; margin-bottom:6px; }
+        .search-results{ position:absolute; background:#fff; border:1px solid var(--border); width:100%;
+            z-index:100; border-radius:0 0 10px 10px; max-height:220px; overflow-y:auto; display:none; box-shadow:var(--shadow); }
+        .search-item{ padding:12px 14px; cursor:pointer; border-bottom:1px solid var(--border); font-size:13.5px; }
+        .search-item:hover{ background:var(--accent-soft); color:var(--accent); }
+
+        .list-header{ display:flex; justify-content:space-between; align-items:center; margin:22px 0 12px; }
+        .list-header h3{ font-size:15px; }
+        .list-header span{ font-size:12px; color:var(--muted); }
+
+        .card-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:14px; }
+        .list-card{ background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:16px;
+            box-shadow:var(--shadow); cursor:pointer; transition:.15s; }
+        .list-card:hover{ border-color:var(--accent); transform:translateY(-2px); }
+        .list-card .name{ font-weight:600; font-size:14.5px; color:var(--ink); margin-bottom:4px; }
+        .list-card .meta{ font-size:12.5px; color:var(--muted); margin-bottom:3px; }
+        .list-card .tag{ display:inline-block; font-size:10.5px; text-transform:uppercase; padding:3px 9px;
+            border-radius:20px; background:var(--accent-soft); color:var(--accent); font-weight:600; margin-top:6px; }
+
+        .guest-profile{ display:flex; gap:18px; margin-top:14px; align-items:center; flex-wrap:wrap; }
+        .guest-info p{ margin-bottom:5px; font-size:13.5px; }
+
+        .bottom-nav{ display:none; }
+
+        @media (max-width:900px){
+            body{ display:block; height:auto; overflow:visible; }
+            .sidebar{ display:none; }
+            .main{ height:auto; overflow:visible; padding:20px 16px 90px; }
+            .mobile-topbar{ display:flex; align-items:center; gap:10px; margin-bottom:18px; }
+            .mobile-topbar span{ font-family:'Fraunces', serif; font-weight:600; font-size:16px; color:var(--ink); }
+            .field-row{ grid-template-columns:1fr; }
+            .card{ max-width:100%; padding:20px; }
+
+            .bottom-nav{ display:flex; position:fixed; bottom:0; left:0; right:0; background:var(--ink);
+                padding:8px 4px calc(8px + env(safe-area-inset-bottom)); z-index:50; box-shadow:0 -4px 16px rgba(0,0,0,.15); }
+            .bottom-nav .nav-link{ flex:1; flex-direction:column; gap:4px; padding:6px 2px; font-size:10px;
+                text-align:center; border-left:none; border-radius:8px; }
+            .bottom-nav .nav-link.active{ background:rgba(244,242,236,0.1); color:#fff; }
+            .bottom-nav form{ flex:1; }
+            .bottom-nav .logout-btn-mobile{ width:100%; background:none; border:none; color:#c7cec8; display:flex;
+                flex-direction:column; align-items:center; gap:4px; font-size:10px; padding:6px 2px; cursor:pointer; }
         }
-        button {
-            margin-top:15px; padding:10px 18px; border:none; border-radius:5px;
-            background:#3498db; color:white; cursor:pointer; transition:.3s; font-weight: bold;
+        @media (max-width:480px){
+            .stat-grid{ grid-template-columns:1fr 1fr; }
+            .card-grid{ grid-template-columns:1fr; }
+            video, .preview-img{ width:100%; }
         }
-        button:hover { background:#2980b9; }
-        button.danger { background:#e74c3c; }
-        button.danger:hover { background:#c0392b; }
-        button.success { background:#27ae60; }
-
-        /* Messages */
-        .success-msg { background:#eafaf1; color:#27ae60; padding:12px; border-left:5px solid #27ae60; border-radius:5px; margin-bottom:20px; }
-        .errors { background:#ffecec; color:#c0392b; padding:15px 20px; margin-bottom:20px; border-left:5px solid #e74c3c; border-radius:5px; list-style: none; }
-
-        /* Webcam Area */
-        .cam-box { display:flex; gap:15px; align-items:flex-start; flex-wrap:wrap; margin-bottom:10px; }
-        video, canvas, .preview-img { width:240px; height:180px; background:#000; border-radius:6px; object-fit:cover; border: 1px solid #ddd; }
-        canvas { display:none; }
-
-        /* Search Results */
-        .search-container { position: relative; width: 100%; max-width: 350px; }
-        .search-results { 
-            position: absolute; background: white; border: 1px solid #ddd; width: 100%; 
-            z-index: 100; border-radius: 0 0 5px 5px; max-height: 200px; overflow-y: auto; display:none; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .search-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #eee; font-size: 14px; }
-        .search-item:hover { background: #f4f6f9; color: #3498db; }
-
-        /* Price & Balance Display */
-        .price-line { font-weight:bold; color:#2c3e50; margin-top:10px; padding: 12px; background: #eef2f7; border-radius: 5px; border-left: 4px solid #3498db; }
-        .bal-box { font-weight:bold; margin-top:10px; padding: 12px; border-radius: 5px; border-left: 4px solid; }
-        .bal-red { background: #fdf2f2; color: #c0392b; border-color: #e74c3c; }
-        .bal-green { background: #f2fdf5; color: #27ae60; border-color: #27ae60; }
-
-        /* Checkout Guest Profile */
-        .guest-profile { display: flex; gap: 20px; margin-top: 15px; align-items: center; }
-        .guest-info p { margin-bottom: 5px; font-size: 14px; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <h2>Elroi Staff</h2>
-        <a onclick="showPanel('dashboard')" id="nav-dashboard" class="active">Dashboard</a>
-        <a onclick="showPanel('checkin')" id="nav-checkin">Check In</a>
-        <a onclick="showPanel('checkout')" id="nav-checkout">Check Out</a>
-        <a onclick="showPanel('reservation')" id="nav-reservation">Reservation</a>
-        <a onclick="showPanel('reservationlist')" id="nav-reservationlist">Reservation List</a>
-
-        <form action="{{ route('logout') }}" method="POST" style="margin-top:auto; padding:0 20px;">
-            @csrf
-            <button type="submit" style="width:100%; background:#e74c3c;">Logout</button>
-        </form>
+        <div class="brand">
+            <svg width="22" height="22" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="30" height="30" rx="7" fill="#3f6b52"/><path d="M8 20V13.5L15 8L22 13.5V20H17V15.5H13V20H8Z" fill="#f4f2ec"/>
+            </svg>
+            <span>Elroi — Staff</span>
+        </div>
+        <a class="nav-link" data-panel="dashboard" onclick="showPanel('dashboard')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>
+            Dashboard
+        </a>
+        <a class="nav-link" data-panel="checkin" onclick="showPanel('checkin')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
+            Check In
+        </a>
+        <a class="nav-link" data-panel="checkout" onclick="showPanel('checkout')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+            Check Out
+        </a>
+        <a class="nav-link" data-panel="reservation" onclick="showPanel('reservation')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            Reservation
+        </a>
+        <a class="nav-link" data-panel="reservationlist" onclick="showPanel('reservationlist')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/></svg>
+            Reservation List
+        </a>
+        <div class="sidebar-footer">
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
+        </div>
     </div>
 
-    <div class="main">
-        @if (session('success')) <p class="success-msg">{{ session('success') }}</p> @endif
-        @if ($errors->any())
-            <ul class="errors">
-                @foreach ($errors->all() as $error) <li>{{ $error }}</li> @endforeach
-            </ul>
-        @endif
-
-        <!-- DASHBOARD -->
-        <div id="panel-dashboard" class="panel active">
-            <h1>Staff Dashboard</h1>
-            <p>Welcome. Select an action from the sidebar to manage guests.</p>
+    <div class="main" id="mainContent">
+        <div class="mobile-topbar">
+            <svg width="20" height="20" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="30" height="30" rx="7" fill="#3f6b52"/><path d="M8 20V13.5L15 8L22 13.5V20H17V15.5H13V20H8Z" fill="#f4f2ec"/>
+            </svg>
+            <span>Elroi — Staff</span>
         </div>
 
-        <!-- CHECK IN -->
+        @if (session('success')) <p class="success-msg">{{ session('success') }}</p> @endif
+        @if ($errors->any())
+            <ul class="errors">@foreach ($errors->all() as $error) <li>{{ $error }}</li> @endforeach</ul>
+        @endif
+
+        <!-- ===== DASHBOARD ===== -->
+        <div id="panel-dashboard" class="panel active">
+            <div class="topline"><h1>Good to see you</h1></div>
+
+            @isset($dashStats)
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <div class="icon-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg></div>
+                    <div class="label">Guests In-House</div>
+                    <div class="value">{{ $dashStats['active_guests'] }}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="10" width="18" height="9" rx="1"/><path d="M3 10V7a2 2 0 0 1 2-2h6v5"/></svg></div>
+                    <div class="label">Rooms Available</div>
+                    <div class="value">{{ $dashStats['available_rooms'] }}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+                    <div class="label">Pending Arrivals</div>
+                    <div class="value">{{ $dashStats['pending_arrivals'] }}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/></svg></div>
+                    <div class="label">Checked In Today</div>
+                    <div class="value">{{ $dashStats['checked_in_today'] }}</div>
+                </div>
+            </div>
+            @endisset
+
+            <div class="list-header"><h3>Currently Staying</h3></div>
+            @isset($activeStays)
+                @if ($activeStays->count())
+                    <div class="card-grid">
+                        @foreach ($activeStays->take(6) as $r)
+                            <div class="list-card" onclick="showPanel('checkout')">
+                                <div class="name">{{ $r->guest->fullname }}</div>
+                                <div class="meta">Room {{ $r->room->room_number }}</div>
+                                <div class="meta">Out: {{ \Carbon\Carbon::parse($r->check_out_date)->format('M j') }}</div>
+                                <span class="tag">In House</span>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="empty-panel"><h3>No guests currently staying</h3><p>Checked-in guests will appear here.</p></div>
+                @endif
+            @else
+                <div class="empty-panel"><h3>Nothing to show yet</h3><p>Once you start checking guests in, activity will appear here.</p></div>
+            @endisset
+        </div>
+
+        <!-- ===== CHECK IN ===== -->
         <div id="panel-checkin" class="panel">
-            <h1>Direct Check In</h1>
-            <form action="{{ route('staff.checkin.store') }}" method="POST" class="card">
+            <div class="topline"><h1>Check In Guest</h1></div>
+
+            <form action="{{ route('staff.checkin.store') }}" method="POST" class="card" id="checkinForm">
                 @csrf
-                <h3>Guest Identity</h3>
-                <label>Full Name</label>
-                <input type="text" name="fullname" required>
-                <label>Phone Number</label>
-                <input type="text" name="phone_no" required>
-                <label>ID Type</label>
-                <select name="id_type" required>
-                    <option value="national_id">National ID</option>
-                    <option value="kebele_id">Kebele ID</option>
-                    <option value="passport">Passport</option>
-                    <option value="driving_license">Driving License</option>
-                </select>
 
-                <label>Capture ID Photo</label>
-                <div class="cam-box">
-                    <video id="ci-video" autoplay playsinline></video>
-                    <img id="ci-preview" class="preview-img" style="display:none;">
-                </div>
-                <button type="button" onclick="startCamera('ci-video', 'ci-cap-btn')">Start Camera</button>
-                <button type="button" id="ci-cap-btn" onclick="takeSnapshot('ci-video', 'ci-preview', 'ci-photo-input')" disabled>Capture</button>
-                <input type="hidden" name="id_photo" id="ci-photo-input">
-
-                <h3>Room & Stay</h3>
-                <label>Dates</label>
-                <div style="display:flex; gap:10px;">
-                    <input type="date" name="check_in_date" id="ci-in" required onchange="calculateCheckinPrice()">
-                    <input type="date" name="check_out_date" id="ci-out" required onchange="calculateCheckinPrice()">
+                <div class="steps-nav">
+                    <div class="step-dot active" data-step="1"><span class="circle">1</span> Guest</div>
+                    <div class="step-line"></div>
+                    <div class="step-dot" data-step="2"><span class="circle">2</span> Room</div>
+                    <div class="step-line"></div>
+                    <div class="step-dot" data-step="3"><span class="circle">3</span> Payment</div>
                 </div>
 
-                <label>Room Type</label>
-                <select id="ci-type">
-                    <option value="">-- select --</option>
-                    @foreach ($roomTypes as $type) <option value="{{ $type->id }}">{{ $type->name }}</option> @endforeach
-                </select>
-                <button type="button" onclick="findRooms('ci-type', 'ci-room-select')">Find Available Rooms</button>
+                <!-- STEP 1 -->
+                <div class="step-panel active" data-step="1">
+                    <div class="field"><label>Full Name</label><input type="text" name="fullname" required></div>
+                    <div class="field"><label>Phone Number</label><input type="text" name="phone_no" required pattern="[0-9+\-\s]{6,20}"></div>
+                    <div class="field">
+                        <label>ID Type</label>
+                        <select name="id_type" required>
+                            <option value="national_id">National ID</option>
+                            <option value="kebele_id">Kebele ID</option>
+                            <option value="passport">Passport</option>
+                            <option value="driving_license">Driving License</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Capture ID Photo</label>
+                        <div class="cam-box">
+                            <video id="ci-video" autoplay playsinline></video>
+                            <img id="ci-preview" class="preview-img" style="display:none;">
+                        </div>
+                        <div class="cam-actions">
+                            <button type="button" class="ghost" onclick="startCamera('ci-video','ci-cap-btn')">Start Camera</button>
+                            <button type="button" id="ci-cap-btn" onclick="takeSnapshot('ci-video','ci-preview','ci-photo-input')" disabled>Capture</button>
+                        </div>
+                        <input type="hidden" name="id_photo" id="ci-photo-input">
+                    </div>
+                </div>
 
-                <label>Select Room</label>
-                <select name="room_id" id="ci-room-select" required onchange="calculateCheckinPrice()"></select>
-                <div id="ci-price-line" class="price-line" style="display:none;"></div>
+                <!-- STEP 2 -->
+                <div class="step-panel" data-step="2">
+                    <div class="field">
+                        <label>Check-in Date</label>
+                        <input type="date" id="ci-in" name="check_in_date" required onchange="calculateCheckinPrice()">
+                    </div>
+                    <div class="field">
+                        <label>Check-out Date</label>
+                        <input type="date" id="ci-out" name="check_out_date" required onchange="calculateCheckinPrice()">
+                        <div class="chip-row">
+                            <span class="chip" onclick="setNights('ci-in','ci-out',1)">1 night</span>
+                            <span class="chip" onclick="setNights('ci-in','ci-out',2)">2 nights</span>
+                            <span class="chip" onclick="setNights('ci-in','ci-out',3)">3 nights</span>
+                            <span class="chip" onclick="setNights('ci-in','ci-out',7)">1 week</span>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Room Type</label>
+                        <select id="ci-type"><option value="">-- select --</option>
+                            @foreach ($roomTypes as $type) <option value="{{ $type->id }}">{{ $type->name }}</option> @endforeach
+                        </select>
+                        <button type="button" class="ghost" style="margin-top:8px;" onclick="findRooms('ci-type','ci-room-select')">Find Available Rooms</button>
+                    </div>
+                    <div class="field">
+                        <label>Select Room</label>
+                        <select name="room_id" id="ci-room-select" required onchange="calculateCheckinPrice()"><option value="">-- find rooms first --</option></select>
+                    </div>
+                    <div id="ci-price-line" class="price-line" style="display:none;"></div>
+                </div>
 
-                <h3>Payment</h3>
-                <label>Payment Method</label>
-                <select name="payment_type">
-                    <option value="cash">Cash</option>
-                    <option value="bank_transfer">Bank Transfer</option>
-                    <option value="pos">POS</option>
-                </select>
-                <label>Payment Mode</label>
-                <select name="payment_way" id="ci-pay-way" onchange="calculateCheckinPrice()">
-                    <option value="full">Full Payment</option>
-                    <option value="partial">Partial Payment</option>
-                </select>
-                <label>Amount Paid Now</label>
-                <input type="number" step="0.01" name="amount_paid" id="ci-paid" required oninput="calculateCheckinPrice()">
-                <div id="ci-bal-line" class="bal-box" style="display:none;"></div>
+                <!-- STEP 3 -->
+                <div class="step-panel" data-step="3">
+                    <div class="field-row">
+                        <div class="field">
+                            <label>Payment Method</label>
+                            <select name="payment_type">
+                                <option value="cash">Cash</option>
+                                <option value="bank_transfer">Bank Transfer</option>
+                                <option value="pos">POS</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Payment Mode</label>
+                            <select name="payment_way" id="ci-pay-way" onchange="calculateCheckinPrice()">
+                                <option value="full">Full Payment</option>
+                                <option value="partial">Partial Payment</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Amount Paid Now</label>
+                        <input type="number" step="0.01" min="0" name="amount_paid" id="ci-paid" required oninput="calculateCheckinPrice()">
+                    </div>
+                    <div id="ci-bal-line" class="bal-box" style="display:none;"></div>
+                </div>
 
-                <button type="submit" class="success">Complete Check In</button>
+                <div class="step-actions">
+                    <button type="button" class="ghost btn-back" style="visibility:hidden;">Back</button>
+                    <div>
+                        <button type="button" class="btn-next">Next</button>
+                        <button type="submit" class="success btn-submit" style="display:none;">Complete Check In</button>
+                    </div>
+                </div>
             </form>
         </div>
 
-        <!-- CHECK OUT -->
+        <!-- ===== CHECK OUT ===== -->
         <div id="panel-checkout" class="panel">
-            <h1>Guest Check Out</h1>
-            <div class="card">
+            <div class="topline"><h1>Guest Check Out</h1></div>
+            <div class="card" style="max-width:680px;">
                 <label>Search Guest Name or Room</label>
                 <div class="search-container">
-                    <input type="text" id="co-search" placeholder="Search name or room..." oninput="searchCheckout()">
+                    <input type="text" id="co-search" placeholder="Search name or room..." oninput="searchCheckout()" autocomplete="off">
                     <div id="co-results" class="search-results"></div>
                 </div>
 
-                <div id="co-details" style="display:none; margin-top:20px;">
-                    <hr>
+                <div id="co-details" style="display:none; margin-top:18px;">
+                    <hr style="border:none; border-top:1px solid var(--border); margin-bottom:14px;">
                     <div class="guest-profile">
-                        <img id="co-img" src="" class="preview-img">
+                        <img id="co-img" src="" class="preview-img" alt="Guest ID">
                         <div class="guest-info">
                             <p><strong>Name:</strong> <span id="co-name"></span></p>
                             <p><strong>Room:</strong> <span id="co-room"></span></p>
@@ -190,113 +397,254 @@
                     <form action="{{ route('staff.checkout.process') }}" method="POST">
                         @csrf
                         <input type="hidden" name="reservation_id" id="co-res-id">
-                        <button type="submit" class="danger">Confirm Checkout</button>
+                        <button type="submit" class="danger" style="margin-top:10px;">Confirm Checkout</button>
                     </form>
                 </div>
             </div>
+
+            <div class="list-header"><h3>Currently Staying</h3><span>tap a guest to check out</span></div>
+            @isset($activeStays)
+                @if ($activeStays->count())
+                    <div class="card-grid">
+                        @foreach ($activeStays as $r)
+                            <div class="list-card" onclick='showCheckoutDetails(@json($r))'>
+                                <div class="name">{{ $r->guest->fullname }}</div>
+                                <div class="meta">Room {{ $r->room->room_number }}</div>
+                                <div class="meta">{{ \Carbon\Carbon::parse($r->check_in_date)->format('M j') }} → {{ \Carbon\Carbon::parse($r->check_out_date)->format('M j') }}</div>
+                                <span class="tag">In House</span>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="empty-panel"><h3>No one to check out</h3><p>Guests currently staying will appear here.</p></div>
+                @endif
+            @endisset
         </div>
 
-        <!-- RESERVATION (Phone Booking) -->
+        <!-- ===== RESERVATION (Phone Booking) ===== -->
         <div id="panel-reservation" class="panel">
-            <h1>Create Phone Reservation</h1>
-            <form action="{{ route('staff.reservation.store') }}" method="POST" class="card">
-                @csrf
-                <h3>Contact Info</h3>
-                <label>Guest Full Name</label>
-                <input type="text" name="fullname" required>
-                <label>Phone Number</label>
-                <input type="text" name="phone_no" required>
+            <div class="topline"><h1>Create Phone Reservation</h1></div>
 
-                <h3>Stay Details</h3>
-                <label>Dates</label>
-                <div style="display:flex; gap:10px;">
-                    <input type="date" name="check_in_date" id="res-in" required onchange="calculateReservationPrice()">
-                    <input type="date" name="check_out_date" id="res-out" required onchange="calculateReservationPrice()">
+            <form action="{{ route('staff.reservation.store') }}" method="POST" class="card" id="reservationForm">
+                @csrf
+
+                <div class="steps-nav">
+                    <div class="step-dot active" data-step="1"><span class="circle">1</span> Guest &amp; Stay</div>
+                    <div class="step-line"></div>
+                    <div class="step-dot" data-step="2"><span class="circle">2</span> Deposit</div>
                 </div>
 
-                <label>Room Type</label>
-                <select id="res-type">
-                    <option value="">-- select --</option>
-                    @foreach ($roomTypes as $type) <option value="{{ $type->id }}">{{ $type->name }}</option> @endforeach
-                </select>
-                <button type="button" onclick="findRooms('res-type', 'res-room-select')">Find Rooms</button>
+                <div class="step-panel active" data-step="1">
+                    <div class="field"><label>Guest Full Name</label><input type="text" name="fullname" required></div>
+                    <div class="field"><label>Phone Number</label><input type="text" name="phone_no" required pattern="[0-9+\-\s]{6,20}"></div>
 
-                <label>Select Room</label>
-                <select name="room_id" id="res-room-select" required onchange="calculateReservationPrice()"></select>
-                <div id="res-price-line" class="price-line" style="display:none;"></div>
+                    <div class="field">
+                        <label>Check-in Date</label>
+                        <input type="date" id="res-in" name="check_in_date" required onchange="calculateReservationPrice()">
+                    </div>
+                    <div class="field">
+                        <label>Check-out Date</label>
+                        <input type="date" id="res-out" name="check_out_date" required onchange="calculateReservationPrice()">
+                        <div class="chip-row">
+                            <span class="chip" onclick="setNights('res-in','res-out',1)">1 night</span>
+                            <span class="chip" onclick="setNights('res-in','res-out',2)">2 nights</span>
+                            <span class="chip" onclick="setNights('res-in','res-out',3)">3 nights</span>
+                            <span class="chip" onclick="setNights('res-in','res-out',7)">1 week</span>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Room Type</label>
+                        <select id="res-type"><option value="">-- select --</option>
+                            @foreach ($roomTypes as $type) <option value="{{ $type->id }}">{{ $type->name }}</option> @endforeach
+                        </select>
+                        <button type="button" class="ghost" style="margin-top:8px;" onclick="findRooms('res-type','res-room-select')">Find Rooms</button>
+                    </div>
+                    <div class="field">
+                        <label>Select Room</label>
+                        <select name="room_id" id="res-room-select" required onchange="calculateReservationPrice()"><option value="">-- find rooms first --</option></select>
+                    </div>
+                    <div id="res-price-line" class="price-line" style="display:none;"></div>
+                </div>
 
-                <label>Deposit / Down Payment</label>
-                <input type="number" step="0.01" name="amount_paid" placeholder="Enter deposit amount" required>
+                <div class="step-panel" data-step="2">
+                    <div class="field">
+                        <label>Deposit / Down Payment</label>
+                        <input type="number" step="0.01" min="0" name="amount_paid" placeholder="Enter deposit amount" required>
+                    </div>
+                </div>
 
-                <button type="submit">Save Reservation</button>
+                <div class="step-actions">
+                    <button type="button" class="ghost btn-back" style="visibility:hidden;">Back</button>
+                    <div>
+                        <button type="button" class="btn-next">Next</button>
+                        <button type="submit" class="btn-submit" style="display:none;">Save Reservation</button>
+                    </div>
+                </div>
             </form>
         </div>
 
-        <!-- RESERVATION LIST (Convert to Check-in) -->
+        <!-- ===== RESERVATION LIST ===== -->
         <div id="panel-reservationlist" class="panel">
-            <h1>Reservation Arrivals</h1>
-            <div class="card">
+            <div class="topline"><h1>Reservation Arrivals</h1></div>
+
+            <div class="card" style="max-width:680px;">
                 <label>Search Reserved Guest (Name or Phone)</label>
                 <div class="search-container">
-                    <input type="text" id="rl-search" placeholder="Search Name or Phone..." oninput="searchReservation()">
+                    <input type="text" id="rl-search" placeholder="Search name or phone..." oninput="searchReservation()" autocomplete="off">
                     <div id="rl-results" class="search-results"></div>
                 </div>
 
-                <div id="rl-box" style="display:none; margin-top:20px;">
-                    <hr>
-                    <h3 id="rl-title"></h3>
-                    <p>Room: <span id="rl-room"></span> | Paid Deposit: <span id="rl-deposit"></span> ETB</p>
-                    
+                <div id="rl-box" style="display:none; margin-top:18px;">
+                    <hr style="border:none; border-top:1px solid var(--border); margin-bottom:14px;">
+                    <h3 id="rl-title" style="font-size:16px; margin-bottom:6px;"></h3>
+                    <p style="font-size:13.5px; color:var(--muted); margin-bottom:14px;">Room: <span id="rl-room"></span> &middot; Paid Deposit: <span id="rl-deposit"></span> ETB</p>
+
                     <form action="{{ route('staff.reservation.complete') }}" method="POST">
                         @csrf
                         <input type="hidden" name="reservation_id" id="rl-res-id">
-                        <label>ID Type</label>
-                        <select name="id_type" required>
-                            <option value="national_id">National ID</option>
-                            <option value="passport">Passport</option>
-                            <option value="kebele_id">Kebele ID</option>
-                        </select>
-                        <label>Capture Photo Now</label>
-                        <div class="cam-box">
-                            <video id="rl-video" autoplay playsinline></video>
-                            <img id="rl-preview" class="preview-img" style="display:none;">
+                        <div class="field">
+                            <label>ID Type</label>
+                            <select name="id_type" required>
+                                <option value="national_id">National ID</option>
+                                <option value="passport">Passport</option>
+                                <option value="kebele_id">Kebele ID</option>
+                            </select>
                         </div>
-                        <button type="button" onclick="startCamera('rl-video', 'rl-cap-btn')">Start Camera</button>
-                        <button type="button" id="rl-cap-btn" onclick="takeSnapshot('rl-video', 'rl-preview', 'rl-photo-input')" disabled>Capture</button>
-                        <input type="hidden" name="id_photo" id="rl-photo-input" required>
-                        
+                        <div class="field">
+                            <label>Capture Photo Now</label>
+                            <div class="cam-box">
+                                <video id="rl-video" autoplay playsinline></video>
+                                <img id="rl-preview" class="preview-img" style="display:none;">
+                            </div>
+                            <div class="cam-actions">
+                                <button type="button" class="ghost" onclick="startCamera('rl-video','rl-cap-btn')">Start Camera</button>
+                                <button type="button" id="rl-cap-btn" onclick="takeSnapshot('rl-video','rl-preview','rl-photo-input')" disabled>Capture</button>
+                            </div>
+                            <input type="hidden" name="id_photo" id="rl-photo-input" required>
+                        </div>
                         <button type="submit" class="success">Finish Full Check-In</button>
                     </form>
                 </div>
             </div>
+
+            <div class="list-header"><h3>Awaiting Arrival</h3><span>tap a reservation to check them in</span></div>
+            @isset($pendingArrivals)
+                @if ($pendingArrivals->count())
+                    <div class="card-grid">
+                        @foreach ($pendingArrivals as $r)
+                            <div class="list-card" onclick='showReservationDetails(@json($r))'>
+                                <div class="name">{{ $r->guest->fullname }}</div>
+                                <div class="meta">{{ $r->guest->phone_no }}</div>
+                                <div class="meta">Room {{ $r->room->room_number }}</div>
+                                <span class="tag">Reserved</span>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="empty-panel"><h3>No pending arrivals</h3><p>Phone reservations waiting to check in will appear here.</p></div>
+                @endif
+            @endisset
         </div>
+
     </div>
 
-    <!-- Hidden canvas for snapshots -->
     <canvas id="main-canvas"></canvas>
 
+    <!-- ===== MOBILE BOTTOM NAV ===== -->
+    <div class="bottom-nav">
+        <a class="nav-link" data-panel="dashboard" onclick="showPanel('dashboard')">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>
+            Home
+        </a>
+        <a class="nav-link" data-panel="checkin" onclick="showPanel('checkin')">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/></svg>
+            Check In
+        </a>
+        <a class="nav-link" data-panel="checkout" onclick="showPanel('checkout')">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/></svg>
+            Check Out
+        </a>
+        <a class="nav-link" data-panel="reservationlist" onclick="showPanel('reservationlist')">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13"/></svg>
+            Reserved
+        </a>
+        <form action="{{ route('logout') }}" method="POST">
+            @csrf
+            <button type="submit" class="logout-btn-mobile">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+                Logout
+            </button>
+        </form>
+    </div>
+
     <script>
-        // NAVIGATION
+        // ===== NAVIGATION =====
         function showPanel(name) {
             document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
-            document.getElementById('panel-' + name).classList.add('active');
-            document.getElementById('nav-' + name).classList.add('active');
+            document.querySelectorAll('.nav-link').forEach(a => a.classList.remove('active'));
+            document.getElementById('panel-' + name)?.classList.add('active');
+            document.querySelectorAll('.nav-link[data-panel="' + name + '"]').forEach(a => a.classList.add('active'));
+            sessionStorage.setItem('staffActivePanel', name);
         }
 
-        // CAMERA HELPERS
+        document.addEventListener('DOMContentLoaded', () => {
+            showPanel(sessionStorage.getItem('staffActivePanel') || 'dashboard');
+            initWizard('checkinForm', 3);
+            initWizard('reservationForm', 2);
+        });
+
+        // ===== WIZARD =====
+        function initWizard(formId, stepCount) {
+            const form = document.getElementById(formId);
+            if (!form) return;
+            let current = 1;
+
+            function render(n) {
+                form.querySelectorAll('.step-panel').forEach(s => s.classList.remove('active'));
+                form.querySelector(`.step-panel[data-step="${n}"]`).classList.add('active');
+                form.querySelectorAll('.step-dot').forEach(d => d.classList.toggle('active', parseInt(d.dataset.step) <= n));
+                form.querySelector('.btn-back').style.visibility = n === 1 ? 'hidden' : 'visible';
+                form.querySelector('.btn-next').style.display = n === stepCount ? 'none' : 'inline-block';
+                form.querySelector('.btn-submit').style.display = n === stepCount ? 'inline-block' : 'none';
+                current = n;
+            }
+
+            form.querySelector('.btn-next').addEventListener('click', () => {
+                const stepEl = form.querySelector(`.step-panel[data-step="${current}"]`);
+                const inputs = stepEl.querySelectorAll('input[required], select[required]');
+                for (const inp of inputs) {
+                    if (!inp.value) { inp.reportValidity(); return; }
+                }
+                if (current < stepCount) render(current + 1);
+            });
+            form.querySelector('.btn-back').addEventListener('click', () => { if (current > 1) render(current - 1); });
+
+            render(1);
+        }
+
+        // ===== QUICK NIGHTS PICKER =====
+        function setNights(inId, outId, nights) {
+            const inEl = document.getElementById(inId);
+            if (!inEl.value) inEl.value = new Date().toISOString().split('T')[0];
+            const base = new Date(inEl.value);
+            base.setDate(base.getDate() + nights);
+            const outEl = document.getElementById(outId);
+            outEl.value = base.toISOString().split('T')[0];
+            outEl.dispatchEvent(new Event('change'));
+        }
+
+        // ===== CAMERA =====
         let activeStream = null;
         async function startCamera(videoId, btnId) {
             try {
-                if(activeStream) activeStream.getTracks().forEach(t => t.stop());
+                if (activeStream) activeStream.getTracks().forEach(t => t.stop());
                 activeStream = await navigator.mediaDevices.getUserMedia({ video: true });
                 const video = document.getElementById(videoId);
                 video.srcObject = activeStream;
                 video.style.display = 'block';
                 document.getElementById(btnId).disabled = false;
-            } catch (e) { alert("Camera Error: " + e.message); }
+            } catch (e) { alert('Camera error: ' + e.message); }
         }
-
         function takeSnapshot(videoId, previewId, inputId) {
             const video = document.getElementById(videoId);
             const canvas = document.getElementById('main-canvas');
@@ -309,147 +657,144 @@
             preview.src = data;
             preview.style.display = 'block';
             video.style.display = 'none';
+            if (activeStream) activeStream.getTracks().forEach(t => t.stop());
         }
 
-        // ROOM LOOKUP
+        // ===== ROOM LOOKUP =====
         let roomPrices = {};
         async function findRooms(typeSelectId, roomSelectId) {
             const typeId = document.getElementById(typeSelectId).value;
-            if(!typeId) return alert("Select room type");
-            const res = await fetch(`{{ route('staff.rooms.available') }}?room_type_id=${typeId}`);
+            if (!typeId) return alert('Select a room type first.');
+            const res = await fetch(`{{ route('staff.rooms.available') }}?room_type_id=${encodeURIComponent(typeId)}`);
             const rooms = await res.json();
             const sel = document.getElementById(roomSelectId);
             sel.innerHTML = '<option value="">-- select room --</option>';
             rooms.forEach(r => {
                 roomPrices[r.id] = parseFloat(r.price_per_night);
-                sel.innerHTML += `<option value="${r.id}">Room ${r.room_number} - ${r.price_per_night} ETB</option>`;
+                const opt = document.createElement('option');
+                opt.value = r.id;
+                opt.textContent = `Room ${r.room_number} — ${r.price_per_night} ETB`;
+                sel.appendChild(opt);
             });
         }
 
-        // CHECK IN PRICE CALC
+        // ===== CHECK-IN PRICE =====
         function calculateCheckinPrice() {
             const rid = document.getElementById('ci-room-select').value;
             const d1 = new Date(document.getElementById('ci-in').value);
             const d2 = new Date(document.getElementById('ci-out').value);
             const payWay = document.getElementById('ci-pay-way').value;
             const paidInput = document.getElementById('ci-paid');
+            if (!rid || isNaN(d1) || isNaN(d2)) return;
 
-            if(!rid || isNaN(d1) || isNaN(d2)) return;
-
-            let nights = Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
-            if(nights < 1) nights = 1;
+            let nights = Math.round((d2 - d1) / 86400000);
+            if (nights < 1) nights = 1;
             const total = nights * roomPrices[rid];
 
             const pLine = document.getElementById('ci-price-line');
             pLine.style.display = 'block';
-            pLine.innerHTML = `Stay Summary: ${nights} nights x ${roomPrices[rid]} ETB = <strong>${total.toFixed(2)} ETB Total</strong>`;
+            pLine.innerHTML = `${nights} night(s) × ${roomPrices[rid]} ETB = <strong>${total.toFixed(2)} ETB total</strong>`;
 
-            if(payWay === 'full') {
-                paidInput.value = total.toFixed(2);
-                paidInput.readOnly = true;
-            } else {
-                paidInput.readOnly = false;
-            }
+            if (payWay === 'full') { paidInput.value = total.toFixed(2); paidInput.readOnly = true; }
+            else { paidInput.readOnly = false; }
 
             const paid = parseFloat(paidInput.value) || 0;
             const bal = total - paid;
             const bLine = document.getElementById('ci-bal-line');
             bLine.style.display = 'block';
             bLine.className = bal <= 0 ? 'bal-box bal-green' : 'bal-box bal-red';
-            bLine.textContent = bal <= 0 ? "Balance: Paid in Full" : `Balance Due: ${bal.toFixed(2)} ETB`;
+            bLine.textContent = bal <= 0 ? 'Balance: Paid in Full' : `Balance Due: ${bal.toFixed(2)} ETB`;
         }
 
-        // RESERVATION PRICE CALC
         function calculateReservationPrice() {
             const rid = document.getElementById('res-room-select').value;
             const d1 = new Date(document.getElementById('res-in').value);
             const d2 = new Date(document.getElementById('res-out').value);
-
-            if(!rid || isNaN(d1) || isNaN(d2)) return;
-
-            let nights = Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
-            if(nights < 1) nights = 1;
+            if (!rid || isNaN(d1) || isNaN(d2)) return;
+            let nights = Math.round((d2 - d1) / 86400000);
+            if (nights < 1) nights = 1;
             const total = nights * roomPrices[rid];
-
             const pLine = document.getElementById('res-price-line');
             pLine.style.display = 'block';
-            pLine.innerHTML = `Reservation Summary: ${nights} nights x ${roomPrices[rid]} ETB = <strong>${total.toFixed(2)} ETB Total</strong>`;
+            pLine.innerHTML = `${nights} night(s) × ${roomPrices[rid]} ETB = <strong>${total.toFixed(2)} ETB total</strong>`;
         }
 
-        // CHECK OUT SEARCH
+        // ===== CHECK OUT: shared detail renderer (search + default list) =====
+        function showCheckoutDetails(r) {
+            document.getElementById('co-details').style.display = 'block';
+            document.getElementById('co-res-id').value = r.id;
+            document.getElementById('co-name').textContent = r.guest.fullname;
+            document.getElementById('co-room').textContent = r.room.room_number;
+            document.getElementById('co-dates').textContent = `${r.check_in_date.split('T')[0]} to ${r.check_out_date.split('T')[0]}`;
+            document.getElementById('co-img').src = r.guest.id_photo || '';
+
+            const outDate = new Date(r.check_out_date);
+            const today = new Date(); today.setHours(0,0,0,0);
+            const overBox = document.getElementById('co-overstay');
+            if (today > outDate) {
+                const days = Math.ceil((today - outDate) / 86400000);
+                overBox.textContent = `OVERSTAY ALERT: Guest is ${days} day(s) late!`;
+                overBox.style.display = 'block';
+            } else { overBox.style.display = 'none'; }
+
+            const bBox = document.getElementById('co-balance');
+            if (r.payment) {
+                const rem = parseFloat(r.payment.remaining_amount);
+                bBox.className = rem <= 0 ? 'bal-box bal-green' : 'bal-box bal-red';
+                bBox.textContent = rem <= 0 ? 'Payment: Clear' : `Collect Payment: ${rem.toFixed(2)} ETB`;
+            } else {
+                bBox.className = 'bal-box bal-red';
+                bBox.textContent = 'No payment record found.';
+            }
+            document.getElementById('co-results').style.display = 'none';
+        }
+
         async function searchCheckout() {
             const q = document.getElementById('co-search').value;
-            if(q.length < 2) return document.getElementById('co-results').style.display='none';
-            const res = await fetch(`{{ route('staff.checkout.search') }}?query=${q}`);
-            const data = await res.json();
             const results = document.getElementById('co-results');
+            if (q.length < 2) { results.style.display = 'none'; return; }
+            const res = await fetch(`{{ route('staff.checkout.search') }}?query=${encodeURIComponent(q)}`);
+            const data = await res.json();
             results.innerHTML = '';
-            if(data.length > 0) {
+            if (data.length > 0) {
                 results.style.display = 'block';
                 data.forEach(r => {
                     const div = document.createElement('div');
                     div.className = 'search-item';
                     div.textContent = `${r.guest.fullname} (Room ${r.room.room_number})`;
-                    div.onclick = () => {
-                        results.style.display = 'none';
-                        document.getElementById('co-details').style.display = 'block';
-                        document.getElementById('co-res-id').value = r.id;
-                        document.getElementById('co-name').textContent = r.guest.fullname;
-                        document.getElementById('co-room').textContent = r.room.room_number;
-                        document.getElementById('co-dates').textContent = `${r.check_in_date.split('T')[0]} to ${r.check_out_date.split('T')[0]}`;
-                        document.getElementById('co-img').src = r.guest.id_photo;
-
-                        // Overstay Check
-                        const outDate = new Date(r.check_out_date);
-                        const today = new Date(); today.setHours(0,0,0,0);
-                        const overBox = document.getElementById('co-overstay');
-                        if(today > outDate) {
-                            const days = Math.ceil((today - outDate) / (86400000));
-                            overBox.textContent = `OVERSTAY ALERT: Guest is ${days} day(s) late!`;
-                            overBox.style.display = 'block';
-                        } else { overBox.style.display = 'none'; }
-
-                        // Balance Check
-                        const rem = parseFloat(r.payment.remaining_amount);
-                        const bBox = document.getElementById('co-balance');
-                        bBox.className = rem <= 0 ? 'bal-box bal-green' : 'bal-box bal-red';
-                        bBox.textContent = rem <= 0 ? "Payment: Clear" : `COLLECT PAYMENT: ${rem.toFixed(2)} ETB`;
-                    };
+                    div.onclick = () => showCheckoutDetails(r);
                     results.appendChild(div);
                 });
-            }
+            } else { results.style.display = 'none'; }
         }
 
-        // RESERVATION SEARCH (Updated to show Phone in list)
+        // ===== RESERVATION LIST: shared detail renderer =====
+        function showReservationDetails(r) {
+            document.getElementById('rl-box').style.display = 'block';
+            document.getElementById('rl-res-id').value = r.id;
+            document.getElementById('rl-title').textContent = 'Arriving: ' + r.guest.fullname;
+            document.getElementById('rl-room').textContent = r.room.room_number;
+            document.getElementById('rl-deposit').textContent = r.payment ? r.payment.amount_paid : '0.00';
+            document.getElementById('rl-results').style.display = 'none';
+        }
+
         async function searchReservation() {
             const q = document.getElementById('rl-search').value;
-            if(q.length < 2) return document.getElementById('rl-results').style.display = 'none';
-            
-            const res = await fetch(`{{ route('staff.reservation.search') }}?query=${q}`);
-            const data = await res.json();
             const results = document.getElementById('rl-results');
+            if (q.length < 2) { results.style.display = 'none'; return; }
+            const res = await fetch(`{{ route('staff.reservation.search') }}?query=${encodeURIComponent(q)}`);
+            const data = await res.json();
             results.innerHTML = '';
-            
-            if(data.length > 0) {
+            if (data.length > 0) {
                 results.style.display = 'block';
                 data.forEach(r => {
                     const div = document.createElement('div');
                     div.className = 'search-item';
-                    // Added phone number to the display string
-                    div.textContent = `${r.guest.fullname} (${r.guest.phone_no}) - Room ${r.room.room_number}`;
-                    div.onclick = () => {
-                        results.style.display = 'none';
-                        document.getElementById('rl-box').style.display = 'block';
-                        document.getElementById('rl-res-id').value = r.id;
-                        document.getElementById('rl-title').textContent = "Arriving: " + r.guest.fullname;
-                        document.getElementById('rl-room').textContent = r.room.room_number;
-                        document.getElementById('rl-deposit').textContent = r.payment.amount_paid;
-                    };
+                    div.textContent = `${r.guest.fullname} (${r.guest.phone_no}) — Room ${r.room.room_number}`;
+                    div.onclick = () => showReservationDetails(r);
                     results.appendChild(div);
                 });
-            } else {
-                results.style.display = 'none';
-            }
+            } else { results.style.display = 'none'; }
         }
     </script>
 </body>
