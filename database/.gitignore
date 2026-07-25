@@ -1,1 +1,46 @@
-*.sqlite*
+# Laravel core
+/vendor
+/node_modules
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+/storage/pail
+/bootstrap/cache/*.php
+
+# Environment / secrets
+.env
+.env.backup
+.env.production
+.phpunit.result.cache
+
+# Database
+*.sqlite
+*.sqlite-journal
+*.sqlite-shm
+*.sqlite-wal
+database.sqlite
+
+# Logs
+/storage/logs/*.log
+npm-debug.log
+yarn-error.log
+
+# Editor/IDE
+.idea
+.vscode
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Testing
+/coverage
+
+# Homestead (only relevant if you ever use it)
+Homestead.json
+Homestead.yaml
