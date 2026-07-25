@@ -1,0 +1,7 @@
+/node_modules
+/vendor
+.env
+.git
+.gitignore
+*.sqlite
+storage/logs/*
