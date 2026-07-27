@@ -19,7 +19,6 @@
         body{ background:var(--bg); color:var(--text); display:flex; height:100vh; overflow:hidden; }
         h1,h2,h3{ font-family:'Fraunces', serif; font-weight:500; color:var(--ink); }
 
-        /* ===== Sidebar ===== */
         .sidebar{ width:230px; flex-shrink:0; background:linear-gradient(160deg, var(--ink) 0%, var(--panel) 100%);
             color:#f4f2ec; display:flex; flex-direction:column; padding:26px 0; height:100vh; overflow-y:auto; }
         .brand{ display:flex; align-items:center; gap:10px; padding:0 22px 22px;
@@ -35,7 +34,6 @@
             border-radius:8px; color:#f2a9a4; font-size:13px; font-weight:600; cursor:pointer; }
         .logout-btn:hover{ background:rgba(179,65,58,0.28); }
 
-        /* ===== Main ===== */
         .main{ flex:1; height:100vh; overflow-y:auto; padding:30px 34px 100px; }
         .topline{ margin-bottom:20px; }
         .topline h1{ font-size:24px; }
@@ -47,8 +45,7 @@
         .panel{ display:none; }
         .panel.active{ display:block; }
 
-        /* ===== Stat cards ===== */
-        .stat-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:14px; margin-bottom:26px; }
+        .stat-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:14px; margin-bottom:22px; }
         .stat-card{ background:var(--card-bg); border:1px solid var(--border); border-radius:12px; padding:18px; box-shadow:var(--shadow); }
         .stat-card .icon-badge{ width:34px; height:34px; border-radius:9px; background:var(--accent-soft); color:var(--accent);
             display:flex; align-items:center; justify-content:center; margin-bottom:10px; }
@@ -59,7 +56,14 @@
             text-align:center; color:var(--muted); }
         .empty-panel h3{ margin-bottom:6px; color:var(--text); }
 
-        /* ===== Cards / forms ===== */
+        .type-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:26px; }
+        .type-card{ background:var(--card-bg); border:1px solid var(--border); border-radius:12px; padding:16px 18px; box-shadow:var(--shadow); }
+        .type-card .tname{ font-weight:600; font-size:14.5px; color:var(--ink); margin-bottom:8px; }
+        .type-bar-track{ height:6px; background:#eceae4; border-radius:4px; overflow:hidden; margin-bottom:8px; }
+        .type-bar-fill{ height:100%; background:var(--accent); border-radius:4px; }
+        .type-meta{ display:flex; justify-content:space-between; font-size:12px; color:var(--muted); }
+        .type-meta strong{ color:var(--accent); font-weight:700; }
+
         .card{ background:var(--card-bg); border:1px solid var(--border); border-radius:12px; padding:26px;
             box-shadow:var(--shadow); max-width:640px; margin-bottom:20px; }
         label{ display:block; font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:0 0 6px; }
@@ -79,7 +83,6 @@
         button.ghost:hover{ background:#f1f0ec; }
         button:disabled{ opacity:.5; cursor:not-allowed; }
 
-        /* ===== Wizard steps ===== */
         .steps-nav{ display:flex; align-items:center; gap:8px; margin-bottom:22px; }
         .step-dot{ display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted); }
         .step-dot .circle{ width:24px; height:24px; border-radius:50%; background:#eceae4; color:var(--muted);
@@ -94,26 +97,25 @@
 
         .step-actions{ display:flex; justify-content:space-between; margin-top:20px; }
 
-        /* ===== Nights quick chips ===== */
+        .ban-warning{ display:none; margin-bottom:16px; padding:12px 14px; background:var(--error-bg); color:var(--error);
+            border-left:4px solid var(--error); border-radius:8px; font-size:13.5px; font-weight:600; }
+
         .chip-row{ display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 2px; }
         .chip{ padding:7px 13px; border-radius:20px; border:1px solid var(--border); background:#fff;
             font-size:12.5px; color:var(--text); cursor:pointer; transition:.15s; }
         .chip:hover{ border-color:var(--accent); color:var(--accent); }
 
-        /* ===== Camera ===== */
         .cam-box{ display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap; margin-bottom:10px; }
         video, .preview-img{ width:220px; height:165px; background:#0e1a17; border-radius:10px; object-fit:cover; border:1px solid var(--border); }
         .cam-actions{ display:flex; gap:8px; }
         canvas{ display:none; }
 
-        /* ===== Info boxes ===== */
         .price-line{ font-weight:600; color:var(--ink); margin-top:12px; padding:12px 14px; background:var(--accent-soft);
             border-radius:8px; border-left:4px solid var(--accent); font-size:13.5px; }
         .bal-box{ font-weight:600; margin-top:10px; padding:12px 14px; border-radius:8px; border-left:4px solid; font-size:13.5px; }
         .bal-red{ background:var(--error-bg); color:var(--error); border-color:var(--error); }
         .bal-green{ background:var(--accent-soft); color:var(--accent); border-color:var(--accent); }
 
-        /* ===== Search + lists ===== */
         .search-container{ position:relative; max-width:420px; margin-bottom:6px; }
         .search-results{ position:absolute; background:#fff; border:1px solid var(--border); width:100%;
             z-index:100; border-radius:0 0 10px 10px; max-height:220px; overflow-y:auto; display:none; box-shadow:var(--shadow); }
@@ -126,15 +128,36 @@
 
         .card-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:14px; }
         .list-card{ background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:16px;
-            box-shadow:var(--shadow); cursor:pointer; transition:.15s; }
+            box-shadow:var(--shadow); cursor:pointer; transition:.15s; position:relative; }
         .list-card:hover{ border-color:var(--accent); transform:translateY(-2px); }
+        .list-card .top-row{ display:flex; justify-content:space-between; align-items:flex-start; }
         .list-card .name{ font-weight:600; font-size:14.5px; color:var(--ink); margin-bottom:4px; }
         .list-card .meta{ font-size:12.5px; color:var(--muted); margin-bottom:3px; }
         .list-card .tag{ display:inline-block; font-size:10.5px; text-transform:uppercase; padding:3px 9px;
             border-radius:20px; background:var(--accent-soft); color:var(--accent); font-weight:600; margin-top:6px; }
+        .list-card .tag.banned{ background:var(--error-bg); color:var(--error); }
+
+        .dots-btn{ background:none; border:none; padding:2px 6px; font-size:16px; line-height:1; color:var(--muted);
+            cursor:pointer; border-radius:6px; margin:0; }
+        .dots-btn:hover{ background:#f1f0ec; }
+        .dots-menu{ position:absolute; top:36px; right:14px; background:#fff; border:1px solid var(--border);
+            border-radius:8px; box-shadow:var(--shadow); z-index:20; display:none; min-width:130px; overflow:hidden; }
+        .dots-menu.open{ display:block; }
+        .dots-menu button{ width:100%; text-align:left; background:none; color:var(--error); border:none;
+            border-radius:0; padding:10px 14px; font-size:12.5px; font-weight:600; margin:0; }
+        .dots-menu button:hover{ background:var(--error-bg); }
 
         .guest-profile{ display:flex; gap:18px; margin-top:14px; align-items:center; flex-wrap:wrap; }
         .guest-info p{ margin-bottom:5px; font-size:13.5px; }
+
+        .modal-overlay{ position:fixed; inset:0; background:rgba(28,43,41,0.5); display:none; align-items:center;
+            justify-content:center; z-index:200; padding:16px; }
+        .modal-overlay.open{ display:flex; }
+        .modal-box{ background:#fff; border-radius:12px; padding:26px; max-width:360px; width:100%; box-shadow:0 10px 40px rgba(0,0,0,.25); }
+        .modal-box h3{ font-size:17px; margin-bottom:6px; }
+        .modal-box p{ font-size:13px; color:var(--muted); margin-bottom:16px; }
+        .modal-actions{ display:flex; gap:10px; margin-top:16px; }
+        .modal-actions button{ flex:1; }
 
         .bottom-nav{ display:none; }
 
@@ -148,16 +171,18 @@
             .card{ max-width:100%; padding:20px; }
 
             .bottom-nav{ display:flex; position:fixed; bottom:0; left:0; right:0; background:var(--ink);
-                padding:8px 4px calc(8px + env(safe-area-inset-bottom)); z-index:50; box-shadow:0 -4px 16px rgba(0,0,0,.15); }
-            .bottom-nav .nav-link{ flex:1; flex-direction:column; gap:4px; padding:6px 2px; font-size:10px;
-                text-align:center; border-left:none; border-radius:8px; }
+                padding:6px 2px calc(6px + env(safe-area-inset-bottom)); z-index:50; box-shadow:0 -4px 16px rgba(0,0,0,.15);
+                overflow-x:auto; }
+            .bottom-nav .nav-link{ flex:1; flex-direction:column; gap:3px; padding:6px 2px; font-size:9.5px;
+                text-align:center; border-left:none; border-radius:8px; min-width:56px; }
             .bottom-nav .nav-link.active{ background:rgba(244,242,236,0.1); color:#fff; }
             .bottom-nav form{ flex:1; }
             .bottom-nav .logout-btn-mobile{ width:100%; background:none; border:none; color:#c7cec8; display:flex;
-                flex-direction:column; align-items:center; gap:4px; font-size:10px; padding:6px 2px; cursor:pointer; }
+                flex-direction:column; align-items:center; gap:3px; font-size:9.5px; padding:6px 2px; cursor:pointer; }
         }
         @media (max-width:480px){
             .stat-grid{ grid-template-columns:1fr 1fr; }
+            .type-grid{ grid-template-columns:1fr 1fr; }
             .card-grid{ grid-template-columns:1fr; }
             video, .preview-img{ width:100%; }
         }
@@ -191,6 +216,10 @@
         <a class="nav-link" data-panel="reservationlist" onclick="showPanel('reservationlist')">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/></svg>
             Reservation List
+        </a>
+        <a class="nav-link" data-panel="bannedguests" onclick="showPanel('bannedguests')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M5 5l14 14"/></svg>
+            Banned Guests
         </a>
         <div class="sidebar-footer">
             <form action="{{ route('logout') }}" method="POST">
@@ -242,6 +271,25 @@
             </div>
             @endisset
 
+            @isset($roomTypes)
+            <div class="list-header"><h3>Room Availability by Type</h3></div>
+            <div class="type-grid">
+                @foreach ($roomTypes as $type)
+                    @php
+                        $pct = $type->rooms_count > 0 ? round(($type->available_rooms_count / $type->rooms_count) * 100) : 0;
+                    @endphp
+                    <div class="type-card">
+                        <div class="tname">{{ $type->name }}</div>
+                        <div class="type-bar-track"><div class="type-bar-fill" style="width:{{ $pct }}%;"></div></div>
+                        <div class="type-meta">
+                            <span><strong>{{ $type->available_rooms_count }}</strong> free</span>
+                            <span>{{ $type->rooms_count }} total</span>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+            @endisset
+
             <div class="list-header"><h3>Currently Staying</h3></div>
             @isset($activeStays)
                 @if ($activeStays->count())
@@ -250,6 +298,7 @@
                             <div class="list-card" onclick="showPanel('checkout')">
                                 <div class="name">{{ $r->guest->fullname }}</div>
                                 <div class="meta">Room {{ $r->room->room_number }}</div>
+                                <div class="meta">{{ $r->guest->phone_no }}</div>
                                 <div class="meta">Out: {{ \Carbon\Carbon::parse($r->check_out_date)->format('M j') }}</div>
                                 <span class="tag">In House</span>
                             </div>
@@ -280,8 +329,9 @@
 
                 <!-- STEP 1 -->
                 <div class="step-panel active" data-step="1">
-                    <div class="field"><label>Full Name</label><input type="text" name="fullname" required></div>
-                    <div class="field"><label>Phone Number</label><input type="text" name="phone_no" required pattern="[0-9+\-\s]{6,20}"></div>
+                    <div id="ci-ban-warning" class="ban-warning">This guest is banned from the guest house and cannot be checked in.</div>
+                    <div class="field"><label>Full Name</label><input type="text" name="fullname" id="ci-fullname" required onblur="checkGuestBan('ci')"></div>
+                    <div class="field"><label>Phone Number</label><input type="text" name="phone_no" id="ci-phone" required pattern="[0-9+\-\s]{6,20}" onblur="checkGuestBan('ci')"></div>
                     <div class="field">
                         <label>ID Type</label>
                         <select name="id_type" required>
@@ -326,7 +376,7 @@
                         <select id="ci-type"><option value="">-- select --</option>
                             @foreach ($roomTypes as $type) <option value="{{ $type->id }}">{{ $type->name }}</option> @endforeach
                         </select>
-                        <button type="button" class="ghost" style="margin-top:8px;" onclick="findRooms('ci-type','ci-room-select')">Find Available Rooms</button>
+                        <button type="button" class="ghost" style="margin-top:8px;" onclick="findRooms('ci-type','ci-room-select','ci-in','ci-out', this)">Find Available Rooms</button>
                     </div>
                     <div class="field">
                         <label>Select Room</label>
@@ -387,6 +437,7 @@
                         <img id="co-img" src="" class="preview-img" alt="Guest ID">
                         <div class="guest-info">
                             <p><strong>Name:</strong> <span id="co-name"></span></p>
+                            <p><strong>Phone:</strong> <span id="co-phone"></span></p>
                             <p><strong>Room:</strong> <span id="co-room"></span></p>
                             <p><strong>Dates:</strong> <span id="co-dates"></span></p>
                         </div>
@@ -407,11 +458,20 @@
                 @if ($activeStays->count())
                     <div class="card-grid">
                         @foreach ($activeStays as $r)
-                            <div class="list-card" onclick='showCheckoutDetails(@json($r))'>
-                                <div class="name">{{ $r->guest->fullname }}</div>
-                                <div class="meta">Room {{ $r->room->room_number }}</div>
-                                <div class="meta">{{ \Carbon\Carbon::parse($r->check_in_date)->format('M j') }} → {{ \Carbon\Carbon::parse($r->check_out_date)->format('M j') }}</div>
-                                <span class="tag">In House</span>
+                            <div class="list-card">
+                                <div class="top-row">
+                                    <div onclick="loadCheckoutDetails({{ $r->id }})" style="flex:1; cursor:pointer;">
+                                        <div class="name">{{ $r->guest->fullname }}</div>
+                                        <div class="meta">Room {{ $r->room->room_number }}</div>
+                                        <div class="meta">{{ $r->guest->phone_no }}</div>
+                                        <div class="meta">{{ \Carbon\Carbon::parse($r->check_in_date)->format('M j') }} → {{ \Carbon\Carbon::parse($r->check_out_date)->format('M j') }}</div>
+                                        <span class="tag">In House</span>
+                                    </div>
+                                    <button type="button" class="dots-btn" onclick="event.stopPropagation(); toggleDots(this)">⋮</button>
+                                </div>
+                                <div class="dots-menu">
+                                    <button type="button" onclick="event.stopPropagation(); openBanModal({{ $r->guest->id }}, '{{ addslashes($r->guest->fullname) }}')">Ban Guest</button>
+                                </div>
                             </div>
                         @endforeach
                     </div>
@@ -435,8 +495,9 @@
                 </div>
 
                 <div class="step-panel active" data-step="1">
-                    <div class="field"><label>Guest Full Name</label><input type="text" name="fullname" required></div>
-                    <div class="field"><label>Phone Number</label><input type="text" name="phone_no" required pattern="[0-9+\-\s]{6,20}"></div>
+                    <div id="res-ban-warning" class="ban-warning">This guest is banned from the guest house and cannot be reserved for.</div>
+                    <div class="field"><label>Guest Full Name</label><input type="text" name="fullname" id="res-fullname" required onblur="checkGuestBan('res')"></div>
+                    <div class="field"><label>Phone Number</label><input type="text" name="phone_no" id="res-phone" required pattern="[0-9+\-\s]{6,20}" onblur="checkGuestBan('res')"></div>
 
                     <div class="field">
                         <label>Check-in Date</label>
@@ -457,7 +518,7 @@
                         <select id="res-type"><option value="">-- select --</option>
                             @foreach ($roomTypes as $type) <option value="{{ $type->id }}">{{ $type->name }}</option> @endforeach
                         </select>
-                        <button type="button" class="ghost" style="margin-top:8px;" onclick="findRooms('res-type','res-room-select')">Find Rooms</button>
+                        <button type="button" class="ghost" style="margin-top:8px;" onclick="findRooms('res-type','res-room-select','res-in','res-out', this)">Find Rooms</button>
                     </div>
                     <div class="field">
                         <label>Select Room</label>
@@ -496,7 +557,8 @@
 
                 <div id="rl-box" style="display:none; margin-top:18px;">
                     <hr style="border:none; border-top:1px solid var(--border); margin-bottom:14px;">
-                    <h3 id="rl-title" style="font-size:16px; margin-bottom:6px;"></h3>
+                    <h3 id="rl-title" style="font-size:16px; margin-bottom:2px;"></h3>
+                    <p style="font-size:12.5px; color:var(--muted); margin-bottom:6px;">Phone: <span id="rl-phone"></span></p>
                     <p style="font-size:13.5px; color:var(--muted); margin-bottom:14px;">Room: <span id="rl-room"></span> &middot; Paid Deposit: <span id="rl-deposit"></span> ETB</p>
 
                     <form action="{{ route('staff.reservation.complete') }}" method="POST">
@@ -532,7 +594,7 @@
                 @if ($pendingArrivals->count())
                     <div class="card-grid">
                         @foreach ($pendingArrivals as $r)
-                            <div class="list-card" onclick='showReservationDetails(@json($r))'>
+                            <div class="list-card" onclick="loadReservationDetails({{ $r->id }})">
                                 <div class="name">{{ $r->guest->fullname }}</div>
                                 <div class="meta">{{ $r->guest->phone_no }}</div>
                                 <div class="meta">Room {{ $r->room->room_number }}</div>
@@ -546,9 +608,51 @@
             @endisset
         </div>
 
+        <!-- ===== BANNED GUESTS ===== -->
+        <div id="panel-bannedguests" class="panel">
+            <div class="topline"><h1>Banned Guests</h1></div>
+
+            @isset($bannedGuests)
+                @if ($bannedGuests->count())
+                    <div class="card-grid">
+                        @foreach ($bannedGuests as $g)
+                            <div class="list-card" style="cursor:default;">
+                                <div class="name">{{ $g->fullname }}</div>
+                                <div class="meta">{{ $g->phone_no }}</div>
+                                <span class="tag banned">Banned</span>
+                                <button type="button" class="ghost" style="width:100%; margin-top:12px;" onclick="openUnbanModal({{ $g->id }}, '{{ addslashes($g->fullname) }}')">Unban</button>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="empty-panel"><h3>No banned guests</h3><p>Guests you ban will show up here.</p></div>
+                @endif
+            @endisset
+        </div>
+
     </div>
 
     <canvas id="main-canvas"></canvas>
+
+    <!-- ===== PASSWORD CONFIRM MODAL (Ban / Unban) ===== -->
+    <div class="modal-overlay" id="banModalOverlay">
+        <div class="modal-box">
+            <h3 id="banModalTitle">Ban Guest</h3>
+            <p id="banModalText">Enter your staff password to confirm.</p>
+            <form id="banModalForm" method="POST">
+                @csrf
+                <input type="hidden" name="guest_id" id="banModalGuestId">
+                <div class="field">
+                    <label>Your Password</label>
+                    <input type="password" name="password" required autofocus>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="ghost" onclick="closeBanModal()">Cancel</button>
+                    <button type="submit" class="danger" id="banModalSubmit">Confirm Ban</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- ===== MOBILE BOTTOM NAV ===== -->
     <div class="bottom-nav">
@@ -568,6 +672,10 @@
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13"/></svg>
             Reserved
         </a>
+        <a class="nav-link" data-panel="bannedguests" onclick="showPanel('bannedguests')">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M5 5l14 14"/></svg>
+            Banned
+        </a>
         <form action="{{ route('logout') }}" method="POST">
             @csrf
             <button type="submit" class="logout-btn-mobile">
@@ -578,22 +686,68 @@
     </div>
 
     <script>
-        // ===== NAVIGATION =====
         function showPanel(name) {
             document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-link').forEach(a => a.classList.remove('active'));
             document.getElementById('panel-' + name)?.classList.add('active');
             document.querySelectorAll('.nav-link[data-panel="' + name + '"]').forEach(a => a.classList.add('active'));
             sessionStorage.setItem('staffActivePanel', name);
+            document.querySelectorAll('.dots-menu.open').forEach(m => m.classList.remove('open'));
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             showPanel(sessionStorage.getItem('staffActivePanel') || 'dashboard');
             initWizard('checkinForm', 3);
             initWizard('reservationForm', 2);
+
+            ['ci-in', 'ci-out'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('change', () => autoRefreshRooms('ci'));
+            });
+            ['res-in', 'res-out'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('change', () => autoRefreshRooms('res'));
+            });
         });
 
-        // ===== WIZARD =====
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.dots-menu.open').forEach(m => m.classList.remove('open'));
+        });
+
+        function toggleDots(btn) {
+            const menu = btn.closest('.list-card').querySelector('.dots-menu');
+            if (!menu) return;
+            const isOpen = menu.classList.contains('open');
+            document.querySelectorAll('.dots-menu.open').forEach(m => m.classList.remove('open'));
+            if (!isOpen) menu.classList.add('open');
+        }
+
+        const CHECKOUT_SHOW_BASE = "{{ url('/staff/checkout/detail') }}";
+        const RESERVATION_SHOW_BASE = "{{ url('/staff/reservation/detail') }}";
+
+        async function loadCheckoutDetails(id) {
+            try {
+                const res = await fetch(`${CHECKOUT_SHOW_BASE}/${id}`);
+                const data = await res.json();
+                showCheckoutDetails(data);
+            } catch (e) { alert('Could not load guest details.'); }
+        }
+
+        async function loadReservationDetails(id) {
+            try {
+                const res = await fetch(`${RESERVATION_SHOW_BASE}/${id}`);
+                const data = await res.json();
+                showReservationDetails(data);
+            } catch (e) { alert('Could not load reservation details.'); }
+        }
+
+        function autoRefreshRooms(prefix) {
+            const typeSel = document.getElementById(prefix + '-type');
+            if (typeSel && typeSel.value) {
+                findRooms(prefix + '-type', prefix + '-room-select', prefix + '-in', prefix + '-out');
+            }
+        }
+
         function initWizard(formId, stepCount) {
             const form = document.getElementById(formId);
             if (!form) return;
@@ -615,6 +769,10 @@
                 for (const inp of inputs) {
                     if (!inp.value) { inp.reportValidity(); return; }
                 }
+                if (stepEl.dataset.banned === 'true') {
+                    alert('This guest is banned and cannot proceed.');
+                    return;
+                }
                 if (current < stepCount) render(current + 1);
             });
             form.querySelector('.btn-back').addEventListener('click', () => { if (current > 1) render(current - 1); });
@@ -622,7 +780,27 @@
             render(1);
         }
 
-        // ===== QUICK NIGHTS PICKER =====
+        async function checkGuestBan(prefix) {
+            const fullname = document.getElementById(prefix + '-fullname').value.trim();
+            const phone = document.getElementById(prefix + '-phone').value.trim();
+            const warningBox = document.getElementById(prefix + '-ban-warning');
+            const stepEl = document.querySelector(`#${prefix === 'ci' ? 'checkinForm' : 'reservationForm'} .step-panel[data-step="1"]`);
+
+            if (!fullname || !phone) return;
+
+            try {
+                const res = await fetch(`{{ route('staff.guest.check') }}?fullname=${encodeURIComponent(fullname)}&phone_no=${encodeURIComponent(phone)}`);
+                const data = await res.json();
+                if (data.found && data.status === 'blacklisted') {
+                    warningBox.style.display = 'block';
+                    stepEl.dataset.banned = 'true';
+                } else {
+                    warningBox.style.display = 'none';
+                    stepEl.dataset.banned = 'false';
+                }
+            } catch (e) { /* fail silent, server-side check still protects on submit */ }
+        }
+
         function setNights(inId, outId, nights) {
             const inEl = document.getElementById(inId);
             if (!inEl.value) inEl.value = new Date().toISOString().split('T')[0];
@@ -633,7 +811,6 @@
             outEl.dispatchEvent(new Event('change'));
         }
 
-        // ===== CAMERA =====
         let activeStream = null;
         async function startCamera(videoId, btnId) {
             try {
@@ -642,16 +819,19 @@
                 const video = document.getElementById(videoId);
                 video.srcObject = activeStream;
                 video.style.display = 'block';
+                video.play().catch(() => {});
                 document.getElementById(btnId).disabled = false;
             } catch (e) { alert('Camera error: ' + e.message); }
         }
         function takeSnapshot(videoId, previewId, inputId) {
             const video = document.getElementById(videoId);
             const canvas = document.getElementById('main-canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            canvas.getContext('2d').drawImage(video, 0, 0);
-            const data = canvas.toDataURL('image/jpeg', 0.8);
+            const maxWidth = 480;
+            const scale = Math.min(1, maxWidth / video.videoWidth);
+            canvas.width = video.videoWidth * scale;
+            canvas.height = video.videoHeight * scale;
+            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+            const data = canvas.toDataURL('image/jpeg', 0.6);
             document.getElementById(inputId).value = data;
             const preview = document.getElementById(previewId);
             preview.src = data;
@@ -660,25 +840,43 @@
             if (activeStream) activeStream.getTracks().forEach(t => t.stop());
         }
 
-        // ===== ROOM LOOKUP =====
         let roomPrices = {};
-        async function findRooms(typeSelectId, roomSelectId) {
+        async function findRooms(typeSelectId, roomSelectId, inDateId, outDateId, btn) {
             const typeId = document.getElementById(typeSelectId).value;
             if (!typeId) return alert('Select a room type first.');
-            const res = await fetch(`{{ route('staff.rooms.available') }}?room_type_id=${encodeURIComponent(typeId)}`);
-            const rooms = await res.json();
-            const sel = document.getElementById(roomSelectId);
-            sel.innerHTML = '<option value="">-- select room --</option>';
-            rooms.forEach(r => {
-                roomPrices[r.id] = parseFloat(r.price_per_night);
-                const opt = document.createElement('option');
-                opt.value = r.id;
-                opt.textContent = `Room ${r.room_number} — ${r.price_per_night} ETB`;
-                sel.appendChild(opt);
-            });
+
+            let url = `{{ route('staff.rooms.available') }}?room_type_id=${encodeURIComponent(typeId)}`;
+            if (inDateId && outDateId) {
+                const inVal = document.getElementById(inDateId).value;
+                const outVal = document.getElementById(outDateId).value;
+                if (inVal && outVal) {
+                    url += `&check_in_date=${encodeURIComponent(inVal)}&check_out_date=${encodeURIComponent(outVal)}`;
+                }
+            }
+
+            const originalText = btn ? btn.textContent : null;
+            if (btn) { btn.disabled = true; btn.textContent = 'Searching...'; }
+
+            try {
+                const res = await fetch(url);
+                const rooms = await res.json();
+                const sel = document.getElementById(roomSelectId);
+                sel.innerHTML = '<option value="">-- select room --</option>';
+                if (rooms.length === 0) {
+                    sel.innerHTML = '<option value="">-- none available for these dates --</option>';
+                }
+                rooms.forEach(r => {
+                    roomPrices[r.id] = parseFloat(r.price_per_night);
+                    const opt = document.createElement('option');
+                    opt.value = r.id;
+                    opt.textContent = `Room ${r.room_number} — ${r.price_per_night} ETB`;
+                    sel.appendChild(opt);
+                });
+            } finally {
+                if (btn) { btn.disabled = false; btn.textContent = originalText; }
+            }
         }
 
-        // ===== CHECK-IN PRICE =====
         function calculateCheckinPrice() {
             const rid = document.getElementById('ci-room-select').value;
             const d1 = new Date(document.getElementById('ci-in').value);
@@ -719,11 +917,11 @@
             pLine.innerHTML = `${nights} night(s) × ${roomPrices[rid]} ETB = <strong>${total.toFixed(2)} ETB total</strong>`;
         }
 
-        // ===== CHECK OUT: shared detail renderer (search + default list) =====
         function showCheckoutDetails(r) {
             document.getElementById('co-details').style.display = 'block';
             document.getElementById('co-res-id').value = r.id;
             document.getElementById('co-name').textContent = r.guest.fullname;
+            document.getElementById('co-phone').textContent = r.guest.phone_no;
             document.getElementById('co-room').textContent = r.room.room_number;
             document.getElementById('co-dates').textContent = `${r.check_in_date.split('T')[0]} to ${r.check_out_date.split('T')[0]}`;
             document.getElementById('co-img').src = r.guest.id_photo || '';
@@ -761,18 +959,18 @@
                 data.forEach(r => {
                     const div = document.createElement('div');
                     div.className = 'search-item';
-                    div.textContent = `${r.guest.fullname} (Room ${r.room.room_number})`;
+                    div.textContent = `${r.guest.fullname} (${r.guest.phone_no}) — Room ${r.room.room_number}`;
                     div.onclick = () => showCheckoutDetails(r);
                     results.appendChild(div);
                 });
             } else { results.style.display = 'none'; }
         }
 
-        // ===== RESERVATION LIST: shared detail renderer =====
         function showReservationDetails(r) {
             document.getElementById('rl-box').style.display = 'block';
             document.getElementById('rl-res-id').value = r.id;
             document.getElementById('rl-title').textContent = 'Arriving: ' + r.guest.fullname;
+            document.getElementById('rl-phone').textContent = r.guest.phone_no;
             document.getElementById('rl-room').textContent = r.room.room_number;
             document.getElementById('rl-deposit').textContent = r.payment ? r.payment.amount_paid : '0.00';
             document.getElementById('rl-results').style.display = 'none';
@@ -795,6 +993,26 @@
                     results.appendChild(div);
                 });
             } else { results.style.display = 'none'; }
+        }
+
+        function openBanModal(guestId, guestName) {
+            document.getElementById('banModalTitle').textContent = 'Ban ' + guestName + '?';
+            document.getElementById('banModalText').textContent = 'This guest will be blocked from future check-ins. Enter your staff password to confirm.';
+            document.getElementById('banModalGuestId').value = guestId;
+            document.getElementById('banModalForm').action = "{{ route('staff.guest.ban') }}";
+            document.getElementById('banModalSubmit').textContent = 'Confirm Ban';
+            document.getElementById('banModalOverlay').classList.add('open');
+        }
+        function openUnbanModal(guestId, guestName) {
+            document.getElementById('banModalTitle').textContent = 'Unban ' + guestName + '?';
+            document.getElementById('banModalText').textContent = 'This guest will be allowed to check in again. Enter your staff password to confirm.';
+            document.getElementById('banModalGuestId').value = guestId;
+            document.getElementById('banModalForm').action = "{{ route('staff.guest.unban') }}";
+            document.getElementById('banModalSubmit').textContent = 'Confirm Unban';
+            document.getElementById('banModalOverlay').classList.add('open');
+        }
+        function closeBanModal() {
+            document.getElementById('banModalOverlay').classList.remove('open');
         }
     </script>
 </body>

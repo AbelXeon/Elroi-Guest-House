@@ -41,4 +41,18 @@ Route::middleware(['auth'])->prefix('staff')->group(function () {
     Route::post('/reservation/store', [StaffController::class, 'reservationStore'])->name('staff.reservation.store');
     Route::get('/reservation/list/search', [StaffController::class, 'reservationSearch'])->name('staff.reservation.search');
     Route::post('/reservation/complete', [StaffController::class, 'reservationComplete'])->name('staff.reservation.complete');
-});
+
+
+
+
+Route::get('/guest/check', [StaffController::class, 'checkGuestStatus'])->name('staff.guest.check');
+Route::post('/guest/ban', [StaffController::class, 'banGuest'])->name('staff.guest.ban');
+Route::post('/guest/unban', [StaffController::class, 'unbanGuest'])->name('staff.guest.unban');
+
+Route::get('/checkout/detail/{reservation}', [StaffController::class, 'checkoutShow'])->name('staff.checkout.show');
+Route::get('/reservation/detail/{reservation}', [StaffController::class, 'reservationShow'])->name('staff.reservation.show');
+
+
+
+    });
+
