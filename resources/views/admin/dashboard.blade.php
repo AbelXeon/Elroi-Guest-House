@@ -50,7 +50,7 @@
 
         h1,h2,h3{ font-family:'Fraunces', serif; font-weight:500; color:var(--ink); }
 
-        /* ================= SIDEBAR (desktop) ================= */
+        /* ================= SIDEBAR ================= */
         .sidebar{
             width:240px;
             flex-shrink:0;
@@ -125,26 +125,6 @@
         .topline h1{ font-size:26px; }
         .topline .datestamp{ font-size:13px; color:var(--muted); }
 
-        .success-msg{
-            background:var(--accent-soft);
-            color:var(--accent);
-            padding:12px 16px;
-            border-left:4px solid var(--accent);
-            border-radius:7px;
-            margin-bottom:20px;
-            font-size:14px;
-        }
-        ul.errors{
-            background:var(--error-bg);
-            color:var(--error);
-            padding:14px 18px;
-            border-left:4px solid var(--error);
-            border-radius:7px;
-            margin-bottom:20px;
-            list-style:none;
-            font-size:14px;
-        }
-
         .panel{ display:none; }
         .panel.active{ display:block; }
 
@@ -197,6 +177,16 @@
         .chart-card canvas{ max-height:230px; }
         .chart-row{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px; }
 
+        /* ---- Recent activity ---- */
+        .list-header{ display:flex; justify-content:space-between; align-items:center; margin:26px 0 12px; flex-wrap:wrap; gap:10px; }
+        .list-header h3{ font-size:16px; }
+        .plain-table-wrap{ background:var(--card-bg); border:1px solid var(--border); border-radius:12px; box-shadow:var(--shadow); overflow-x:auto; }
+        table.plain-table{ width:100%; border-collapse:collapse; min-width:640px; }
+        table.plain-table thead th{ background:var(--ink); color:#f4f2ec; padding:11px 12px; text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; }
+        table.plain-table tbody td{ padding:10px 12px; font-size:13px; border-bottom:1px solid var(--border); }
+        table.plain-table tbody tr:last-child td{ border-bottom:none; }
+        table.plain-table tbody tr:hover{ background:var(--accent-soft); }
+
         /* ---- Cards / forms ---- */
         .card{
             background:var(--card-bg);
@@ -209,7 +199,8 @@
         .card h2{ font-size:18px; margin-bottom:4px; }
         .card .hint{ font-size:12.5px; color:var(--muted); margin-bottom:18px; }
 
-        .form-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:16px; align-items:end; }
+        .form-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:16px; align-items:end; }
+        .field-actions{ grid-column:1 / -1; display:flex; gap:8px; flex-wrap:wrap; }
 
         .field{ position:relative; }
         .field-label{
@@ -243,6 +234,7 @@
             font-size:13.5px;
             cursor:pointer;
             transition:background .15s ease, transform .1s ease;
+            white-space:nowrap;
         }
         button:hover, .btn:hover{ background:var(--accent-light); }
         button:active{ transform:translateY(1px); }
@@ -254,9 +246,6 @@
             color:var(--text);
         }
         .btn-ghost:hover{ background:#f1f0ec; }
-
-        .radio-row{ display:flex; gap:18px; align-items:center; margin-bottom:14px; }
-        .radio-row label{ display:flex; align-items:center; gap:6px; font-size:13.5px; cursor:pointer; }
 
         .status-pill{
             display:inline-block;
@@ -305,77 +294,83 @@
 
         .empty-note{ color:var(--muted); font-size:13.5px; padding:20px 0; }
 
-        /* ================= MOBILE ================= */
-        .bottom-nav{ display:none; }
+        /* ---- Custom calendar range picker ---- */
+        .calendar-popup{
+            position:absolute; top:calc(100% + 6px); left:0; z-index:60;
+            background:#fff; border:1px solid var(--border); border-radius:12px;
+            box-shadow:0 10px 30px rgba(0,0,0,.15); padding:14px; width:270px;
+        }
+        .cal-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-size:13.5px; font-weight:600; color:var(--ink); }
+        .cal-header button{ padding:4px 9px; background:var(--accent-soft); color:var(--accent); font-size:14px; }
+        .cal-grid{ display:grid; grid-template-columns:repeat(7, 1fr); gap:2px; }
+        .cal-dow{ font-size:10px; text-transform:uppercase; color:var(--muted); text-align:center; padding:4px 0; }
+        .cal-day{ text-align:center; padding:7px 0; font-size:12.5px; border-radius:6px; cursor:pointer; color:var(--text); }
+        .cal-day:hover{ background:var(--accent-soft); }
+        .cal-day.cal-in-range{ background:var(--accent-soft); color:var(--accent); }
+        .cal-day.cal-selected{ background:var(--accent); color:#fff; font-weight:700; }
+        .cal-footer{ margin-top:10px; font-size:12px; color:var(--muted); text-align:center; }
+        .range-field-wrap{ position:relative; }
+
+        /* ---- Toast notifications ---- */
+        .toast-container{ position:fixed; bottom:22px; right:22px; z-index:500; display:flex; flex-direction:column; gap:10px; }
+        .toast{
+            background:var(--ink); color:#f4f2ec; padding:13px 18px; border-radius:10px;
+            box-shadow:0 8px 24px rgba(0,0,0,.25); min-width:220px; max-width:320px;
+            font-size:13.5px; position:relative; overflow:hidden; animation:toastIn .3s ease;
+        }
+        .toast.success{ border-left:4px solid var(--accent); }
+        .toast.error{ border-left:4px solid var(--error); }
+        .toast.info{ border-left:4px solid var(--warn); }
+        .toast .toast-bar{ position:absolute; bottom:0; left:0; height:3px; background:rgba(244,242,236,0.35); animation:toastBar 3s linear forwards; }
+        @keyframes toastIn{ from{ opacity:0; transform:translateX(30px); } to{ opacity:1; transform:translateX(0); } }
+        @keyframes toastOut{ from{ opacity:1; transform:translateX(0); } to{ opacity:0; transform:translateX(30px); } }
+        @keyframes toastBar{ from{ width:100%; } to{ width:0%; } }
+
+        /* ================= MOBILE: hamburger + off-canvas sidebar ================= */
+        .hamburger-btn{ display:none; background:none; border:none; color:var(--ink); cursor:pointer; padding:6px; }
+        .sidebar-overlay{ display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:39; }
+        .sidebar-overlay.open{ display:block; }
 
         @media (max-width:900px){
             body{ display:block; height:auto; overflow:visible; }
-            .sidebar{ display:none; }
+
+            .sidebar{
+                position:fixed; top:0; left:0; z-index:40;
+                width:260px; transform:translateX(-100%);
+                transition:transform .25s ease;
+            }
+            .sidebar.open{ transform:translateX(0); }
+
+            .hamburger-btn{ display:inline-flex; align-items:center; }
 
             .main{
                 height:auto;
                 overflow:visible;
-                padding:20px 16px 90px;
+                padding:20px 16px 40px;
             }
 
             .mobile-topbar{
                 display:flex;
                 align-items:center;
-                gap:10px;
+                gap:12px;
                 margin-bottom:18px;
             }
             .mobile-topbar span{ font-family:'Fraunces', serif; font-weight:600; font-size:16px; color:var(--ink); }
 
             .chart-grid, .chart-row{ grid-template-columns:1fr; }
             .stat-grid{ grid-template-columns:repeat(2, 1fr); }
-
-            .bottom-nav{
-                display:flex;
-                position:fixed;
-                bottom:0; left:0; right:0;
-                background:var(--ink);
-                padding:6px 2px calc(6px + env(safe-area-inset-bottom));
-                z-index:50;
-                box-shadow:0 -4px 16px rgba(0,0,0,0.15);
-                overflow-x:auto;
-            }
-            .bottom-nav .nav-link{
-                flex:1;
-                flex-direction:column;
-                gap:3px;
-                padding:6px 2px;
-                font-size:9.5px;
-                text-align:center;
-                border-left:none;
-                border-radius:8px;
-                min-width:56px;
-            }
-            .bottom-nav .nav-link.active{ background:rgba(244,242,236,0.1); color:#fff; }
-            .bottom-nav form{ flex:1; }
-            .bottom-nav .logout-btn-mobile{
-                width:100%;
-                background:none;
-                border:none;
-                color:#c7cec8;
-                display:flex;
-                flex-direction:column;
-                align-items:center;
-                gap:3px;
-                font-size:9.5px;
-                padding:6px 2px;
-                cursor:pointer;
-            }
         }
 
         @media (max-width:480px){
             .stat-grid{ grid-template-columns:1fr 1fr; }
+            .calendar-popup{ width:230px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ================= DESKTOP SIDEBAR ================= -->
-    <div class="sidebar">
+    <!-- ================= SIDEBAR ================= -->
+    <div class="sidebar" id="sidebar">
         <div class="brand">
             <svg width="24" height="24" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect width="30" height="30" rx="7" fill="#3f6b52"/>
@@ -408,11 +403,15 @@
             </form>
         </div>
     </div>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
     <!-- ================= MAIN ================= -->
     <div class="main" id="mainContent">
 
         <div class="mobile-topbar">
+            <button type="button" class="hamburger-btn" onclick="toggleSidebar()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+            </button>
             <svg width="22" height="22" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect width="30" height="30" rx="7" fill="#3f6b52"/>
                 <path d="M8 20V13.5L15 8L22 13.5V20H17V15.5H13V20H8Z" fill="#f4f2ec"/>
@@ -421,17 +420,13 @@
         </div>
 
         @if (session('success'))
-            <p class="success-msg">{{ session('success') }}</p>
+            <script>document.addEventListener('DOMContentLoaded', () => showToast(@json(session('success')), 'success'));</script>
         @endif
         @if ($errors->any())
-            <ul class="errors">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+            <script>document.addEventListener('DOMContentLoaded', () => showToast(@json($errors->first()), 'error'));</script>
         @endif
 
-        <!-- ============ OVERVIEW PANEL — UNCHANGED ============ -->
+        <!-- ============ OVERVIEW PANEL ============ -->
         <div id="panel-overview" class="panel active">
             <div class="topline">
                 <h1>Overview</h1>
@@ -509,6 +504,36 @@
                     </div>
                 </div>
             </div>
+
+            <div class="list-header">
+                <h3>Recent Activity</h3>
+                <button type="button" class="btn-ghost" onclick="showPanel('reports')">View All Reports</button>
+            </div>
+            <div class="plain-table-wrap">
+                <table class="plain-table">
+                    <thead>
+                        <tr>
+                            <th>Staff</th><th>Guest</th><th>Room</th><th>Price/Night</th>
+                            <th>Check-in</th><th>Check-out</th><th>Remaining</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($recentReservations as $r)
+                            <tr>
+                                <td>{{ $r->user->fullname ?? '—' }}</td>
+                                <td>{{ $r->guest->fullname ?? '—' }}</td>
+                                <td>{{ $r->room->room_number ?? '—' }}</td>
+                                <td>{{ number_format($r->room->price_per_night ?? 0, 2) }}</td>
+                                <td>{{ optional($r->check_in_date)->format('M j') }}</td>
+                                <td>{{ optional($r->check_out_date)->format('M j') }}</td>
+                                <td>{{ $r->payment ? number_format($r->payment->remaining_amount, 2) : '—' }}</td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="7" style="text-align:center; color:var(--muted);">No activity yet.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- ============ ROOMS PANEL ============ -->
@@ -519,17 +544,13 @@
             <div class="card" id="editRoomCard" style="display:none;">
                 <h2>Edit Room</h2>
                 <p class="hint">Update this room, then save. This form clears itself after saving.</p>
-                <form id="editRoomForm" method="POST">
+                <form id="editRoomForm" method="POST" onsubmit="showToast('Saving changes...', 'info', true)">
                     @csrf
                     @method('PUT')
                     <div class="form-grid">
                         <div class="field">
                             <label class="field-label">Room Number</label>
                             <input type="text" name="room_number" id="edit_room_number" required>
-                        </div>
-                        <div class="field">
-                            <label class="field-label">Floor Number</label>
-                            <input type="number" name="floor_number" id="edit_floor_number">
                         </div>
                         <div class="field">
                             <label class="field-label">Room Type</label>
@@ -547,7 +568,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="field" style="display:flex; gap:8px;">
+                        <div class="field-actions">
                             <button type="submit">Save Changes</button>
                             <button type="button" class="btn-ghost" onclick="cancelEditRoom()">Cancel</button>
                         </div>
@@ -558,16 +579,12 @@
             <div class="card">
                 <h2>Create Rooms</h2>
                 <p class="hint">Type a room type name (new or existing), a starting room number like G001 or F101, and how many to generate.</p>
-                <form action="{{ route('rooms.batchStore') }}" method="POST">
+                <form action="{{ route('rooms.batchStore') }}" method="POST" onsubmit="showToast('Creating rooms...', 'info', true)">
                     @csrf
                     <div class="form-grid">
                         <div class="field">
                             <label class="field-label">Room Type</label>
                             <input type="text" name="room_type_name" list="roomTypeSuggestions" placeholder="e.g. Single, Double, Single With Shower" required>
-                        </div>
-                        <div class="field">
-                            <label class="field-label">Floor Number</label>
-                            <input type="number" name="floor_number" placeholder="e.g. 1">
                         </div>
                         <div class="field">
                             <label class="field-label">Starting Room No</label>
@@ -596,18 +613,13 @@
 
             <div class="card">
                 <h2>Bulk Price Update</h2>
-                <p class="hint">Change the price for every room at once, or just one room type — no need to edit them one by one.</p>
-                <form action="{{ route('rooms.bulkPrice') }}" method="POST">
+                <p class="hint">Pick a room type and set a new price for every room of that type at once.</p>
+                <form action="{{ route('rooms.bulkPrice') }}" method="POST" onsubmit="showToast('Updating prices...', 'info', true)">
                     @csrf
-                    <div class="radio-row">
-                        <label><input type="radio" name="scope" value="all" checked onchange="toggleBulkType()"> All Rooms</label>
-                        <label><input type="radio" name="scope" value="type" onchange="toggleBulkType()"> By Room Type</label>
-                    </div>
-
                     <div class="form-grid">
-                        <div class="field" id="bulkTypeWrap" style="display:none;">
+                        <div class="field">
                             <label class="field-label">Room Type</label>
-                            <select name="room_type_id">
+                            <select name="room_type_id" required>
                                 <option value="">-- select --</option>
                                 @foreach ($roomTypes as $type)
                                     <option value="{{ $type->id }}">{{ $type->name }}</option>
@@ -640,7 +652,7 @@
             <div class="card" id="editStaffCard" style="display:none;">
                 <h2>Edit Staff Member</h2>
                 <p class="hint">Leave password blank to keep it unchanged.</p>
-                <form id="editStaffForm" method="POST">
+                <form id="editStaffForm" method="POST" onsubmit="showToast('Saving changes...', 'info', true)">
                     @csrf
                     @method('PUT')
                     <div class="form-grid">
@@ -656,7 +668,7 @@
                             <label class="field-label">New Password</label>
                             <input type="password" name="password" id="edit_staff_password" placeholder="leave blank to keep current">
                         </div>
-                        <div class="field" style="display:flex; gap:8px;">
+                        <div class="field-actions">
                             <button type="submit">Save Changes</button>
                             <button type="button" class="btn-ghost" onclick="cancelEditStaff()">Cancel</button>
                         </div>
@@ -667,7 +679,7 @@
             <div class="card">
                 <h2>Create Staff Member</h2>
                 <p class="hint">They'll use this username and password to log into the staff dashboard.</p>
-                <form action="{{ route('staff.store') }}" method="POST">
+                <form action="{{ route('staff.store') }}" method="POST" onsubmit="showToast('Creating staff member...', 'info', true)">
                     @csrf
                     <div class="form-grid">
                         <div class="field">
@@ -702,27 +714,31 @@
 
             <div class="card">
                 <h2>Reservation Report</h2>
-                <p class="hint">Choose a period, run the report, then export it as CSV, Excel, or print it directly.</p>
+                <p class="hint">The report updates automatically as soon as you change the range — export with the buttons above the table.</p>
                 <div class="form-grid">
                     <div class="field">
                         <label class="field-label">Range</label>
-                        <select id="reportRange" onchange="toggleCustomRange()">
+                        <select id="reportRange" onchange="onRangeChange()">
                             <option value="today">Today</option>
                             <option value="week">Last 7 Days</option>
                             <option value="month">This Month</option>
                             <option value="custom">Custom Range</option>
                         </select>
                     </div>
-                    <div class="field" id="customFromWrap" style="display:none;">
-                        <label class="field-label">From</label>
-                        <input type="date" id="reportFrom">
-                    </div>
-                    <div class="field" id="customToWrap" style="display:none;">
-                        <label class="field-label">To</label>
-                        <input type="date" id="reportTo">
-                    </div>
-                    <div class="field">
-                        <button type="button" onclick="runReport()">Run Report</button>
+                    <div class="field range-field-wrap" id="customRangeWrap" style="display:none;">
+                        <label class="field-label">Custom Range</label>
+                        <button type="button" class="btn-ghost" onclick="toggleRangeCalendar()">Pick Dates</button>
+                        <div id="rangeCalendarPopup" class="calendar-popup" style="display:none;">
+                            <div class="cal-header">
+                                <button type="button" onclick="calNav(-1)">‹</button>
+                                <span id="calMonthLabel"></span>
+                                <button type="button" onclick="calNav(1)">›</button>
+                            </div>
+                            <div class="cal-grid" id="calGrid"></div>
+                            <div class="cal-footer" id="calRangeLabel">Select start date</div>
+                        </div>
+                        <input type="hidden" id="reportFrom">
+                        <input type="hidden" id="reportTo">
                     </div>
                 </div>
             </div>
@@ -747,8 +763,9 @@
             <table id="reportsTable" class="display" style="width:100%">
                 <thead>
                     <tr>
-                        <th>Guest</th><th>Phone</th><th>Room</th><th>Check-in</th><th>Check-out</th>
-                        <th>Total (ETB)</th><th>Paid (ETB)</th><th>Remaining (ETB)</th><th>Status</th>
+                        <th>Guest</th><th>Phone</th><th>Staff</th><th>Room</th><th>Room Price/Night</th>
+                        <th>Check-in</th><th>Check-out</th><th>Total (ETB)</th><th>Paid (ETB)</th>
+                        <th>Remaining (ETB)</th><th>Status</th>
                     </tr>
                 </thead>
             </table>
@@ -766,33 +783,7 @@
         @method('DELETE')
     </form>
 
-    <!-- ================= MOBILE BOTTOM NAV ================= -->
-    <div class="bottom-nav">
-        <a class="nav-link" data-panel="overview" onclick="showPanel('overview')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>
-            Overview
-        </a>
-        <a class="nav-link" data-panel="rooms" onclick="showPanel('rooms')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="10" width="18" height="9" rx="1"/><path d="M3 10V7a2 2 0 0 1 2-2h6v5"/><circle cx="15" cy="14" r="1"/></svg>
-            Rooms
-        </a>
-        <a class="nav-link" data-panel="staff" onclick="showPanel('staff')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
-            Staff
-        </a>
-        <a class="nav-link" data-panel="reports" onclick="showPanel('reports')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13"/></svg>
-            Reports
-        </a>
-        <form action="{{ route('logout') }}" method="POST">
-            @csrf
-            <button type="submit" class="logout-btn-mobile">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
-                Logout
-            </button>
-        </form>
-    </div>
-
+    <div class="toast-container" id="toastContainer"></div>
 
     @php
         $roomStatusData = [
@@ -805,7 +796,7 @@
     @endphp
 
     <script>
-        // ---- Panel switching (shared by desktop sidebar + mobile bottom nav) ----
+        // ---- Sidebar / panel switching ----
         function showPanel(name, updateUrl = true) {
             document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-link').forEach(a => a.classList.remove('active'));
@@ -824,12 +815,34 @@
 
             if (name === 'rooms' && roomsTableInstance) roomsTableInstance.columns.adjust();
             if (name === 'staff' && staffTableInstance) staffTableInstance.columns.adjust();
-            if (name === 'reports' && reportsTableInstance) reportsTableInstance.columns.adjust();
+            if (name === 'reports') {
+                if (reportsTableInstance) reportsTableInstance.columns.adjust();
+                else runReport();
+            }
+
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('open');
         }
 
-        function toggleBulkType() {
-            const scope = document.querySelector('input[name="scope"]:checked').value;
-            document.getElementById('bulkTypeWrap').style.display = (scope === 'type') ? 'block' : 'none';
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('open');
+        }
+
+        // ---- Toasts ----
+        function showToast(message, type = 'success', persist = false) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<span>${message}</span>` + (persist ? '' : '<div class="toast-bar"></div>');
+            container.appendChild(toast);
+            if (!persist) {
+                setTimeout(() => {
+                    toast.style.animation = 'toastOut .3s ease forwards';
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+            return toast;
         }
 
         // ==================== ROOMS DATATABLE ====================
@@ -875,7 +888,6 @@
 
             document.getElementById('editRoomForm').action = `{{ url('/admin/rooms') }}/${id}`;
             document.getElementById('edit_room_number').value = data.room_number;
-            document.getElementById('edit_floor_number').value = data.floor_number === '—' ? '' : data.floor_number;
             document.getElementById('edit_room_type').value = data.room_type;
             document.getElementById('edit_price_per_night').value = data.price_raw;
             document.getElementById('edit_status').value = data.status;
@@ -954,19 +966,22 @@
         // ==================== REPORTS ====================
         let reportsTableInstance = null;
 
-        function toggleCustomRange() {
+        function onRangeChange() {
             const isCustom = document.getElementById('reportRange').value === 'custom';
-            document.getElementById('customFromWrap').style.display = isCustom ? 'block' : 'none';
-            document.getElementById('customToWrap').style.display = isCustom ? 'block' : 'none';
+            document.getElementById('customRangeWrap').style.display = isCustom ? 'block' : 'none';
+            if (!isCustom) runReport();
         }
 
         async function runReport() {
             const range = document.getElementById('reportRange').value;
-            const from = document.getElementById('reportFrom').value;
-            const to = document.getElementById('reportTo').value;
-
             let url = `{{ route('admin.reports.data') }}?range=${range}`;
-            if (range === 'custom') url += `&from=${from}&to=${to}`;
+
+            if (range === 'custom') {
+                const from = document.getElementById('reportFrom').value;
+                const to = document.getElementById('reportTo').value;
+                if (!from || !to) return; // wait until both picked
+                url += `&from=${from}&to=${to}`;
+            }
 
             const res = await fetch(url);
             const json = await res.json();
@@ -987,7 +1002,9 @@
                 columns: [
                     { data: 'guest_name' },
                     { data: 'phone' },
+                    { data: 'staff' },
                     { data: 'room' },
+                    { data: 'room_price' },
                     { data: 'check_in' },
                     { data: 'check_out' },
                     { data: 'total_price' },
@@ -999,6 +1016,83 @@
                 buttons: ['copy', 'csv', 'excel', 'print'],
                 pageLength: 10,
             });
+        }
+
+        // ---- Custom calendar range picker ----
+        let calViewDate = new Date();
+        let rangeStart = null, rangeEnd = null, rangeHoverDate = null;
+
+        function toggleRangeCalendar() {
+            const popup = document.getElementById('rangeCalendarPopup');
+            const isOpen = popup.style.display === 'block';
+            popup.style.display = isOpen ? 'none' : 'block';
+            if (!isOpen) renderCalendar();
+        }
+
+        function calNav(dir) {
+            calViewDate.setMonth(calViewDate.getMonth() + dir);
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calGrid');
+            const label = document.getElementById('calMonthLabel');
+            const year = calViewDate.getFullYear();
+            const month = calViewDate.getMonth();
+            label.textContent = calViewDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+
+            const firstDay = new Date(year, month, 1);
+            const startWeekday = firstDay.getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            let html = '';
+            ['S','M','T','W','T','F','S'].forEach(d => html += `<div class="cal-dow">${d}</div>`);
+            for (let i = 0; i < startWeekday; i++) html += `<div></div>`;
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateObj = new Date(year, month, d);
+                const iso = dateObj.toISOString().split('T')[0];
+                let cls = 'cal-day';
+
+                if (rangeStart && !rangeEnd && rangeHoverDate) {
+                    const lo = rangeStart < rangeHoverDate ? rangeStart : rangeHoverDate;
+                    const hi = rangeStart < rangeHoverDate ? rangeHoverDate : rangeStart;
+                    if (dateObj >= lo && dateObj <= hi) cls += ' cal-in-range';
+                }
+                if (rangeStart && rangeEnd && dateObj >= rangeStart && dateObj <= rangeEnd) cls += ' cal-in-range';
+                if (rangeStart && dateObj.getTime() === rangeStart.getTime()) cls += ' cal-selected';
+                if (rangeEnd && dateObj.getTime() === rangeEnd.getTime()) cls += ' cal-selected';
+
+                html += `<div class="${cls}" onclick="calPick('${iso}')" onmouseenter="calHover('${iso}')">${d}</div>`;
+            }
+            grid.innerHTML = html;
+        }
+
+        function calPick(iso) {
+            const picked = new Date(iso + 'T00:00:00');
+            if (!rangeStart || (rangeStart && rangeEnd)) {
+                rangeStart = picked; rangeEnd = null;
+                document.getElementById('calRangeLabel').textContent = 'Select end date';
+            } else {
+                if (picked < rangeStart) { rangeEnd = rangeStart; rangeStart = picked; }
+                else { rangeEnd = picked; }
+
+                const fromIso = rangeStart.toISOString().split('T')[0];
+                const toIso = rangeEnd.toISOString().split('T')[0];
+                document.getElementById('calRangeLabel').textContent = `${fromIso} → ${toIso}`;
+                document.getElementById('reportFrom').value = fromIso;
+                document.getElementById('reportTo').value = toIso;
+                document.getElementById('rangeCalendarPopup').style.display = 'none';
+                runReport();
+            }
+            renderCalendar();
+        }
+
+        function calHover(iso) {
+            if (rangeStart && !rangeEnd) {
+                rangeHoverDate = new Date(iso + 'T00:00:00');
+                renderCalendar();
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {

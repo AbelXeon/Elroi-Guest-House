@@ -16,7 +16,7 @@ class AdminController extends Controller
 {
     public function dashboard(Request $request)
     {
-        // ---- Overview data — UNCHANGED, do not touch ----
+        // ---- Overview stat/chart data ----
         $allRooms = Room::with('roomType')->get();
         $roomTypes = RoomType::all();
         $allStaff = User::where('role', 'staff')->get();
@@ -53,15 +53,20 @@ class AdminController extends Controller
                 'count' => $allRooms->where('room_type_id', $type->id)->count(),
             ];
         });
-        // ---- End Overview data ----
+
+        // ---- Recent Activity widget (last 6 reservations) ----
+        $recentReservations = Reservation::with(['guest', 'room', 'user', 'payment'])
+            ->latest('check_in_date')
+            ->take(6)
+            ->get();
 
         return view('admin.dashboard', compact(
             'roomTypes', 'staffCount', 'roomStats',
-            'incomeStats', 'incomeLabels', 'incomeData', 'roomsByType'
+            'incomeStats', 'incomeLabels', 'incomeData', 'roomsByType',
+            'recentReservations'
         ));
     }
 
-    // ---- AJAX: full staff list for the DataTable ----
     public function staffData()
     {
         $staff = User::where('role', 'staff')->orderBy('fullname')->get(['id', 'fullname', 'username']);
@@ -109,7 +114,7 @@ class AdminController extends Controller
 
         AdminAction::create([
             'user_id'     => auth()->id(),
-            'action_type' => 'edited_rooms', // reuse existing enum value; see note below
+            'action_type' => 'edited_staff',
             'status'      => "Staff '{$staff->fullname}' updated",
         ]);
 
@@ -134,7 +139,6 @@ class AdminController extends Controller
         return redirect()->route('admin.dashboard', ['panel' => 'staff'])->with('success', 'Staff member removed.');
     }
 
-    // ---- Reports: reservations within a date range, with export-ready data ----
     public function reportsData(Request $request)
     {
         $range = $request->query('range', 'today');
@@ -158,7 +162,7 @@ class AdminController extends Controller
                 $to   = $today->copy()->endOfDay();
         }
 
-        $reservations = Reservation::with(['guest', 'room', 'payment'])
+        $reservations = Reservation::with(['guest', 'room', 'user', 'payment'])
             ->whereBetween('check_in_date', [$from, $to])
             ->orderByDesc('check_in_date')
             ->get();
@@ -167,7 +171,9 @@ class AdminController extends Controller
             return [
                 'guest_name'  => $r->guest->fullname ?? '—',
                 'phone'       => $r->guest->phone_no ?? '—',
+                'staff'       => $r->user->fullname ?? '—',
                 'room'        => $r->room->room_number ?? '—',
+                'room_price'  => number_format($r->room->price_per_night ?? 0, 2),
                 'check_in'    => optional($r->check_in_date)->format('Y-m-d'),
                 'check_out'   => optional($r->check_out_date)->format('Y-m-d'),
                 'total_price' => number_format($r->total_price, 2),

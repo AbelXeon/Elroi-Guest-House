@@ -17,7 +17,6 @@ class RoomController extends Controller
         return view('admin.rooms', compact('rooms', 'roomTypes'));
     }
 
-    // AJAX: full room list for the DataTable
     public function roomsData()
     {
         $rooms = Room::with('roomType')->orderBy('room_number')->get();
@@ -38,12 +37,10 @@ class RoomController extends Controller
         return response()->json(['data' => $data]);
     }
 
-    // Batch generator: admin types the starting room number (e.g. G001) + how many to create
     public function batchStore(Request $request)
     {
         $validated = $request->validate([
             'room_type_name'    => 'required|string|max:255',
-            'floor_number'      => 'nullable|integer',
             'start_room_number' => 'required|string|max:50',
             'count'             => 'required|integer|min:1|max:500',
             'price_per_night'   => 'required|numeric|min:0',
@@ -75,7 +72,6 @@ class RoomController extends Controller
 
             Room::create([
                 'room_number'     => $roomNumber,
-                'floor_number'    => $validated['floor_number'] ?? null,
                 'room_type_id'    => $roomType->id,
                 'price_per_night' => $validated['price_per_night'],
                 'status'          => 'available',
@@ -94,19 +90,16 @@ class RoomController extends Controller
             ->with('success', "$created rooms created." . (count($skipped) ? ' Already existed: ' . implode(', ', $skipped) : ''));
     }
 
+    // Bulk price update — by room type only
     public function bulkPriceUpdate(Request $request)
     {
         $validated = $request->validate([
-            'scope'           => 'required|in:all,type',
-            'room_type_id'    => 'nullable|required_if:scope,type|exists:room_types,id',
+            'room_type_id'    => 'required|exists:room_types,id',
             'price_per_night' => 'required|numeric|min:0',
         ]);
 
-        $query = Room::query();
-        if ($validated['scope'] === 'type') {
-            $query->where('room_type_id', $validated['room_type_id']);
-        }
-        $count = $query->update(['price_per_night' => $validated['price_per_night']]);
+        $count = Room::where('room_type_id', $validated['room_type_id'])
+            ->update(['price_per_night' => $validated['price_per_night']]);
 
         AdminAction::create([
             'user_id'     => auth()->id(),
@@ -117,13 +110,11 @@ class RoomController extends Controller
         return redirect()->route('admin.dashboard', ['panel' => 'rooms'])->with('success', "{$count} room(s) updated.");
     }
 
-    // Edit a room: type is free text now, auto-created if new
     public function update(Request $request, Room $room)
     {
         $validated = $request->validate([
             'room_number'     => 'required|string|max:50|unique:rooms,room_number,' . $room->id,
             'room_type_name'  => 'required|string|max:255',
-            'floor_number'    => 'nullable|integer',
             'price_per_night' => 'required|numeric|min:0',
             'status'          => 'required|in:available,booked,reserved,maintenance,cleaning',
         ]);
@@ -133,7 +124,6 @@ class RoomController extends Controller
         $room->update([
             'room_number'     => $validated['room_number'],
             'room_type_id'    => $roomType->id,
-            'floor_number'    => $validated['floor_number'] ?? null,
             'price_per_night' => $validated['price_per_night'],
             'status'          => $validated['status'],
         ]);
