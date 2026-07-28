@@ -21,8 +21,10 @@ return new class extends Migration
         $table->enum('action_type',[
             'create_staff',
             'remove_staff',
+            'edited_staff',
             'created_rooms',
             'edited_rooms',
+            
         ]);
 
         $table->string('status');

@@ -6,15 +6,17 @@ use App\Models\User;
 use App\Models\Room;
 use App\Models\RoomType;
 use App\Models\Payment;
+use App\Models\Reservation;
 use App\Models\AdminAction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
 
 class AdminController extends Controller
 {
     public function dashboard(Request $request)
     {
-        // ---- Unfiltered data used for stat cards + charts ----
+        // ---- Overview data — UNCHANGED, do not touch ----
         $allRooms = Room::with('roomType')->get();
         $roomTypes = RoomType::all();
         $allStaff = User::where('role', 'staff')->get();
@@ -29,7 +31,6 @@ class AdminController extends Controller
         ];
         $staffCount = $allStaff->count();
 
-        // ---- Income stats ----
         $today = today();
         $incomeStats = [
             'today' => (float) Payment::whereDate('created_at', $today)->sum('amount_paid'),
@@ -38,7 +39,6 @@ class AdminController extends Controller
             'year'  => (float) Payment::whereYear('created_at', $today->year)->sum('amount_paid'),
         ];
 
-        // ---- 7-day income chart ----
         $incomeLabels = [];
         $incomeData = [];
         for ($i = 6; $i >= 0; $i--) {
@@ -47,38 +47,25 @@ class AdminController extends Controller
             $incomeData[] = (float) Payment::whereDate('created_at', $date)->sum('amount_paid');
         }
 
-        // ---- Rooms by type chart ----
         $roomsByType = $roomTypes->map(function ($type) use ($allRooms) {
             return [
                 'name'  => $type->name,
                 'count' => $allRooms->where('room_type_id', $type->id)->count(),
             ];
         });
-
-        // ---- Filtered + paginated ROOMS list ----
-        $roomQuery = Room::with('roomType');
-        if ($roomQ = $request->query('room_q')) {
-            $roomQuery->where('room_number', 'like', "%{$roomQ}%");
-        }
-        if ($roomStatusFilter = $request->query('room_status')) {
-            $roomQuery->where('status', $roomStatusFilter);
-        }
-        $rooms = $roomQuery->orderBy('room_number')->paginate(12, ['*'], 'rooms_page')->withQueryString();
-
-        // ---- Filtered + paginated STAFF list ----
-        $staffQuery = User::where('role', 'staff');
-        if ($staffQ = $request->query('staff_q')) {
-            $staffQuery->where(function ($q) use ($staffQ) {
-                $q->where('fullname', 'like', "%{$staffQ}%")
-                  ->orWhere('username', 'like', "%{$staffQ}%");
-            });
-        }
-        $staff = $staffQuery->orderBy('fullname')->paginate(10, ['*'], 'staff_page')->withQueryString();
+        // ---- End Overview data ----
 
         return view('admin.dashboard', compact(
-            'rooms', 'roomTypes', 'staff', 'staffCount', 'roomStats',
+            'roomTypes', 'staffCount', 'roomStats',
             'incomeStats', 'incomeLabels', 'incomeData', 'roomsByType'
         ));
+    }
+
+    // ---- AJAX: full staff list for the DataTable ----
+    public function staffData()
+    {
+        $staff = User::where('role', 'staff')->orderBy('fullname')->get(['id', 'fullname', 'username']);
+        return response()->json(['data' => $staff]);
     }
 
     public function staffStore(Request $request)
@@ -102,11 +89,31 @@ class AdminController extends Controller
             'status'      => "Staff '{$validated['fullname']}' created",
         ]);
 
-        return redirect()->route('admin.dashboard', [
-            'panel'      => 'staff',
-            'staff_page' => $request->input('return_page', 1),
-            'staff_q'    => $request->input('return_q'),
-        ])->with('success', 'Staff member created.');
+        return redirect()->route('admin.dashboard', ['panel' => 'staff'])->with('success', 'Staff member created.');
+    }
+
+    public function staffUpdate(Request $request, User $staff)
+    {
+        $validated = $request->validate([
+            'fullname' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users,username,' . $staff->id,
+            'password' => 'nullable|string|min:6',
+        ]);
+
+        $staff->fullname = $validated['fullname'];
+        $staff->username = $validated['username'];
+        if (!empty($validated['password'])) {
+            $staff->password = Hash::make($validated['password']);
+        }
+        $staff->save();
+
+        AdminAction::create([
+            'user_id'     => auth()->id(),
+            'action_type' => 'edited_rooms', // reuse existing enum value; see note below
+            'status'      => "Staff '{$staff->fullname}' updated",
+        ]);
+
+        return redirect()->route('admin.dashboard', ['panel' => 'staff'])->with('success', 'Staff member updated.');
     }
 
     public function staffDestroy(Request $request, User $staff)
@@ -124,10 +131,59 @@ class AdminController extends Controller
             'status'      => "Staff '$name' removed",
         ]);
 
-        return redirect()->route('admin.dashboard', [
-            'panel'      => 'staff',
-            'staff_page' => $request->input('return_page', 1),
-            'staff_q'    => $request->input('return_q'),
-        ])->with('success', 'Staff member removed.');
+        return redirect()->route('admin.dashboard', ['panel' => 'staff'])->with('success', 'Staff member removed.');
+    }
+
+    // ---- Reports: reservations within a date range, with export-ready data ----
+    public function reportsData(Request $request)
+    {
+        $range = $request->query('range', 'today');
+        $today = today();
+
+        switch ($range) {
+            case 'week':
+                $from = now()->subDays(6)->startOfDay();
+                $to   = now()->endOfDay();
+                break;
+            case 'month':
+                $from = $today->copy()->startOfMonth();
+                $to   = $today->copy()->endOfMonth()->endOfDay();
+                break;
+            case 'custom':
+                $from = $request->query('from') ? Carbon::parse($request->query('from'))->startOfDay() : $today->copy()->startOfDay();
+                $to   = $request->query('to') ? Carbon::parse($request->query('to'))->endOfDay() : $today->copy()->endOfDay();
+                break;
+            default:
+                $from = $today->copy()->startOfDay();
+                $to   = $today->copy()->endOfDay();
+        }
+
+        $reservations = Reservation::with(['guest', 'room', 'payment'])
+            ->whereBetween('check_in_date', [$from, $to])
+            ->orderByDesc('check_in_date')
+            ->get();
+
+        $rows = $reservations->map(function ($r) {
+            return [
+                'guest_name'  => $r->guest->fullname ?? '—',
+                'phone'       => $r->guest->phone_no ?? '—',
+                'room'        => $r->room->room_number ?? '—',
+                'check_in'    => optional($r->check_in_date)->format('Y-m-d'),
+                'check_out'   => optional($r->check_out_date)->format('Y-m-d'),
+                'total_price' => number_format($r->total_price, 2),
+                'paid'        => $r->payment ? number_format($r->payment->amount_paid, 2) : '0.00',
+                'remaining'   => $r->payment ? number_format($r->payment->remaining_amount, 2) : number_format($r->total_price, 2),
+                'status'      => $r->status,
+            ];
+        });
+
+        return response()->json([
+            'data' => $rows,
+            'summary' => [
+                'count'           => $reservations->count(),
+                'total_revenue'   => number_format($reservations->sum('total_price'), 2),
+                'total_collected' => number_format($reservations->sum(fn($r) => $r->payment->amount_paid ?? 0), 2),
+            ],
+        ]);
     }
 }

@@ -8,6 +8,17 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" defer></script>
+
+    <!-- DataTables + Buttons (export) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.11/css/jquery.dataTables.min.css">
+    <script src="https://cdn.datatables.net/1.13.11/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
     <style>
         :root{
             --ink:#1c2b29;
@@ -209,7 +220,7 @@
             color:var(--muted);
             margin-bottom:6px;
         }
-        input[type="text"], input[type="number"], input[type="password"], select{
+        input[type="text"], input[type="number"], input[type="password"], input[type="date"], select{
             width:100%;
             padding:11px 12px;
             font-size:14px;
@@ -247,35 +258,6 @@
         .radio-row{ display:flex; gap:18px; align-items:center; margin-bottom:14px; }
         .radio-row label{ display:flex; align-items:center; gap:6px; font-size:13.5px; cursor:pointer; }
 
-        /* ---- Filter bar ---- */
-        .filter-bar{
-            display:flex;
-            gap:10px;
-            flex-wrap:wrap;
-            align-items:center;
-            margin-bottom:18px;
-        }
-        .filter-bar input, .filter-bar select{ max-width:220px; }
-        .clear-link{ font-size:12.5px; color:var(--muted); text-decoration:underline; }
-
-        /* ---- Room / staff grids ---- */
-        .room-grid, .staff-grid{
-            display:grid;
-            grid-template-columns:repeat(auto-fill, minmax(230px, 1fr));
-            gap:14px;
-            margin-bottom:18px;
-        }
-        .item-card{
-            background:var(--card-bg);
-            border:1px solid var(--border);
-            border-radius:10px;
-            padding:16px;
-            box-shadow:var(--shadow);
-        }
-        .item-card .top-row{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
-        .item-card .room-no{ font-family:'Fraunces', serif; font-size:17px; color:var(--ink); font-weight:600; }
-        .item-card .floor-tag{ font-size:11px; color:var(--muted); }
-
         .status-pill{
             display:inline-block;
             font-size:10.5px;
@@ -290,38 +272,38 @@
         .status-reserved{ background:#fdf1de; color:#a9700f; }
         .status-maintenance{ background:#fbeceb; color:var(--error); }
         .status-cleaning{ background:#eef0f0; color:#616a67; }
+        .status-checked_in{ background:#e2f3e8; color:#2b7a4b; }
+        .status-checked_out{ background:#eef0f0; color:#616a67; }
+        .status-cancelled{ background:#fbeceb; color:var(--error); }
 
-        .item-card .mini-field{ margin-bottom:8px; }
-        .item-card .mini-field label{ font-size:10.5px; text-transform:uppercase; color:var(--muted); display:block; margin-bottom:3px; }
-        .item-card select, .item-card input{ padding:8px 9px; font-size:13px; }
-        .item-card .actions{ display:flex; gap:8px; margin-top:10px; }
-        .item-card .actions button{ flex:1; padding:8px; font-size:12.5px; }
-
-        .staff-avatar{
-            width:38px; height:38px; border-radius:50%;
-            background:var(--accent-soft); color:var(--accent);
-            display:flex; align-items:center; justify-content:center;
-            font-weight:700; font-size:14px; margin-bottom:10px;
+        /* ---- DataTables theming ---- */
+        table.dataTable{ border-collapse:collapse !important; width:100% !important; margin-top:12px !important; }
+        table.dataTable thead th{
+            background:var(--ink); color:#f4f2ec; font-size:11.5px; text-transform:uppercase;
+            letter-spacing:.04em; padding:12px !important; border-bottom:none !important;
         }
-        .staff-name{ font-weight:600; font-size:14.5px; color:var(--ink); }
-        .staff-username{ font-size:12.5px; color:var(--muted); margin-bottom:10px; }
+        table.dataTable tbody td{ padding:11px 12px !important; font-size:13.5px; border-bottom:1px solid var(--border) !important; }
+        table.dataTable tbody tr:hover{ background:var(--accent-soft); }
+        .dataTables_wrapper .dataTables_filter input,
+        .dataTables_wrapper .dataTables_length select{
+            border:1px solid var(--border); border-radius:7px; padding:7px 10px; margin-left:6px;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button{
+            border-radius:6px !important; padding:5px 11px !important; margin-left:3px !important;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current{
+            background:var(--accent) !important; color:#fff !important; border:none !important;
+        }
+        .dt-buttons{ margin-bottom:10px; }
+        .dt-buttons .dt-button{
+            background:var(--accent) !important; color:#fff !important; border:none !important;
+            border-radius:7px !important; padding:8px 14px !important; font-size:12.5px !important;
+            font-weight:600 !important; margin-right:6px !important;
+        }
+        .dt-buttons .dt-button:hover{ background:var(--accent-light) !important; }
+        table.dataTable td .btn-ghost, table.dataTable td .btn-danger{ padding:6px 10px; font-size:12px; margin-right:4px; }
 
         .empty-note{ color:var(--muted); font-size:13.5px; padding:20px 0; }
-
-        /* ---- Pagination ---- */
-        .pagination{ display:flex; align-items:center; gap:12px; justify-content:center; margin-top:6px; }
-        .page-btn{
-            padding:8px 14px;
-            border:1px solid var(--border);
-            border-radius:7px;
-            font-size:13px;
-            color:var(--text);
-            text-decoration:none;
-            background:#fff;
-        }
-        .page-btn:hover{ background:#f1f0ec; }
-        .page-btn.disabled{ color:#c3c1ba; cursor:default; }
-        .page-info{ font-size:12.5px; color:var(--muted); }
 
         /* ================= MOBILE ================= */
         .bottom-nav{ display:none; }
@@ -352,19 +334,21 @@
                 position:fixed;
                 bottom:0; left:0; right:0;
                 background:var(--ink);
-                padding:8px 4px calc(8px + env(safe-area-inset-bottom));
+                padding:6px 2px calc(6px + env(safe-area-inset-bottom));
                 z-index:50;
                 box-shadow:0 -4px 16px rgba(0,0,0,0.15);
+                overflow-x:auto;
             }
             .bottom-nav .nav-link{
                 flex:1;
                 flex-direction:column;
-                gap:4px;
+                gap:3px;
                 padding:6px 2px;
-                font-size:10.5px;
+                font-size:9.5px;
                 text-align:center;
                 border-left:none;
                 border-radius:8px;
+                min-width:56px;
             }
             .bottom-nav .nav-link.active{ background:rgba(244,242,236,0.1); color:#fff; }
             .bottom-nav form{ flex:1; }
@@ -376,8 +360,8 @@
                 display:flex;
                 flex-direction:column;
                 align-items:center;
-                gap:4px;
-                font-size:10.5px;
+                gap:3px;
+                font-size:9.5px;
                 padding:6px 2px;
                 cursor:pointer;
             }
@@ -385,7 +369,6 @@
 
         @media (max-width:480px){
             .stat-grid{ grid-template-columns:1fr 1fr; }
-            .room-grid, .staff-grid{ grid-template-columns:1fr; }
         }
     </style>
 </head>
@@ -407,11 +390,15 @@
         </a>
         <a class="nav-link" data-panel="rooms" onclick="showPanel('rooms')">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="10" width="18" height="9" rx="1"/><path d="M3 10V7a2 2 0 0 1 2-2h6v5"/><circle cx="15" cy="14" r="1"/></svg>
-            Rooms
+            Manage Rooms
         </a>
         <a class="nav-link" data-panel="staff" onclick="showPanel('staff')">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
-            Staff
+            Manage Staff
+        </a>
+        <a class="nav-link" data-panel="reports" onclick="showPanel('reports')">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/></svg>
+            Reports
         </a>
 
         <div class="sidebar-footer">
@@ -444,7 +431,7 @@
             </ul>
         @endif
 
-        <!-- ============ OVERVIEW PANEL ============ -->
+        <!-- ============ OVERVIEW PANEL — UNCHANGED ============ -->
         <div id="panel-overview" class="panel active">
             <div class="topline">
                 <h1>Overview</h1>
@@ -526,38 +513,69 @@
 
         <!-- ============ ROOMS PANEL ============ -->
         <div id="panel-rooms" class="panel">
-            <div class="topline"><h1>Rooms</h1></div>
+            <div class="topline"><h1>Manage Rooms</h1></div>
 
-            <div class="card">
-                <h2>Batch Create Rooms</h2>
-                <p class="hint">Generate a sequential run of rooms in one go.</p>
-                <form action="{{ route('rooms.batchStore') }}" method="POST">
+            <!-- Edit Room (hidden until Edit is clicked) -->
+            <div class="card" id="editRoomCard" style="display:none;">
+                <h2>Edit Room</h2>
+                <p class="hint">Update this room, then save. This form clears itself after saving.</p>
+                <form id="editRoomForm" method="POST">
                     @csrf
-                    <input type="hidden" name="return_page" value="{{ $rooms->currentPage() }}">
-                    <input type="hidden" name="return_q" value="{{ request('room_q') }}">
-                    <input type="hidden" name="return_status" value="{{ request('room_status') }}">
-
+                    @method('PUT')
                     <div class="form-grid">
                         <div class="field">
+                            <label class="field-label">Room Number</label>
+                            <input type="text" name="room_number" id="edit_room_number" required>
+                        </div>
+                        <div class="field">
                             <label class="field-label">Floor Number</label>
-                            <input type="number" name="floor_number">
-                        </div>
-                        <div class="field">
-                            <label class="field-label">Start Room No</label>
-                            <input type="number" name="start_room_no" required>
-                        </div>
-                        <div class="field">
-                            <label class="field-label">End Room No</label>
-                            <input type="number" name="end_room_no" required>
+                            <input type="number" name="floor_number" id="edit_floor_number">
                         </div>
                         <div class="field">
                             <label class="field-label">Room Type</label>
-                            <select name="room_type_id" required>
-                                <option value="">-- select --</option>
-                                @foreach ($roomTypes as $type)
-                                    <option value="{{ $type->id }}">{{ $type->name }}</option>
+                            <input type="text" name="room_type_name" id="edit_room_type" list="roomTypeSuggestions" required>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">Price / Night</label>
+                            <input type="number" step="0.01" name="price_per_night" id="edit_price_per_night" required>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">Status</label>
+                            <select name="status" id="edit_status" required>
+                                @foreach (['available','booked','reserved','maintenance','cleaning'] as $s)
+                                    <option value="{{ $s }}">{{ ucfirst($s) }}</option>
                                 @endforeach
                             </select>
+                        </div>
+                        <div class="field" style="display:flex; gap:8px;">
+                            <button type="submit">Save Changes</button>
+                            <button type="button" class="btn-ghost" onclick="cancelEditRoom()">Cancel</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>Create Rooms</h2>
+                <p class="hint">Type a room type name (new or existing), a starting room number like G001 or F101, and how many to generate.</p>
+                <form action="{{ route('rooms.batchStore') }}" method="POST">
+                    @csrf
+                    <div class="form-grid">
+                        <div class="field">
+                            <label class="field-label">Room Type</label>
+                            <input type="text" name="room_type_name" list="roomTypeSuggestions" placeholder="e.g. Single, Double, Single With Shower" required>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">Floor Number</label>
+                            <input type="number" name="floor_number" placeholder="e.g. 1">
+                        </div>
+                        <div class="field">
+                            <label class="field-label">Starting Room No</label>
+                            <input type="text" name="start_room_number" placeholder="e.g. G001 or F101" required>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">How Many Rooms</label>
+                            <input type="number" name="count" min="1" placeholder="e.g. 10" required>
                         </div>
                         <div class="field">
                             <label class="field-label">Price / Night</label>
@@ -568,6 +586,12 @@
                         </div>
                     </div>
                 </form>
+
+                <datalist id="roomTypeSuggestions">
+                    @foreach ($roomTypes as $type)
+                        <option value="{{ $type->name }}">
+                    @endforeach
+                </datalist>
             </div>
 
             <div class="card">
@@ -575,10 +599,6 @@
                 <p class="hint">Change the price for every room at once, or just one room type — no need to edit them one by one.</p>
                 <form action="{{ route('rooms.bulkPrice') }}" method="POST">
                     @csrf
-                    <input type="hidden" name="return_page" value="{{ $rooms->currentPage() }}">
-                    <input type="hidden" name="return_q" value="{{ request('room_q') }}">
-                    <input type="hidden" name="return_status" value="{{ request('room_status') }}">
-
                     <div class="radio-row">
                         <label><input type="radio" name="scope" value="all" checked onchange="toggleBulkType()"> All Rooms</label>
                         <label><input type="radio" name="scope" value="type" onchange="toggleBulkType()"> By Room Type</label>
@@ -605,107 +625,50 @@
                 </form>
             </div>
 
-            <form method="GET" action="{{ route('admin.dashboard') }}" class="filter-bar">
-                <input type="hidden" name="panel" value="rooms">
-                <input type="text" name="room_q" placeholder="Search room number..." value="{{ request('room_q') }}">
-                <select name="room_status">
-                    <option value="">All Statuses</option>
-                    @foreach (['available','booked','reserved','maintenance','cleaning'] as $s)
-                        <option value="{{ $s }}" @selected(request('room_status') == $s)>{{ ucfirst($s) }}</option>
-                    @endforeach
-                </select>
-                <button type="submit" class="btn-ghost">Filter</button>
-                @if(request('room_q') || request('room_status'))
-                    <a href="{{ route('admin.dashboard', ['panel'=>'rooms']) }}" class="clear-link">Clear filters</a>
-                @endif
-            </form>
-
-            <div class="room-grid">
-                @forelse ($rooms as $room)
-                    <div class="item-card">
-                        <div class="top-row">
-                            <span class="room-no">Room {{ $room->room_number }}</span>
-                            <span class="status-pill status-{{ $room->status }}">{{ $room->status }}</span>
-                        </div>
-                        <div class="floor-tag" style="margin-bottom:10px;">Floor: {{ $room->floor_number ?? '—' }}</div>
-
-                        <form action="{{ route('rooms.update', $room->id) }}" method="POST" id="room-form-{{ $room->id }}">
-                            @csrf
-                            @method('PUT')
-                            <input type="hidden" name="return_page" value="{{ $rooms->currentPage() }}">
-                            <input type="hidden" name="return_q" value="{{ request('room_q') }}">
-                            <input type="hidden" name="return_status" value="{{ request('room_status') }}">
-                        </form>
-
-                        <div class="mini-field">
-                            <label>Type</label>
-                            <select name="room_type_id" form="room-form-{{ $room->id }}">
-                                @foreach ($roomTypes as $type)
-                                    <option value="{{ $type->id }}" @selected($room->room_type_id == $type->id)>{{ $type->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="mini-field">
-                            <label>Price / Night</label>
-                            <input type="number" step="0.01" name="price_per_night" value="{{ $room->price_per_night }}" form="room-form-{{ $room->id }}">
-                        </div>
-                        <div class="mini-field">
-                            <label>Status</label>
-                            <select name="status" form="room-form-{{ $room->id }}">
-                                @foreach (['available','booked','reserved','maintenance','cleaning'] as $status)
-                                    <option value="{{ $status }}" @selected($room->status == $status)>{{ ucfirst($status) }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="actions">
-                            <button type="submit" form="room-form-{{ $room->id }}">Save</button>
-                            <form action="{{ route('rooms.destroy', $room->id) }}" method="POST" style="flex:1;">
-                                @csrf
-                                @method('DELETE')
-                                <input type="hidden" name="return_page" value="{{ $rooms->currentPage() }}">
-                                <input type="hidden" name="return_q" value="{{ request('room_q') }}">
-                                <input type="hidden" name="return_status" value="{{ request('room_status') }}">
-                                <button type="submit" class="btn-danger" style="width:100%;" onclick="return confirm('Delete this room?')">Delete</button>
-                            </form>
-                        </div>
-                    </div>
-                @empty
-                    <p class="empty-note">No rooms match your filters yet.</p>
-                @endforelse
-            </div>
-
-            @if ($rooms->hasPages())
-                <div class="pagination">
-                    @if ($rooms->onFirstPage())
-                        <span class="page-btn disabled">Prev</span>
-                    @else
-                        <a href="{{ $rooms->previousPageUrl() }}" class="page-btn">Prev</a>
-                    @endif
-
-                    <span class="page-info">Page {{ $rooms->currentPage() }} of {{ $rooms->lastPage() }} &middot; {{ $rooms->total() }} rooms</span>
-
-                    @if ($rooms->hasMorePages())
-                        <a href="{{ $rooms->nextPageUrl() }}" class="page-btn">Next</a>
-                    @else
-                        <span class="page-btn disabled">Next</span>
-                    @endif
-                </div>
-            @endif
+            <table id="roomsTable" class="display" style="width:100%">
+                <thead>
+                    <tr><th>Room No</th><th>Floor</th><th>Type</th><th>Price/Night</th><th>Status</th><th>Actions</th></tr>
+                </thead>
+            </table>
         </div>
 
         <!-- ============ STAFF PANEL ============ -->
         <div id="panel-staff" class="panel">
-            <div class="topline"><h1>Staff</h1></div>
+            <div class="topline"><h1>Manage Staff</h1></div>
+
+            <!-- Edit Staff (hidden until Edit is clicked) -->
+            <div class="card" id="editStaffCard" style="display:none;">
+                <h2>Edit Staff Member</h2>
+                <p class="hint">Leave password blank to keep it unchanged.</p>
+                <form id="editStaffForm" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="form-grid">
+                        <div class="field">
+                            <label class="field-label">Full Name</label>
+                            <input type="text" name="fullname" id="edit_staff_fullname" required>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">Username</label>
+                            <input type="text" name="username" id="edit_staff_username" required>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">New Password</label>
+                            <input type="password" name="password" id="edit_staff_password" placeholder="leave blank to keep current">
+                        </div>
+                        <div class="field" style="display:flex; gap:8px;">
+                            <button type="submit">Save Changes</button>
+                            <button type="button" class="btn-ghost" onclick="cancelEditStaff()">Cancel</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
 
             <div class="card">
                 <h2>Create Staff Member</h2>
                 <p class="hint">They'll use this username and password to log into the staff dashboard.</p>
                 <form action="{{ route('staff.store') }}" method="POST">
                     @csrf
-                    <input type="hidden" name="return_page" value="{{ $staff->currentPage() }}">
-                    <input type="hidden" name="return_q" value="{{ request('staff_q') }}">
-
                     <div class="form-grid">
                         <div class="field">
                             <label class="field-label">Full Name</label>
@@ -726,54 +689,82 @@
                 </form>
             </div>
 
-            <form method="GET" action="{{ route('admin.dashboard') }}" class="filter-bar">
-                <input type="hidden" name="panel" value="staff">
-                <input type="text" name="staff_q" placeholder="Search name or username..." value="{{ request('staff_q') }}">
-                <button type="submit" class="btn-ghost">Search</button>
-                @if(request('staff_q'))
-                    <a href="{{ route('admin.dashboard', ['panel'=>'staff']) }}" class="clear-link">Clear</a>
-                @endif
-            </form>
+            <table id="staffTable" class="display" style="width:100%">
+                <thead>
+                    <tr><th>Full Name</th><th>Username</th><th>Actions</th></tr>
+                </thead>
+            </table>
+        </div>
 
-            <div class="staff-grid">
-                @forelse ($staff as $member)
-                    <div class="item-card">
-                        <div class="staff-avatar">{{ strtoupper(substr($member->fullname, 0, 1)) }}</div>
-                        <div class="staff-name">{{ $member->fullname }}</div>
-                        <div class="staff-username">{{ '@' . $member->username }}</div>
-                        <form action="{{ route('staff.destroy', $member->id) }}" method="POST">
-                            @csrf
-                            @method('DELETE')
-                            <input type="hidden" name="return_page" value="{{ $staff->currentPage() }}">
-                            <input type="hidden" name="return_q" value="{{ request('staff_q') }}">
-                            <button type="submit" class="btn-danger" style="width:100%;" onclick="return confirm('Remove this staff member?')">Remove</button>
-                        </form>
+        <!-- ============ REPORTS PANEL ============ -->
+        <div id="panel-reports" class="panel">
+            <div class="topline"><h1>Reports</h1></div>
+
+            <div class="card">
+                <h2>Reservation Report</h2>
+                <p class="hint">Choose a period, run the report, then export it as CSV, Excel, or print it directly.</p>
+                <div class="form-grid">
+                    <div class="field">
+                        <label class="field-label">Range</label>
+                        <select id="reportRange" onchange="toggleCustomRange()">
+                            <option value="today">Today</option>
+                            <option value="week">Last 7 Days</option>
+                            <option value="month">This Month</option>
+                            <option value="custom">Custom Range</option>
+                        </select>
                     </div>
-                @empty
-                    <p class="empty-note">No staff members match your search yet.</p>
-                @endforelse
+                    <div class="field" id="customFromWrap" style="display:none;">
+                        <label class="field-label">From</label>
+                        <input type="date" id="reportFrom">
+                    </div>
+                    <div class="field" id="customToWrap" style="display:none;">
+                        <label class="field-label">To</label>
+                        <input type="date" id="reportTo">
+                    </div>
+                    <div class="field">
+                        <button type="button" onclick="runReport()">Run Report</button>
+                    </div>
+                </div>
             </div>
 
-            @if ($staff->hasPages())
-                <div class="pagination">
-                    @if ($staff->onFirstPage())
-                        <span class="page-btn disabled">Prev</span>
-                    @else
-                        <a href="{{ $staff->previousPageUrl() }}" class="page-btn">Prev</a>
-                    @endif
-
-                    <span class="page-info">Page {{ $staff->currentPage() }} of {{ $staff->lastPage() }} &middot; {{ $staff->total() }} staff</span>
-
-                    @if ($staff->hasMorePages())
-                        <a href="{{ $staff->nextPageUrl() }}" class="page-btn">Next</a>
-                    @else
-                        <span class="page-btn disabled">Next</span>
-                    @endif
+            <div class="stat-grid" id="reportSummary" style="display:none;">
+                <div class="stat-card accent">
+                    <div class="label">Reservations</div>
+                    <div class="value" id="reportCount">0</div>
                 </div>
-            @endif
+                <div class="stat-card">
+                    <div class="label">Total Revenue</div>
+                    <div class="value" id="reportRevenue">0</div>
+                    <div class="sub">ETB</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Total Collected</div>
+                    <div class="value" id="reportCollected">0</div>
+                    <div class="sub">ETB</div>
+                </div>
+            </div>
+
+            <table id="reportsTable" class="display" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Guest</th><th>Phone</th><th>Room</th><th>Check-in</th><th>Check-out</th>
+                        <th>Total (ETB)</th><th>Paid (ETB)</th><th>Remaining (ETB)</th><th>Status</th>
+                    </tr>
+                </thead>
+            </table>
         </div>
 
     </div>
+
+    <!-- Hidden forms used by row action buttons -->
+    <form id="deleteRoomForm" method="POST" style="display:none;">
+        @csrf
+        @method('DELETE')
+    </form>
+    <form id="deleteStaffForm" method="POST" style="display:none;">
+        @csrf
+        @method('DELETE')
+    </form>
 
     <!-- ================= MOBILE BOTTOM NAV ================= -->
     <div class="bottom-nav">
@@ -789,6 +780,10 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
             Staff
         </a>
+        <a class="nav-link" data-panel="reports" onclick="showPanel('reports')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13"/></svg>
+            Reports
+        </a>
         <form action="{{ route('logout') }}" method="POST">
             @csrf
             <button type="submit" class="logout-btn-mobile">
@@ -800,14 +795,14 @@
 
 
     @php
-    $roomStatusData = [
-        $roomStats['available'],
-        $roomStats['booked'],
-        $roomStats['reserved'],
-        $roomStats['maintenance'],
-        $roomStats['cleaning'],
-    ];
-@endphp
+        $roomStatusData = [
+            $roomStats['available'],
+            $roomStats['booked'],
+            $roomStats['reserved'],
+            $roomStats['maintenance'],
+            $roomStats['cleaning'],
+        ];
+    @endphp
 
     <script>
         // ---- Panel switching (shared by desktop sidebar + mobile bottom nav) ----
@@ -826,6 +821,10 @@
                 url.searchParams.set('panel', name);
                 window.history.replaceState({}, '', url);
             }
+
+            if (name === 'rooms' && roomsTableInstance) roomsTableInstance.columns.adjust();
+            if (name === 'staff' && staffTableInstance) staffTableInstance.columns.adjust();
+            if (name === 'reports' && reportsTableInstance) reportsTableInstance.columns.adjust();
         }
 
         function toggleBulkType() {
@@ -833,13 +832,180 @@
             document.getElementById('bulkTypeWrap').style.display = (scope === 'type') ? 'block' : 'none';
         }
 
+        // ==================== ROOMS DATATABLE ====================
+        let roomsTableInstance = null;
+        let roomsDataCache = [];
+
+        async function loadRoomsTable() {
+            const res = await fetch('{{ route('rooms.data') }}');
+            const json = await res.json();
+            roomsDataCache = json.data;
+
+            if (roomsTableInstance) {
+                roomsTableInstance.clear();
+                roomsTableInstance.rows.add(roomsDataCache).draw();
+                return;
+            }
+
+            roomsTableInstance = $('#roomsTable').DataTable({
+                data: roomsDataCache,
+                columns: [
+                    { data: 'room_number' },
+                    { data: 'floor_number' },
+                    { data: 'room_type' },
+                    { data: 'price_per_night' },
+                    { data: 'status', render: s => `<span class="status-pill status-${s}">${s}</span>` },
+                    {
+                        data: null, orderable: false, searchable: false,
+                        render: (data) => `
+                            <button type="button" class="btn-ghost" onclick="editRoomById(${data.id})">Edit</button>
+                            <button type="button" class="btn-danger" onclick="deleteRoom(${data.id})">Delete</button>
+                        `
+                    },
+                ],
+                dom: 'Bfrtip',
+                buttons: ['copy', 'csv', 'excel', 'print'],
+                pageLength: 10,
+            });
+        }
+
+        function editRoomById(id) {
+            const data = roomsDataCache.find(r => r.id === id);
+            if (!data) return;
+
+            document.getElementById('editRoomForm').action = `{{ url('/admin/rooms') }}/${id}`;
+            document.getElementById('edit_room_number').value = data.room_number;
+            document.getElementById('edit_floor_number').value = data.floor_number === '—' ? '' : data.floor_number;
+            document.getElementById('edit_room_type').value = data.room_type;
+            document.getElementById('edit_price_per_night').value = data.price_raw;
+            document.getElementById('edit_status').value = data.status;
+
+            document.getElementById('editRoomCard').style.display = 'block';
+            document.getElementById('mainContent').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function cancelEditRoom() {
+            document.getElementById('editRoomCard').style.display = 'none';
+        }
+
+        function deleteRoom(id) {
+            if (!confirm('Delete this room?')) return;
+            document.getElementById('deleteRoomForm').action = `{{ url('/admin/rooms') }}/${id}`;
+            document.getElementById('deleteRoomForm').submit();
+        }
+
+        // ==================== STAFF DATATABLE ====================
+        let staffTableInstance = null;
+        let staffDataCache = [];
+
+        async function loadStaffTable() {
+            const res = await fetch('{{ route('staff.data') }}');
+            const json = await res.json();
+            staffDataCache = json.data;
+
+            if (staffTableInstance) {
+                staffTableInstance.clear();
+                staffTableInstance.rows.add(staffDataCache).draw();
+                return;
+            }
+
+            staffTableInstance = $('#staffTable').DataTable({
+                data: staffDataCache,
+                columns: [
+                    { data: 'fullname' },
+                    { data: 'username' },
+                    {
+                        data: null, orderable: false, searchable: false,
+                        render: (data) => `
+                            <button type="button" class="btn-ghost" onclick="editStaffById(${data.id})">Edit</button>
+                            <button type="button" class="btn-danger" onclick="deleteStaff(${data.id})">Remove</button>
+                        `
+                    },
+                ],
+                dom: 'Bfrtip',
+                buttons: ['copy', 'csv', 'excel', 'print'],
+                pageLength: 10,
+            });
+        }
+
+        function editStaffById(id) {
+            const data = staffDataCache.find(s => s.id === id);
+            if (!data) return;
+
+            document.getElementById('editStaffForm').action = `{{ url('/admin/staff') }}/${id}`;
+            document.getElementById('edit_staff_fullname').value = data.fullname;
+            document.getElementById('edit_staff_username').value = data.username;
+            document.getElementById('edit_staff_password').value = '';
+
+            document.getElementById('editStaffCard').style.display = 'block';
+            document.getElementById('mainContent').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function cancelEditStaff() {
+            document.getElementById('editStaffCard').style.display = 'none';
+        }
+
+        function deleteStaff(id) {
+            if (!confirm('Remove this staff member?')) return;
+            document.getElementById('deleteStaffForm').action = `{{ url('/admin/staff') }}/${id}`;
+            document.getElementById('deleteStaffForm').submit();
+        }
+
+        // ==================== REPORTS ====================
+        let reportsTableInstance = null;
+
+        function toggleCustomRange() {
+            const isCustom = document.getElementById('reportRange').value === 'custom';
+            document.getElementById('customFromWrap').style.display = isCustom ? 'block' : 'none';
+            document.getElementById('customToWrap').style.display = isCustom ? 'block' : 'none';
+        }
+
+        async function runReport() {
+            const range = document.getElementById('reportRange').value;
+            const from = document.getElementById('reportFrom').value;
+            const to = document.getElementById('reportTo').value;
+
+            let url = `{{ route('admin.reports.data') }}?range=${range}`;
+            if (range === 'custom') url += `&from=${from}&to=${to}`;
+
+            const res = await fetch(url);
+            const json = await res.json();
+
+            document.getElementById('reportSummary').style.display = 'grid';
+            document.getElementById('reportCount').textContent = json.summary.count;
+            document.getElementById('reportRevenue').textContent = json.summary.total_revenue;
+            document.getElementById('reportCollected').textContent = json.summary.total_collected;
+
+            if (reportsTableInstance) {
+                reportsTableInstance.clear();
+                reportsTableInstance.rows.add(json.data).draw();
+                return;
+            }
+
+            reportsTableInstance = $('#reportsTable').DataTable({
+                data: json.data,
+                columns: [
+                    { data: 'guest_name' },
+                    { data: 'phone' },
+                    { data: 'room' },
+                    { data: 'check_in' },
+                    { data: 'check_out' },
+                    { data: 'total_price' },
+                    { data: 'paid' },
+                    { data: 'remaining' },
+                    { data: 'status', render: s => `<span class="status-pill status-${s}">${s}</span>` },
+                ],
+                dom: 'Bfrtip',
+                buttons: ['copy', 'csv', 'excel', 'print'],
+                pageLength: 10,
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
-            // Restore active panel: URL param wins, then sessionStorage, then default
             const params = new URLSearchParams(window.location.search);
             const panel = params.get('panel') || sessionStorage.getItem('activePanel') || 'overview';
             showPanel(panel, false);
 
-            // Restore scroll position on desktop main content
             const main = document.getElementById('mainContent');
             const savedScroll = sessionStorage.getItem('scrollPos');
             if (savedScroll) main.scrollTop = parseInt(savedScroll, 10);
@@ -847,10 +1013,13 @@
                 sessionStorage.setItem('scrollPos', main.scrollTop);
             });
 
-            // ---- Charts ----
+            loadRoomsTable();
+            loadStaffTable();
+
+            // ---- Charts (unchanged) ----
             const incomeLabels = @json($incomeLabels);
             const incomeData = @json($incomeData);
-const roomStatusData = @json($roomStatusData);
+            const roomStatusData = @json($roomStatusData);
             const typeLabels = @json($roomsByType->pluck('name'));
             const typeData = @json($roomsByType->pluck('count'));
 
