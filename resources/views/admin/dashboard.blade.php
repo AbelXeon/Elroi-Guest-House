@@ -141,6 +141,8 @@
             border-radius:12px;
             padding:18px 18px 16px;
             box-shadow:var(--shadow);
+            min-width: 0;
+            overflow: hidden;
         }
         .stat-card .label{
             font-size:11px;
@@ -148,14 +150,18 @@
             letter-spacing:0.08em;
             color:var(--muted);
             margin-bottom:8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .stat-card .value{
             font-family:'Fraunces', serif;
             font-size:24px;
             color:var(--ink);
             font-weight:600;
+            word-break: break-word;
         }
-        .stat-card .sub{ font-size:12px; color:var(--muted); margin-top:4px; }
+        .stat-card .sub{ font-size:12px; color:var(--muted); margin-top:4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .stat-card.accent{ border-color:var(--accent); background:var(--accent-soft); }
         .stat-card.accent .value{ color:var(--accent); }
 
@@ -172,9 +178,11 @@
             border-radius:12px;
             padding:20px;
             box-shadow:var(--shadow);
+            min-width: 0;
+            overflow: hidden;
         }
         .chart-card h3{ font-size:15px; margin-bottom:14px; }
-        .chart-card canvas{ max-height:230px; }
+        .chart-card canvas{ max-height:230px; width: 100% !important; }
         .chart-row{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px; }
 
         /* ---- Recent activity ---- */
@@ -195,6 +203,7 @@
             padding:24px;
             box-shadow:var(--shadow);
             margin-bottom:20px;
+            min-width: 0;
         }
         .card h2{ font-size:18px; margin-bottom:4px; }
         .card .hint{ font-size:12.5px; color:var(--muted); margin-bottom:18px; }
@@ -202,7 +211,7 @@
         .form-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:16px; align-items:end; }
         .field-actions{ grid-column:1 / -1; display:flex; gap:8px; flex-wrap:wrap; }
 
-        .field{ position:relative; }
+        .field{ position:relative; min-width: 0; }
         .field-label{
             display:block;
             font-size:11px;
@@ -265,7 +274,7 @@
         .status-checked_out{ background:#eef0f0; color:#616a67; }
         .status-cancelled{ background:#fbeceb; color:var(--error); }
 
-        /* ---- DataTables theming ---- */
+        /* ---- DataTables theming & isolation of scrolling wrapper ---- */
         table.dataTable{ border-collapse:collapse !important; width:100% !important; margin-top:12px !important; }
         table.dataTable thead th{
             background:var(--ink); color:#f4f2ec; font-size:11.5px; text-transform:uppercase;
@@ -273,6 +282,15 @@
         }
         table.dataTable tbody td{ padding:11px 12px !important; font-size:13.5px; border-bottom:1px solid var(--border) !important; }
         table.dataTable tbody tr:hover{ background:var(--accent-soft); }
+        
+        .dataTables_wrapper { width: 100%; position: relative; }
+        .dataTables_wrapper .dataTables_scrollBody, 
+        div.dataTables_wrapper > div:nth-child(2) {
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch;
+            width: 100%;
+        }
+
         .dataTables_wrapper .dataTables_filter input,
         .dataTables_wrapper .dataTables_length select{
             border:1px solid var(--border); border-radius:7px; padding:7px 10px; margin-left:6px;
@@ -283,11 +301,11 @@
         .dataTables_wrapper .dataTables_paginate .paginate_button.current{
             background:var(--accent) !important; color:#fff !important; border:none !important;
         }
-        .dt-buttons{ margin-bottom:10px; }
+        .dt-buttons{ margin-bottom:10px; display: flex; flex-wrap: wrap; gap: 6px; }
         .dt-buttons .dt-button{
             background:var(--accent) !important; color:#fff !important; border:none !important;
             border-radius:7px !important; padding:8px 14px !important; font-size:12.5px !important;
-            font-weight:600 !important; margin-right:6px !important;
+            font-weight:600 !important; margin-right:0px !important;
         }
         .dt-buttons .dt-button:hover{ background:var(--accent-light) !important; }
         table.dataTable td .btn-ghost, table.dataTable td .btn-danger{ padding:6px 10px; font-size:12px; margin-right:4px; }
@@ -314,9 +332,7 @@
 
         /* ---- Mobile overflow hardening ---- */
         html, body{ overflow-x:hidden; }
-        .dataTables_wrapper{ overflow-x:auto; -webkit-overflow-scrolling:touch; width:100%; }
         table.dataTable{ min-width:640px; }
-        .dt-buttons{ display:flex; flex-wrap:wrap; }
         .form-grid, .field{ min-width:0; }
         input, select{ min-width:0; }
 
@@ -339,6 +355,7 @@
         .hamburger-btn{ display:none; background:none; border:none; color:var(--ink); cursor:pointer; padding:6px; }
         .sidebar-overlay{ display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:39; }
         .sidebar-overlay.open{ display:block; }
+        .mobile-topbar{ display: none; }
 
         @media (max-width:900px){
             body{ display:block; height:auto; overflow:visible; }
@@ -357,14 +374,24 @@
                 overflow-y:visible;
                 overflow-x:hidden;
                 max-width:100vw;
-                padding:20px 16px 40px;
+                padding:76px 16px 40px;
             }
 
             .mobile-topbar{
                 display:flex;
                 align-items:center;
                 gap:12px;
-                margin-bottom:18px;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 60px;
+                padding: 0 16px;
+                background: rgba(246, 245, 242, 0.85);
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
+                border-bottom: 1px solid var(--border);
+                z-index: 38;
                 max-width:100%;
             }
             .mobile-topbar span{
@@ -877,6 +904,7 @@
 
             roomsTableInstance = $('#roomsTable').DataTable({
                 data: roomsDataCache,
+                scrollX: true,
                 columns: [
                     { data: 'room_number' },
                     { data: 'floor_number' },
@@ -938,6 +966,7 @@
 
             staffTableInstance = $('#staffTable').DataTable({
                 data: staffDataCache,
+                scrollX: true,
                 columns: [
                     { data: 'fullname' },
                     { data: 'username' },
@@ -1014,6 +1043,7 @@
 
             reportsTableInstance = $('#reportsTable').DataTable({
                 data: json.data,
+                scrollX: true,
                 columns: [
                     { data: 'guest_name' },
                     { data: 'phone' },
@@ -1177,6 +1207,7 @@
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: { y: { beginAtZero: true } }
                 }
@@ -1191,7 +1222,11 @@
                         backgroundColor: ['#3f6b52', '#3855a8', '#c98a2c', '#b3413a', '#8a938f']
                     }]
                 },
-                options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } } }
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } } 
+                }
             });
 
             new Chart(document.getElementById('typeChart'), {
@@ -1207,8 +1242,27 @@
                 },
                 options: {
                     responsive: true,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    return context[0].label;
+                                }
+                            }
+                        }
+                    },
+                    scales: { 
+                        y: { beginAtZero: true, ticks: { stepSize: 1 } },
+                        x: {
+                            ticks: {
+                                autoSkip: false,
+                                maxRotation: 45,
+                                minRotation: 45
+                            }
+                        }
+                    }
                 }
             });
         });
