@@ -139,57 +139,61 @@ class AdminController extends Controller
         return redirect()->route('admin.dashboard', ['panel' => 'staff'])->with('success', 'Staff member removed.');
     }
 
-    public function reportsData(Request $request)
-    {
-        $range = $request->query('range', 'today');
-        $today = today();
+   public function reportsData(Request $request)
+{
+    $range = $request->query('range', 'today');
+    $today = today();
 
-        switch ($range) {
-            case 'week':
-                $from = now()->subDays(6)->startOfDay();
-                $to   = now()->endOfDay();
-                break;
-            case 'month':
-                $from = $today->copy()->startOfMonth();
-                $to   = $today->copy()->endOfMonth()->endOfDay();
-                break;
-            case 'custom':
-                $from = $request->query('from') ? Carbon::parse($request->query('from'))->startOfDay() : $today->copy()->startOfDay();
-                $to   = $request->query('to') ? Carbon::parse($request->query('to'))->endOfDay() : $today->copy()->endOfDay();
-                break;
-            default:
-                $from = $today->copy()->startOfDay();
-                $to   = $today->copy()->endOfDay();
-        }
-
-        $reservations = Reservation::with(['guest', 'room', 'user', 'payment'])
-            ->whereBetween('check_in_date', [$from, $to])
-            ->orderByDesc('check_in_date')
-            ->get();
-
-        $rows = $reservations->map(function ($r) {
-            return [
-                'guest_name'  => $r->guest->fullname ?? '—',
-                'phone'       => $r->guest->phone_no ?? '—',
-                'staff'       => $r->user->fullname ?? '—',
-                'room'        => $r->room->room_number ?? '—',
-                'room_price'  => number_format($r->room->price_per_night ?? 0, 2),
-                'check_in'    => optional($r->check_in_date)->format('Y-m-d'),
-                'check_out'   => optional($r->check_out_date)->format('Y-m-d'),
-                'total_price' => number_format($r->total_price, 2),
-                'paid'        => $r->payment ? number_format($r->payment->amount_paid, 2) : '0.00',
-                'remaining'   => $r->payment ? number_format($r->payment->remaining_amount, 2) : number_format($r->total_price, 2),
-                'status'      => $r->status,
-            ];
-        });
-
-        return response()->json([
-            'data' => $rows,
-            'summary' => [
-                'count'           => $reservations->count(),
-                'total_revenue'   => number_format($reservations->sum('total_price'), 2),
-                'total_collected' => number_format($reservations->sum(fn($r) => $r->payment->amount_paid ?? 0), 2),
-            ],
-        ]);
+    switch ($range) {
+        case 'week':
+            $from = now()->subDays(6)->startOfDay();
+            $to   = now()->endOfDay();
+            break;
+        case 'month':
+            $from = $today->copy()->startOfMonth();
+            $to   = $today->copy()->endOfMonth()->endOfDay();
+            break;
+        case 'custom':
+            $from = $request->query('from') ? Carbon::parse($request->query('from'))->startOfDay() : $today->copy()->startOfDay();
+            $to   = $request->query('to') ? Carbon::parse($request->query('to'))->endOfDay() : $today->copy()->endOfDay();
+            break;
+        default:
+            $from = $today->copy()->startOfDay();
+            $to   = $today->copy()->endOfDay();
     }
+
+    $reservations = Reservation::with(['guest', 'room', 'user', 'payment'])
+        ->whereBetween('check_in_date', [$from, $to])
+        ->orderByDesc('check_in_date')
+        ->get();
+
+    $rows = $reservations->map(function ($r) {
+        $remaining = $r->payment ? (float) $r->payment->remaining_amount : (float) $r->total_price;
+
+        return [
+            'guest_name'       => $r->guest->fullname ?? '—',
+            'phone'            => $r->guest->phone_no ?? '—',
+            'staff'            => $r->user->fullname ?? '—',
+            'room'             => $r->room->room_number ?? '—',
+            'room_price'       => number_format($r->room->price_per_night ?? 0, 2),
+            'check_in'         => optional($r->check_in_date)->format('Y-m-d'),
+            'check_out'        => optional($r->check_out_date)->format('Y-m-d'),
+            'actual_check_out' => $r->actual_check_out_date ? $r->actual_check_out_date->format('Y-m-d') : '—',
+            'total_price'      => number_format($r->total_price, 2),
+            'paid'             => $r->payment ? number_format($r->payment->amount_paid, 2) : '0.00',
+            'remaining'        => number_format($remaining, 2),
+            'payment_status'   => $remaining <= 0 ? 'paid' : 'remaining',
+            'status'           => $r->status,
+        ];
+    });
+
+    return response()->json([
+        'data' => $rows,
+        'summary' => [
+            'count'           => $reservations->count(),
+            'total_revenue'   => number_format($reservations->sum('total_price'), 2),
+            'total_collected' => number_format($reservations->sum(fn($r) => $r->payment->amount_paid ?? 0), 2),
+        ],
+    ]);
+}
 }

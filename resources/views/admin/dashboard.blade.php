@@ -308,8 +308,17 @@
         .cal-day:hover{ background:var(--accent-soft); }
         .cal-day.cal-in-range{ background:var(--accent-soft); color:var(--accent); }
         .cal-day.cal-selected{ background:var(--accent); color:#fff; font-weight:700; }
+        .cal-day.cal-today{ box-shadow:inset 0 0 0 2px var(--accent); font-weight:700; }
         .cal-footer{ margin-top:10px; font-size:12px; color:var(--muted); text-align:center; }
         .range-field-wrap{ position:relative; }
+
+        /* ---- Mobile overflow hardening ---- */
+        html, body{ overflow-x:hidden; }
+        .dataTables_wrapper{ overflow-x:auto; -webkit-overflow-scrolling:touch; width:100%; }
+        table.dataTable{ min-width:640px; }
+        .dt-buttons{ display:flex; flex-wrap:wrap; }
+        .form-grid, .field{ min-width:0; }
+        input, select{ min-width:0; }
 
         /* ---- Toast notifications ---- */
         .toast-container{ position:fixed; bottom:22px; right:22px; z-index:500; display:flex; flex-direction:column; gap:10px; }
@@ -345,7 +354,9 @@
 
             .main{
                 height:auto;
-                overflow:visible;
+                overflow-y:visible;
+                overflow-x:hidden;
+                max-width:100vw;
                 padding:20px 16px 40px;
             }
 
@@ -354,8 +365,12 @@
                 align-items:center;
                 gap:12px;
                 margin-bottom:18px;
+                max-width:100%;
             }
-            .mobile-topbar span{ font-family:'Fraunces', serif; font-weight:600; font-size:16px; color:var(--ink); }
+            .mobile-topbar span{
+                font-family:'Fraunces', serif; font-weight:600; font-size:16px; color:var(--ink);
+                overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+            }
 
             .chart-grid, .chart-row{ grid-template-columns:1fr; }
             .stat-grid{ grid-template-columns:repeat(2, 1fr); }
@@ -764,8 +779,8 @@
                 <thead>
                     <tr>
                         <th>Guest</th><th>Phone</th><th>Staff</th><th>Room</th><th>Room Price/Night</th>
-                        <th>Check-in</th><th>Check-out</th><th>Total (ETB)</th><th>Paid (ETB)</th>
-                        <th>Remaining (ETB)</th><th>Status</th>
+                        <th>Check-in</th><th>Check-out</th><th>Actual Check-out</th><th>Total (ETB)</th>
+                        <th>Paid (ETB)</th><th>Remaining (ETB)</th><th>Payment Status</th><th>Status</th>
                     </tr>
                 </thead>
             </table>
@@ -1007,9 +1022,13 @@
                     { data: 'room_price' },
                     { data: 'check_in' },
                     { data: 'check_out' },
+                    { data: 'actual_check_out' },
                     { data: 'total_price' },
                     { data: 'paid' },
                     { data: 'remaining' },
+                    { data: 'payment_status', render: s => s === 'paid'
+                        ? `<span class="status-pill status-available">Paid</span>`
+                        : `<span class="status-pill status-maintenance">Remaining</span>` },
                     { data: 'status', render: s => `<span class="status-pill status-${s}">${s}</span>` },
                 ],
                 dom: 'Bfrtip',
@@ -1021,6 +1040,7 @@
         // ---- Custom calendar range picker ----
         let calViewDate = new Date();
         let rangeStart = null, rangeEnd = null, rangeHoverDate = null;
+        let calEventsBound = false;
 
         function toggleRangeCalendar() {
             const popup = document.getElementById('rangeCalendarPopup');
@@ -1034,6 +1054,12 @@
             renderCalendar();
         }
 
+        function isSameDate(a, b) {
+            return a && b && a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+        }
+
+        // Builds the grid HTML once. Does NOT get called on every hover — only on
+        // open/navigate/pick — so a click target never gets swapped out from under the user.
         function renderCalendar() {
             const grid = document.getElementById('calGrid');
             const label = document.getElementById('calMonthLabel');
@@ -1041,6 +1067,7 @@
             const month = calViewDate.getMonth();
             label.textContent = calViewDate.toLocaleString('default', { month: 'long', year: 'numeric' });
 
+            const today = new Date();
             const firstDay = new Date(year, month, 1);
             const startWeekday = firstDay.getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -1054,25 +1081,36 @@
                 const iso = dateObj.toISOString().split('T')[0];
                 let cls = 'cal-day';
 
-                if (rangeStart && !rangeEnd && rangeHoverDate) {
-                    const lo = rangeStart < rangeHoverDate ? rangeStart : rangeHoverDate;
-                    const hi = rangeStart < rangeHoverDate ? rangeHoverDate : rangeStart;
-                    if (dateObj >= lo && dateObj <= hi) cls += ' cal-in-range';
-                }
+                if (isSameDate(dateObj, today)) cls += ' cal-today';
                 if (rangeStart && rangeEnd && dateObj >= rangeStart && dateObj <= rangeEnd) cls += ' cal-in-range';
-                if (rangeStart && dateObj.getTime() === rangeStart.getTime()) cls += ' cal-selected';
-                if (rangeEnd && dateObj.getTime() === rangeEnd.getTime()) cls += ' cal-selected';
+                if (rangeStart && isSameDate(dateObj, rangeStart)) cls += ' cal-selected';
+                if (rangeEnd && isSameDate(dateObj, rangeEnd)) cls += ' cal-selected';
 
-                html += `<div class="${cls}" onclick="calPick('${iso}')" onmouseenter="calHover('${iso}')">${d}</div>`;
+                html += `<div class="${cls}" data-iso="${iso}">${d}</div>`;
             }
             grid.innerHTML = html;
+
+            if (!calEventsBound) {
+                // Event delegation: listeners live on the container, not on individual day
+                // cells, so re-rendering the grid later never detaches them.
+                grid.addEventListener('click', (e) => {
+                    const dayEl = e.target.closest('.cal-day');
+                    if (dayEl) calPick(dayEl.dataset.iso);
+                });
+                grid.addEventListener('mouseover', (e) => {
+                    const dayEl = e.target.closest('.cal-day');
+                    if (dayEl) calHover(dayEl.dataset.iso);
+                });
+                calEventsBound = true;
+            }
         }
 
         function calPick(iso) {
             const picked = new Date(iso + 'T00:00:00');
             if (!rangeStart || (rangeStart && rangeEnd)) {
-                rangeStart = picked; rangeEnd = null;
+                rangeStart = picked; rangeEnd = null; rangeHoverDate = null;
                 document.getElementById('calRangeLabel').textContent = 'Select end date';
+                renderCalendar();
             } else {
                 if (picked < rangeStart) { rangeEnd = rangeStart; rangeStart = picked; }
                 else { rangeEnd = picked; }
@@ -1082,17 +1120,23 @@
                 document.getElementById('calRangeLabel').textContent = `${fromIso} → ${toIso}`;
                 document.getElementById('reportFrom').value = fromIso;
                 document.getElementById('reportTo').value = toIso;
+                renderCalendar();
                 document.getElementById('rangeCalendarPopup').style.display = 'none';
                 runReport();
             }
-            renderCalendar();
         }
 
+        // Only toggles a CSS class on already-existing elements — no rebuild, so it
+        // can't interrupt a click gesture in progress.
         function calHover(iso) {
-            if (rangeStart && !rangeEnd) {
-                rangeHoverDate = new Date(iso + 'T00:00:00');
-                renderCalendar();
-            }
+            if (!rangeStart || rangeEnd) return;
+            rangeHoverDate = new Date(iso + 'T00:00:00');
+            const lo = rangeStart < rangeHoverDate ? rangeStart : rangeHoverDate;
+            const hi = rangeStart < rangeHoverDate ? rangeHoverDate : rangeStart;
+            document.querySelectorAll('#calGrid .cal-day').forEach(el => {
+                const d = new Date(el.dataset.iso + 'T00:00:00');
+                el.classList.toggle('cal-in-range', d >= lo && d <= hi);
+            });
         }
 
         document.addEventListener('DOMContentLoaded', () => {
