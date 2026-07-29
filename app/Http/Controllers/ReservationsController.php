@@ -24,7 +24,7 @@ class ReservationsController extends Controller
                 'fullname' => $request->fullname,
                 'id_type' => $request->id_type,
                 'id_number' => $request->id_number,
-                'id_photo' => $request->id_photo, // Base64 from Webcam
+                'id_photo' => $request->id_photo, 
             ]
         );
 

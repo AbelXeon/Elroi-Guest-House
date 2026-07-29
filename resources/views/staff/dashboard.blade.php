@@ -15,10 +15,11 @@
             --warn:#c98a2c; --warn-bg:#fdf1de; --shadow:0 2px 12px rgba(28,43,41,0.06);
         }
         *{ margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
-        html,body{ height:100%; }
+        html,body{ height:100%; overflow-x:hidden; }
         body{ background:var(--bg); color:var(--text); display:flex; height:100vh; overflow:hidden; }
         h1,h2,h3{ font-family:'Fraunces', serif; font-weight:500; color:var(--ink); }
 
+        /* ===== Sidebar ===== */
         .sidebar{ width:230px; flex-shrink:0; background:linear-gradient(160deg, var(--ink) 0%, var(--panel) 100%);
             color:#f4f2ec; display:flex; flex-direction:column; padding:26px 0; height:100vh; overflow-y:auto; }
         .brand{ display:flex; align-items:center; gap:10px; padding:0 22px 22px;
@@ -34,16 +35,21 @@
             border-radius:8px; color:#f2a9a4; font-size:13px; font-weight:600; cursor:pointer; }
         .logout-btn:hover{ background:rgba(179,65,58,0.28); }
 
-        .main{ flex:1; height:100vh; overflow-y:auto; padding:30px 34px 100px; }
-        .topline{ margin-bottom:20px; }
+        /* ===== Main ===== */
+        .main{ flex:1; height:100vh; overflow-y:auto; overflow-x:hidden; padding:30px 34px 100px; }
+        .topline{ position:sticky; top:0; z-index:15; background:var(--bg); padding:0 0 16px; margin-bottom:6px;
+            display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; }
         .topline h1{ font-size:24px; }
-        .success-msg{ background:var(--accent-soft); color:var(--accent); padding:12px 16px; border-left:4px solid var(--accent);
-            border-radius:7px; margin-bottom:18px; font-size:14px; }
-        ul.errors{ background:var(--error-bg); color:var(--error); padding:14px 18px; border-left:4px solid var(--error);
-            border-radius:7px; margin-bottom:18px; list-style:none; font-size:14px; }
+
+        .segmented{ display:flex; gap:5px; background:#eceae4; padding:4px; border-radius:10px; }
+        .seg-btn{ padding:9px 16px; background:transparent; color:var(--muted); border:none; border-radius:8px;
+            font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap; }
+        .seg-btn.active{ background:#fff; color:var(--ink); box-shadow:var(--shadow); }
 
         .panel{ display:none; }
         .panel.active{ display:block; }
+        .fd-view{ display:none; }
+        .fd-view.active{ display:block; }
 
         .stat-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:14px; margin-bottom:22px; }
         .stat-card{ background:var(--card-bg); border:1px solid var(--border); border-radius:12px; padding:18px; box-shadow:var(--shadow); }
@@ -56,22 +62,16 @@
             text-align:center; color:var(--muted); }
         .empty-panel h3{ margin-bottom:6px; color:var(--text); }
 
-        .type-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:26px; }
-        .type-card{ background:var(--card-bg); border:1px solid var(--border); border-radius:12px; padding:16px 18px; box-shadow:var(--shadow); }
-        .type-card .tname{ font-weight:600; font-size:14.5px; color:var(--ink); margin-bottom:8px; }
-        .type-bar-track{ height:6px; background:#eceae4; border-radius:4px; overflow:hidden; margin-bottom:8px; }
-        .type-bar-fill{ height:100%; background:var(--accent); border-radius:4px; }
-        .type-meta{ display:flex; justify-content:space-between; font-size:12px; color:var(--muted); }
-        .type-meta strong{ color:var(--accent); font-weight:700; }
-
         .card{ background:var(--card-bg); border:1px solid var(--border); border-radius:12px; padding:26px;
-            box-shadow:var(--shadow); max-width:640px; margin-bottom:20px; }
+            box-shadow:var(--shadow); margin-bottom:20px; }
         label{ display:block; font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:0 0 6px; }
         input, select{ width:100%; padding:11px 12px; font-size:14px; color:var(--text); background:#fff;
             border:1px solid var(--border); border-radius:8px; outline:none; transition:border-color .15s; }
         input:focus, select:focus{ border-color:var(--accent); }
         .field{ margin-bottom:16px; }
-        .field-row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+        .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:26px; align-items:start; }
+        @media (max-width:900px){ .two-col{ grid-template-columns:1fr; } }
 
         button{ padding:11px 18px; background:var(--accent); border:none; border-radius:8px; color:#fff;
             font-weight:600; font-size:13.5px; cursor:pointer; transition:background .15s; }
@@ -83,24 +83,12 @@
         button.ghost:hover{ background:#f1f0ec; }
         button:disabled{ opacity:.5; cursor:not-allowed; }
 
-        .steps-nav{ display:flex; align-items:center; gap:8px; margin-bottom:22px; }
-        .step-dot{ display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted); }
-        .step-dot .circle{ width:24px; height:24px; border-radius:50%; background:#eceae4; color:var(--muted);
-            display:flex; align-items:center; justify-content:center; font-size:11.5px; font-weight:700; transition:.2s; }
-        .step-dot.active .circle{ background:var(--accent); color:#fff; }
-        .step-dot.active{ color:var(--text); font-weight:600; }
-        .step-line{ flex:1; height:1px; background:var(--border); }
+        .ban-indicator{ display:none; padding:10px 14px; border-radius:8px; font-size:13px; font-weight:600; margin-top:2px; margin-bottom:14px; }
+        .ban-indicator.checking{ background:#f1f0ec; color:var(--muted); display:block; }
+        .ban-indicator.green{ background:var(--accent-soft); color:var(--accent); display:block; }
+        .ban-indicator.red{ background:var(--error-bg); color:var(--error); display:block; }
 
-        .step-panel{ display:none; }
-        .step-panel.active{ display:block; animation:fadeIn .25s ease; }
-        @keyframes fadeIn{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:translateY(0); } }
-
-        .step-actions{ display:flex; justify-content:space-between; margin-top:20px; }
-
-        .ban-warning{ display:none; margin-bottom:16px; padding:12px 14px; background:var(--error-bg); color:var(--error);
-            border-left:4px solid var(--error); border-radius:8px; font-size:13.5px; font-weight:600; }
-
-        .chip-row{ display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 2px; }
+        .chip-row{ display:flex; gap:8px; flex-wrap:wrap; margin:10px 0 4px; }
         .chip{ padding:7px 13px; border-radius:20px; border:1px solid var(--border); background:#fff;
             font-size:12.5px; color:var(--text); cursor:pointer; transition:.15s; }
         .chip:hover{ border-color:var(--accent); color:var(--accent); }
@@ -115,6 +103,30 @@
         .bal-box{ font-weight:600; margin-top:10px; padding:12px 14px; border-radius:8px; border-left:4px solid; font-size:13.5px; }
         .bal-red{ background:var(--error-bg); color:var(--error); border-color:var(--error); }
         .bal-green{ background:var(--accent-soft); color:var(--accent); border-color:var(--accent); }
+
+        /* ---- Inline calendar ---- */
+        .calendar-inline{ border:1px solid var(--border); border-radius:12px; padding:14px; background:#fff; margin-top:6px; }
+        .cal-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-size:13.5px; font-weight:600; color:var(--ink); }
+        .cal-header button{ padding:4px 9px; background:var(--accent-soft); color:var(--accent); font-size:14px; }
+        .cal-grid{ display:grid; grid-template-columns:repeat(7, 1fr); gap:2px; }
+        .cal-dow{ font-size:10px; text-transform:uppercase; color:var(--muted); text-align:center; padding:4px 0; }
+        .cal-day{ text-align:center; padding:8px 0; font-size:12.5px; border-radius:6px; cursor:pointer; color:var(--text); }
+        .cal-day:hover{ background:var(--accent-soft); }
+        .cal-day.cal-in-range{ background:var(--accent-soft); color:var(--accent); }
+        .cal-day.cal-selected{ background:var(--accent); color:#fff; font-weight:700; }
+        .cal-day.cal-today{ box-shadow:inset 0 0 0 2px var(--accent); font-weight:700; }
+        .cal-footer{ margin-top:10px; font-size:12px; color:var(--muted); text-align:center; }
+
+        /* ---- Room chips ---- */
+        .rooms-box{ display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; min-height:20px; }
+        .room-chip{ padding:10px 14px; border:1px solid var(--border); border-radius:10px; cursor:pointer;
+            font-size:12.5px; display:flex; flex-direction:column; gap:2px; transition:.15s; background:#fff; }
+        .room-chip:hover{ border-color:var(--accent); }
+        .room-chip.selected{ background:var(--accent); border-color:var(--accent); color:#fff; }
+        .room-chip span{ font-size:11px; opacity:.8; }
+        .rooms-loading{ font-size:12.5px; color:var(--muted); padding:10px 0; animation:pulse 1.2s infinite; }
+        .rooms-empty{ font-size:12.5px; color:var(--error); padding:10px 0; }
+        @keyframes pulse{ 0%,100%{ opacity:.5; } 50%{ opacity:1; } }
 
         .search-container{ position:relative; max-width:420px; margin-bottom:6px; }
         .search-results{ position:absolute; background:#fff; border:1px solid var(--border); width:100%;
@@ -159,38 +171,50 @@
         .modal-actions{ display:flex; gap:10px; margin-top:16px; }
         .modal-actions button{ flex:1; }
 
-        .bottom-nav{ display:none; }
+        /* ---- Toasts ---- */
+        .toast-container{ position:fixed; bottom:22px; right:22px; z-index:500; display:flex; flex-direction:column; gap:10px; }
+        .toast{ background:var(--ink); color:#f4f2ec; padding:13px 18px; border-radius:10px;
+            box-shadow:0 8px 24px rgba(0,0,0,.25); min-width:220px; max-width:320px;
+            font-size:13.5px; position:relative; overflow:hidden; animation:toastIn .3s ease; }
+        .toast.success{ border-left:4px solid var(--accent); }
+        .toast.error{ border-left:4px solid var(--error); }
+        .toast.info{ border-left:4px solid var(--warn); }
+        .toast .toast-bar{ position:absolute; bottom:0; left:0; height:3px; background:rgba(244,242,236,0.35); animation:toastBar 3s linear forwards; }
+        @keyframes toastIn{ from{ opacity:0; transform:translateX(30px); } to{ opacity:1; transform:translateX(0); } }
+        @keyframes toastOut{ from{ opacity:1; transform:translateX(0); } to{ opacity:0; transform:translateX(30px); } }
+        @keyframes toastBar{ from{ width:100%; } to{ width:0%; } }
+
+        /* ===== Mobile: hamburger + off-canvas sidebar ===== */
+        .hamburger-btn{ display:none; background:none; border:none; color:var(--ink); cursor:pointer; padding:6px; }
+        .sidebar-overlay{ display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:39; }
+        .sidebar-overlay.open{ display:block; }
 
         @media (max-width:900px){
             body{ display:block; height:auto; overflow:visible; }
-            .sidebar{ display:none; }
-            .main{ height:auto; overflow:visible; padding:20px 16px 90px; }
-            .mobile-topbar{ display:flex; align-items:center; gap:10px; margin-bottom:18px; }
-            .mobile-topbar span{ font-family:'Fraunces', serif; font-weight:600; font-size:16px; color:var(--ink); }
-            .field-row{ grid-template-columns:1fr; }
-            .card{ max-width:100%; padding:20px; }
 
-            .bottom-nav{ display:flex; position:fixed; bottom:0; left:0; right:0; background:var(--ink);
-                padding:6px 2px calc(6px + env(safe-area-inset-bottom)); z-index:50; box-shadow:0 -4px 16px rgba(0,0,0,.15);
-                overflow-x:auto; }
-            .bottom-nav .nav-link{ flex:1; flex-direction:column; gap:3px; padding:6px 2px; font-size:9.5px;
-                text-align:center; border-left:none; border-radius:8px; min-width:56px; }
-            .bottom-nav .nav-link.active{ background:rgba(244,242,236,0.1); color:#fff; }
-            .bottom-nav form{ flex:1; }
-            .bottom-nav .logout-btn-mobile{ width:100%; background:none; border:none; color:#c7cec8; display:flex;
-                flex-direction:column; align-items:center; gap:3px; font-size:9.5px; padding:6px 2px; cursor:pointer; }
+            .sidebar{ position:fixed; top:0; left:0; z-index:40; width:260px;
+                transform:translateX(-100%); transition:transform .25s ease; }
+            .sidebar.open{ transform:translateX(0); }
+
+            .hamburger-btn{ display:inline-flex; align-items:center; }
+
+            .main{ height:auto; overflow-y:visible; overflow-x:hidden; max-width:100vw; padding:20px 16px 40px; }
+
+            .mobile-topbar{ display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+            .mobile-topbar span{ font-family:'Fraunces', serif; font-weight:600; font-size:16px; color:var(--ink);
+                overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+            video, .preview-img{ width:100%; }
         }
         @media (max-width:480px){
             .stat-grid{ grid-template-columns:1fr 1fr; }
-            .type-grid{ grid-template-columns:1fr 1fr; }
             .card-grid{ grid-template-columns:1fr; }
-            video, .preview-img{ width:100%; }
         }
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
         <div class="brand">
             <svg width="22" height="22" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect width="30" height="30" rx="7" fill="#3f6b52"/><path d="M8 20V13.5L15 8L22 13.5V20H17V15.5H13V20H8Z" fill="#f4f2ec"/>
@@ -201,17 +225,9 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>
             Dashboard
         </a>
-        <a class="nav-link" data-panel="checkin" onclick="showPanel('checkin')">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
-            Check In
-        </a>
-        <a class="nav-link" data-panel="checkout" onclick="showPanel('checkout')">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
-            Check Out
-        </a>
-        <a class="nav-link" data-panel="reservation" onclick="showPanel('reservation')">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-            Reservation
+        <a class="nav-link" data-panel="frontdesk" onclick="showPanel('frontdesk')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>
+            Front Desk
         </a>
         <a class="nav-link" data-panel="reservationlist" onclick="showPanel('reservationlist')">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/></svg>
@@ -228,74 +244,36 @@
             </form>
         </div>
     </div>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
     <div class="main" id="mainContent">
         <div class="mobile-topbar">
+            <button type="button" class="hamburger-btn" onclick="toggleSidebar()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+            </button>
             <svg width="20" height="20" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect width="30" height="30" rx="7" fill="#3f6b52"/><path d="M8 20V13.5L15 8L22 13.5V20H17V15.5H13V20H8Z" fill="#f4f2ec"/>
             </svg>
             <span>Elroi — Staff</span>
         </div>
 
-        @if (session('success')) <p class="success-msg">{{ session('success') }}</p> @endif
+        @if (session('success'))
+            <script>document.addEventListener('DOMContentLoaded', () => showToast(@json(session('success')), 'success'));</script>
+        @endif
         @if ($errors->any())
-            <ul class="errors">@foreach ($errors->all() as $error) <li>{{ $error }}</li> @endforeach</ul>
+            <script>document.addEventListener('DOMContentLoaded', () => showToast(@json($errors->first()), 'error'));</script>
         @endif
 
         <!-- ===== DASHBOARD ===== -->
         <div id="panel-dashboard" class="panel active">
             <div class="topline"><h1>Good to see you</h1></div>
 
-            @isset($dashStats)
-            <div class="stat-grid">
-                <div class="stat-card">
-                    <div class="icon-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg></div>
-                    <div class="label">Guests In-House</div>
-                    <div class="value">{{ $dashStats['active_guests'] }}</div>
-                </div>
-                <div class="stat-card">
-                    <div class="icon-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="10" width="18" height="9" rx="1"/><path d="M3 10V7a2 2 0 0 1 2-2h6v5"/></svg></div>
-                    <div class="label">Rooms Available</div>
-                    <div class="value">{{ $dashStats['available_rooms'] }}</div>
-                </div>
-                <div class="stat-card">
-                    <div class="icon-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
-                    <div class="label">Pending Arrivals</div>
-                    <div class="value">{{ $dashStats['pending_arrivals'] }}</div>
-                </div>
-                <div class="stat-card">
-                    <div class="icon-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/></svg></div>
-                    <div class="label">Checked In Today</div>
-                    <div class="value">{{ $dashStats['checked_in_today'] }}</div>
-                </div>
-            </div>
-            @endisset
-
-            @isset($roomTypes)
-            <div class="list-header"><h3>Room Availability by Type</h3></div>
-            <div class="type-grid">
-                @foreach ($roomTypes as $type)
-                    @php
-                        $pct = $type->rooms_count > 0 ? round(($type->available_rooms_count / $type->rooms_count) * 100) : 0;
-                    @endphp
-                    <div class="type-card">
-                        <div class="tname">{{ $type->name }}</div>
-                        <div class="type-bar-track"><div class="type-bar-fill" style="width:{{ $pct }}%;"></div></div>
-                        <div class="type-meta">
-                            <span><strong>{{ $type->available_rooms_count }}</strong> free</span>
-                            <span>{{ $type->rooms_count }} total</span>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-            @endisset
-
             <div class="list-header"><h3>Currently Staying</h3></div>
             @isset($activeStays)
                 @if ($activeStays->count())
                     <div class="card-grid">
                         @foreach ($activeStays->take(6) as $r)
-                            <div class="list-card" onclick="showPanel('checkout')">
+                            <div class="list-card" onclick="showPanel('frontdesk'); showFrontDesk('checkout')">
                                 <div class="name">{{ $r->guest->fullname }}</div>
                                 <div class="meta">Room {{ $r->room->room_number }}</div>
                                 <div class="meta">{{ $r->guest->phone_no }}</div>
@@ -312,236 +290,230 @@
             @endisset
         </div>
 
-        <!-- ===== CHECK IN ===== -->
-        <div id="panel-checkin" class="panel">
-            <div class="topline"><h1>Check In Guest</h1></div>
-
-            <form action="{{ route('staff.checkin.store') }}" method="POST" class="card" id="checkinForm">
-                @csrf
-
-                <div class="steps-nav">
-                    <div class="step-dot active" data-step="1"><span class="circle">1</span> Guest</div>
-                    <div class="step-line"></div>
-                    <div class="step-dot" data-step="2"><span class="circle">2</span> Room</div>
-                    <div class="step-line"></div>
-                    <div class="step-dot" data-step="3"><span class="circle">3</span> Payment</div>
-                </div>
-
-                <!-- STEP 1 -->
-                <div class="step-panel active" data-step="1">
-                    <div id="ci-ban-warning" class="ban-warning">This guest is banned from the guest house and cannot be checked in.</div>
-                    <div class="field"><label>Full Name</label><input type="text" name="fullname" id="ci-fullname" required onblur="checkGuestBan('ci')"></div>
-                    <div class="field"><label>Phone Number</label><input type="text" name="phone_no" id="ci-phone" required pattern="[0-9+\-\s]{6,20}" onblur="checkGuestBan('ci')"></div>
-                    <div class="field">
-                        <label>ID Type</label>
-                        <select name="id_type" required>
-                            <option value="national_id">National ID</option>
-                            <option value="kebele_id">Kebele ID</option>
-                            <option value="passport">Passport</option>
-                            <option value="driving_license">Driving License</option>
-                        </select>
-                    </div>
-                    <div class="field">
-                        <label>Capture ID Photo</label>
-                        <div class="cam-box">
-                            <video id="ci-video" autoplay playsinline></video>
-                            <img id="ci-preview" class="preview-img" style="display:none;">
-                        </div>
-                        <div class="cam-actions">
-                            <button type="button" class="ghost" onclick="startCamera('ci-video','ci-cap-btn')">Start Camera</button>
-                            <button type="button" id="ci-cap-btn" onclick="takeSnapshot('ci-video','ci-preview','ci-photo-input')" disabled>Capture</button>
-                        </div>
-                        <input type="hidden" name="id_photo" id="ci-photo-input">
-                    </div>
-                </div>
-
-                <!-- STEP 2 -->
-                <div class="step-panel" data-step="2">
-                    <div class="field">
-                        <label>Check-in Date</label>
-                        <input type="date" id="ci-in" name="check_in_date" required onchange="calculateCheckinPrice()">
-                    </div>
-                    <div class="field">
-                        <label>Check-out Date</label>
-                        <input type="date" id="ci-out" name="check_out_date" required onchange="calculateCheckinPrice()">
-                        <div class="chip-row">
-                            <span class="chip" onclick="setNights('ci-in','ci-out',1)">1 night</span>
-                            <span class="chip" onclick="setNights('ci-in','ci-out',2)">2 nights</span>
-                            <span class="chip" onclick="setNights('ci-in','ci-out',3)">3 nights</span>
-                            <span class="chip" onclick="setNights('ci-in','ci-out',7)">1 week</span>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <label>Room Type</label>
-                        <select id="ci-type"><option value="">-- select --</option>
-                            @foreach ($roomTypes as $type) <option value="{{ $type->id }}">{{ $type->name }}</option> @endforeach
-                        </select>
-                        <button type="button" class="ghost" style="margin-top:8px;" onclick="findRooms('ci-type','ci-room-select','ci-in','ci-out', this)">Find Available Rooms</button>
-                    </div>
-                    <div class="field">
-                        <label>Select Room</label>
-                        <select name="room_id" id="ci-room-select" required onchange="calculateCheckinPrice()"><option value="">-- find rooms first --</option></select>
-                    </div>
-                    <div id="ci-price-line" class="price-line" style="display:none;"></div>
-                </div>
-
-                <!-- STEP 3 -->
-                <div class="step-panel" data-step="3">
-                    <div class="field-row">
-                        <div class="field">
-                            <label>Payment Method</label>
-                            <select name="payment_type">
-                                <option value="cash">Cash</option>
-                                <option value="bank_transfer">Bank Transfer</option>
-                                <option value="pos">POS</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label>Payment Mode</label>
-                            <select name="payment_way" id="ci-pay-way" onchange="calculateCheckinPrice()">
-                                <option value="full">Full Payment</option>
-                                <option value="partial">Partial Payment</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <label>Amount Paid Now</label>
-                        <input type="number" step="0.01" min="0" name="amount_paid" id="ci-paid" required oninput="calculateCheckinPrice()">
-                    </div>
-                    <div id="ci-bal-line" class="bal-box" style="display:none;"></div>
-                </div>
-
-                <div class="step-actions">
-                    <button type="button" class="ghost btn-back" style="visibility:hidden;">Back</button>
-                    <div>
-                        <button type="button" class="btn-next">Next</button>
-                        <button type="submit" class="success btn-submit" style="display:none;">Complete Check In</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-
-        <!-- ===== CHECK OUT ===== -->
-        <div id="panel-checkout" class="panel">
-            <div class="topline"><h1>Guest Check Out</h1></div>
-            <div class="card" style="max-width:680px;">
-                <label>Search Guest Name or Room</label>
-                <div class="search-container">
-                    <input type="text" id="co-search" placeholder="Search name or room..." oninput="searchCheckout()" autocomplete="off">
-                    <div id="co-results" class="search-results"></div>
-                </div>
-
-                <div id="co-details" style="display:none; margin-top:18px;">
-                    <hr style="border:none; border-top:1px solid var(--border); margin-bottom:14px;">
-                    <div class="guest-profile">
-                        <img id="co-img" src="" class="preview-img" alt="Guest ID">
-                        <div class="guest-info">
-                            <p><strong>Name:</strong> <span id="co-name"></span></p>
-                            <p><strong>Phone:</strong> <span id="co-phone"></span></p>
-                            <p><strong>Room:</strong> <span id="co-room"></span></p>
-                            <p><strong>Dates:</strong> <span id="co-dates"></span></p>
-                        </div>
-                    </div>
-                    <div id="co-overstay" class="bal-box bal-red" style="display:none;"></div>
-                    <div id="co-balance" class="bal-box"></div>
-
-                    <form action="{{ route('staff.checkout.process') }}" method="POST">
-                        @csrf
-                        <input type="hidden" name="reservation_id" id="co-res-id">
-                        <button type="submit" class="danger" style="margin-top:10px;">Confirm Checkout</button>
-                    </form>
+        <!-- ===== FRONT DESK (Check In / Check Out / Reservation) ===== -->
+        <div id="panel-frontdesk" class="panel">
+            <div class="topline">
+                <h1>Front Desk</h1>
+                <div class="segmented">
+                    <button type="button" class="seg-btn active" data-fd="checkin" onclick="showFrontDesk('checkin')">Check In</button>
+                    <button type="button" class="seg-btn" data-fd="checkout" onclick="showFrontDesk('checkout')">Check Out</button>
+                    <button type="button" class="seg-btn" data-fd="reservation" onclick="showFrontDesk('reservation')">Reservation</button>
                 </div>
             </div>
 
-            <div class="list-header"><h3>Currently Staying</h3><span>tap a guest to check out</span></div>
-            @isset($activeStays)
-                @if ($activeStays->count())
-                    <div class="card-grid">
-                        @foreach ($activeStays as $r)
-                            <div class="list-card">
-                                <div class="top-row">
-                                    <div onclick="loadCheckoutDetails({{ $r->id }})" style="flex:1; cursor:pointer;">
-                                        <div class="name">{{ $r->guest->fullname }}</div>
-                                        <div class="meta">Room {{ $r->room->room_number }}</div>
-                                        <div class="meta">{{ $r->guest->phone_no }}</div>
-                                        <div class="meta">{{ \Carbon\Carbon::parse($r->check_in_date)->format('M j') }} → {{ \Carbon\Carbon::parse($r->check_out_date)->format('M j') }}</div>
-                                        <span class="tag">In House</span>
-                                    </div>
-                                    <button type="button" class="dots-btn" onclick="event.stopPropagation(); toggleDots(this)">⋮</button>
+            <!-- ---- CHECK IN ---- -->
+            <div id="fd-checkin" class="fd-view active">
+                <form action="{{ route('staff.checkin.store') }}" method="POST" class="card" id="checkinForm">
+                    @csrf
+                    <input type="hidden" name="check_in_date" id="ci-in">
+                    <input type="hidden" name="check_out_date" id="ci-out">
+                    <input type="hidden" name="room_id" id="ci-room-id">
+                    <input type="hidden" id="ci-banned-flag" value="false">
+
+                    <div class="two-col">
+                        <div>
+                            <h3 style="margin-bottom:16px;">Guest</h3>
+                            <div class="field"><label>Full Name</label><input type="text" name="fullname" id="ci-fullname" required oninput="onPhoneInput('ci')"></div>
+                            <div class="field"><label>Phone Number</label><input type="text" name="phone_no" id="ci-phone" required pattern="[0-9+\-\s]{6,20}" oninput="onPhoneInput('ci')"></div>
+                            <div id="ci-ban-status" class="ban-indicator"></div>
+                            <div class="field">
+                                <label>ID Type</label>
+                                <select name="id_type" required>
+                                    <option value="national_id">National ID</option>
+                                    <option value="kebele_id">Kebele ID</option>
+                                    <option value="passport">Passport</option>
+                                    <option value="driving_license">Driving License</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Capture ID Photo</label>
+                                <div class="cam-box">
+                                    <video id="ci-video" autoplay playsinline></video>
+                                    <img id="ci-preview" class="preview-img" style="display:none;">
                                 </div>
-                                <div class="dots-menu">
-                                    <button type="button" onclick="event.stopPropagation(); openBanModal({{ $r->guest->id }}, '{{ addslashes($r->guest->fullname) }}')">Ban Guest</button>
+                                <div class="cam-actions">
+                                    <button type="button" class="ghost" onclick="startCamera('ci-video','ci-cap-btn')">Start Camera</button>
+                                    <button type="button" id="ci-cap-btn" onclick="takeSnapshot('ci-video','ci-preview','ci-photo-input')" disabled>Capture</button>
+                                </div>
+                                <input type="hidden" name="id_photo" id="ci-photo-input">
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 style="margin-bottom:16px;">Stay &amp; Payment</h3>
+                            <div class="field">
+                                <label>Stay Dates</label>
+                                <div class="calendar-inline">
+                                    <div class="cal-header">
+                                        <button type="button" onclick="calNavGeneric('ci',-1)">‹</button>
+                                        <span id="ci-cal-month"></span>
+                                        <button type="button" onclick="calNavGeneric('ci',1)">›</button>
+                                    </div>
+                                    <div class="cal-grid" id="ci-cal-grid"></div>
+                                    <div class="cal-footer" id="ci-cal-label">Select check-in date</div>
+                                </div>
+                                <div class="chip-row">
+                                    <span class="chip" onclick="setNights('ci',1)">1 night</span>
+                                    <span class="chip" onclick="setNights('ci',2)">2 nights</span>
+                                    <span class="chip" onclick="setNights('ci',3)">3 nights</span>
+                                    <span class="chip" onclick="setNights('ci',7)">1 week</span>
                                 </div>
                             </div>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="empty-panel"><h3>No one to check out</h3><p>Guests currently staying will appear here.</p></div>
-                @endif
-            @endisset
-        </div>
 
-        <!-- ===== RESERVATION (Phone Booking) ===== -->
-        <div id="panel-reservation" class="panel">
-            <div class="topline"><h1>Create Phone Reservation</h1></div>
+                            <div class="field">
+                                <label>Room Type</label>
+                                <select id="ci-type" onchange="autoLoadRooms('ci')">
+                                    <option value="">-- select --</option>
+                                    @foreach ($roomTypes as $type) <option value="{{ $type->id }}">{{ $type->name }}</option> @endforeach
+                                </select>
+                                <div class="rooms-box" id="ci-rooms-box"></div>
+                            </div>
+                            <div id="ci-price-line" class="price-line" style="display:none;"></div>
 
-            <form action="{{ route('staff.reservation.store') }}" method="POST" class="card" id="reservationForm">
-                @csrf
+                            <div class="field" style="margin-top:16px;">
+                                <label>Payment Method</label>
+                                <select name="payment_type">
+                                    <option value="cash">Cash</option>
+                                    <option value="bank_transfer">Bank Transfer</option>
+                                    <option value="pos">POS</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Payment Mode</label>
+                                <select name="payment_way" id="ci-pay-way" onchange="calculateCheckinPrice()">
+                                    <option value="full">Full Payment</option>
+                                    <option value="partial">Partial Payment</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Amount Paid Now</label>
+                                <input type="number" step="0.01" min="0" name="amount_paid" id="ci-paid" required oninput="calculateCheckinPrice()">
+                            </div>
+                            <div id="ci-bal-line" class="bal-box" style="display:none;"></div>
 
-                <div class="steps-nav">
-                    <div class="step-dot active" data-step="1"><span class="circle">1</span> Guest &amp; Stay</div>
-                    <div class="step-line"></div>
-                    <div class="step-dot" data-step="2"><span class="circle">2</span> Deposit</div>
-                </div>
-
-                <div class="step-panel active" data-step="1">
-                    <div id="res-ban-warning" class="ban-warning">This guest is banned from the guest house and cannot be reserved for.</div>
-                    <div class="field"><label>Guest Full Name</label><input type="text" name="fullname" id="res-fullname" required onblur="checkGuestBan('res')"></div>
-                    <div class="field"><label>Phone Number</label><input type="text" name="phone_no" id="res-phone" required pattern="[0-9+\-\s]{6,20}" onblur="checkGuestBan('res')"></div>
-
-                    <div class="field">
-                        <label>Check-in Date</label>
-                        <input type="date" id="res-in" name="check_in_date" required onchange="calculateReservationPrice()">
-                    </div>
-                    <div class="field">
-                        <label>Check-out Date</label>
-                        <input type="date" id="res-out" name="check_out_date" required onchange="calculateReservationPrice()">
-                        <div class="chip-row">
-                            <span class="chip" onclick="setNights('res-in','res-out',1)">1 night</span>
-                            <span class="chip" onclick="setNights('res-in','res-out',2)">2 nights</span>
-                            <span class="chip" onclick="setNights('res-in','res-out',3)">3 nights</span>
-                            <span class="chip" onclick="setNights('res-in','res-out',7)">1 week</span>
+                            <button type="submit" class="success" style="width:100%; margin-top:18px;">Complete Check In</button>
                         </div>
                     </div>
-                    <div class="field">
-                        <label>Room Type</label>
-                        <select id="res-type"><option value="">-- select --</option>
-                            @foreach ($roomTypes as $type) <option value="{{ $type->id }}">{{ $type->name }}</option> @endforeach
-                        </select>
-                        <button type="button" class="ghost" style="margin-top:8px;" onclick="findRooms('res-type','res-room-select','res-in','res-out', this)">Find Rooms</button>
+                </form>
+            </div>
+
+            <!-- ---- CHECK OUT ---- -->
+            <div id="fd-checkout" class="fd-view">
+                <div class="card" style="max-width:680px;">
+                    <label>Search Guest Name or Room</label>
+                    <div class="search-container">
+                        <input type="text" id="co-search" placeholder="Search name or room..." oninput="searchCheckout()" autocomplete="off">
+                        <div id="co-results" class="search-results"></div>
                     </div>
-                    <div class="field">
-                        <label>Select Room</label>
-                        <select name="room_id" id="res-room-select" required onchange="calculateReservationPrice()"><option value="">-- find rooms first --</option></select>
+
+                    <div id="co-details" style="display:none; margin-top:18px;">
+                        <hr style="border:none; border-top:1px solid var(--border); margin-bottom:14px;">
+                        <div class="guest-profile">
+                            <img id="co-img" src="" class="preview-img" alt="Guest ID">
+                            <div class="guest-info">
+                                <p><strong>Name:</strong> <span id="co-name"></span></p>
+                                <p><strong>Phone:</strong> <span id="co-phone"></span></p>
+                                <p><strong>Room:</strong> <span id="co-room"></span></p>
+                                <p><strong>Dates:</strong> <span id="co-dates"></span></p>
+                            </div>
+                        </div>
+                        <div id="co-overstay" class="bal-box bal-red" style="display:none;"></div>
+                        <div id="co-balance" class="bal-box"></div>
+
+                        <form action="{{ route('staff.checkout.process') }}" method="POST" onsubmit="showToast('Checking out...', 'info', true)">
+                            @csrf
+                            <input type="hidden" name="reservation_id" id="co-res-id">
+                            <button type="submit" class="danger" style="margin-top:10px;">Confirm Checkout</button>
+                        </form>
                     </div>
-                    <div id="res-price-line" class="price-line" style="display:none;"></div>
                 </div>
 
-                <div class="step-panel" data-step="2">
-                    <div class="field">
-                        <label>Deposit / Down Payment</label>
-                        <input type="number" step="0.01" min="0" name="amount_paid" placeholder="Enter deposit amount" required>
-                    </div>
-                </div>
+                <div class="list-header"><h3>Currently Staying</h3><span>tap a guest to check out</span></div>
+                @isset($activeStays)
+                    @if ($activeStays->count())
+                        <div class="card-grid">
+                            @foreach ($activeStays as $r)
+                                <div class="list-card">
+                                    <div class="top-row">
+                                        <div onclick="loadCheckoutDetails({{ $r->id }})" style="flex:1; cursor:pointer;">
+                                            <div class="name">{{ $r->guest->fullname }}</div>
+                                            <div class="meta">Room {{ $r->room->room_number }}</div>
+                                            <div class="meta">{{ $r->guest->phone_no }}</div>
+                                            <div class="meta">{{ \Carbon\Carbon::parse($r->check_in_date)->format('M j') }} → {{ \Carbon\Carbon::parse($r->check_out_date)->format('M j') }}</div>
+                                            <span class="tag">In House</span>
+                                        </div>
+                                        <button type="button" class="dots-btn" onclick="event.stopPropagation(); toggleDots(this)">⋮</button>
+                                    </div>
+                                    <div class="dots-menu">
+                                        <button type="button" onclick="event.stopPropagation(); openBanModal({{ $r->guest->id }}, '{{ addslashes($r->guest->fullname) }}')">Ban Guest</button>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="empty-panel"><h3>No one to check out</h3><p>Guests currently staying will appear here.</p></div>
+                    @endif
+                @endisset
+            </div>
 
-                <div class="step-actions">
-                    <button type="button" class="ghost btn-back" style="visibility:hidden;">Back</button>
-                    <div>
-                        <button type="button" class="btn-next">Next</button>
-                        <button type="submit" class="btn-submit" style="display:none;">Save Reservation</button>
+            <!-- ---- RESERVATION (Phone Booking) ---- -->
+            <div id="fd-reservation" class="fd-view">
+                <form action="{{ route('staff.reservation.store') }}" method="POST" class="card" id="reservationForm">
+                    @csrf
+                    <input type="hidden" name="check_in_date" id="res-in">
+                    <input type="hidden" name="check_out_date" id="res-out">
+                    <input type="hidden" name="room_id" id="res-room-id">
+                    <input type="hidden" id="res-banned-flag" value="false">
+
+                    <div class="two-col">
+                        <div>
+                            <h3 style="margin-bottom:16px;">Guest &amp; Contact</h3>
+                            <div class="field"><label>Guest Full Name</label><input type="text" name="fullname" id="res-fullname" required oninput="onPhoneInput('res')"></div>
+                            <div class="field"><label>Phone Number</label><input type="text" name="phone_no" id="res-phone" required pattern="[0-9+\-\s]{6,20}" oninput="onPhoneInput('res')"></div>
+                            <div id="res-ban-status" class="ban-indicator"></div>
+
+                            <div class="field">
+                                <label>Deposit / Down Payment</label>
+                                <input type="number" step="0.01" min="0" name="amount_paid" placeholder="Enter deposit amount" required>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 style="margin-bottom:16px;">Stay Details</h3>
+                            <div class="field">
+                                <label>Stay Dates</label>
+                                <div class="calendar-inline">
+                                    <div class="cal-header">
+                                        <button type="button" onclick="calNavGeneric('res',-1)">‹</button>
+                                        <span id="res-cal-month"></span>
+                                        <button type="button" onclick="calNavGeneric('res',1)">›</button>
+                                    </div>
+                                    <div class="cal-grid" id="res-cal-grid"></div>
+                                    <div class="cal-footer" id="res-cal-label">Select check-in date</div>
+                                </div>
+                                <div class="chip-row">
+                                    <span class="chip" onclick="setNights('res',1)">1 night</span>
+                                    <span class="chip" onclick="setNights('res',2)">2 nights</span>
+                                    <span class="chip" onclick="setNights('res',3)">3 nights</span>
+                                    <span class="chip" onclick="setNights('res',7)">1 week</span>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label>Room Type</label>
+                                <select id="res-type" onchange="autoLoadRooms('res')">
+                                    <option value="">-- select --</option>
+                                    @foreach ($roomTypes as $type) <option value="{{ $type->id }}">{{ $type->name }}</option> @endforeach
+                                </select>
+                                <div class="rooms-box" id="res-rooms-box"></div>
+                            </div>
+                            <div id="res-price-line" class="price-line" style="display:none;"></div>
+
+                            <button type="submit" style="width:100%; margin-top:18px;">Save Reservation</button>
+                        </div>
                     </div>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
 
         <!-- ===== RESERVATION LIST ===== -->
@@ -561,7 +533,7 @@
                     <p style="font-size:12.5px; color:var(--muted); margin-bottom:6px;">Phone: <span id="rl-phone"></span></p>
                     <p style="font-size:13.5px; color:var(--muted); margin-bottom:14px;">Room: <span id="rl-room"></span> &middot; Paid Deposit: <span id="rl-deposit"></span> ETB</p>
 
-                    <form action="{{ route('staff.reservation.complete') }}" method="POST">
+                    <form action="{{ route('staff.reservation.complete') }}" method="POST" onsubmit="showToast('Completing check-in...', 'info', true)">
                         @csrf
                         <input type="hidden" name="reservation_id" id="rl-res-id">
                         <div class="field">
@@ -634,12 +606,11 @@
 
     <canvas id="main-canvas"></canvas>
 
-    <!-- ===== PASSWORD CONFIRM MODAL (Ban / Unban) ===== -->
     <div class="modal-overlay" id="banModalOverlay">
         <div class="modal-box">
             <h3 id="banModalTitle">Ban Guest</h3>
             <p id="banModalText">Enter your staff password to confirm.</p>
-            <form id="banModalForm" method="POST">
+            <form id="banModalForm" method="POST" onsubmit="showToast('Processing...', 'info', true)">
                 @csrf
                 <input type="hidden" name="guest_id" id="banModalGuestId">
                 <div class="field">
@@ -654,38 +625,10 @@
         </div>
     </div>
 
-    <!-- ===== MOBILE BOTTOM NAV ===== -->
-    <div class="bottom-nav">
-        <a class="nav-link" data-panel="dashboard" onclick="showPanel('dashboard')">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>
-            Home
-        </a>
-        <a class="nav-link" data-panel="checkin" onclick="showPanel('checkin')">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/></svg>
-            Check In
-        </a>
-        <a class="nav-link" data-panel="checkout" onclick="showPanel('checkout')">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/></svg>
-            Check Out
-        </a>
-        <a class="nav-link" data-panel="reservationlist" onclick="showPanel('reservationlist')">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13"/></svg>
-            Reserved
-        </a>
-        <a class="nav-link" data-panel="bannedguests" onclick="showPanel('bannedguests')">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M5 5l14 14"/></svg>
-            Banned
-        </a>
-        <form action="{{ route('logout') }}" method="POST">
-            @csrf
-            <button type="submit" class="logout-btn-mobile">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
-                Logout
-            </button>
-        </form>
-    </div>
+    <div class="toast-container" id="toastContainer"></div>
 
     <script>
+        // ===== NAVIGATION =====
         function showPanel(name) {
             document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-link').forEach(a => a.classList.remove('active'));
@@ -693,20 +636,67 @@
             document.querySelectorAll('.nav-link[data-panel="' + name + '"]').forEach(a => a.classList.add('active'));
             sessionStorage.setItem('staffActivePanel', name);
             document.querySelectorAll('.dots-menu.open').forEach(m => m.classList.remove('open'));
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('open');
+        }
+
+        function showFrontDesk(name) {
+            document.querySelectorAll('.fd-view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('fd-' + name).classList.add('active');
+            document.querySelector(`.seg-btn[data-fd="${name}"]`).classList.add('active');
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('open');
+        }
+
+        // ===== TOASTS =====
+        function showToast(message, type = 'success', persist = false) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<span>${message}</span>` + (persist ? '' : '<div class="toast-bar"></div>');
+            container.appendChild(toast);
+            if (!persist) {
+                setTimeout(() => {
+                    toast.style.animation = 'toastOut .3s ease forwards';
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+            return toast;
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             showPanel(sessionStorage.getItem('staffActivePanel') || 'dashboard');
-            initWizard('checkinForm', 3);
-            initWizard('reservationForm', 2);
+            initRangeCalendar('ci');
+            initRangeCalendar('res');
 
-            ['ci-in', 'ci-out'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.addEventListener('change', () => autoRefreshRooms('ci'));
+            document.getElementById('checkinForm').addEventListener('submit', (e) => {
+                if (!document.getElementById('ci-in').value || !document.getElementById('ci-out').value) {
+                    e.preventDefault(); alert('Please select check-in and check-out dates.'); return;
+                }
+                if (!document.getElementById('ci-room-id').value) {
+                    e.preventDefault(); alert('Please select a room.'); return;
+                }
+                if (document.getElementById('ci-banned-flag').value === 'true') {
+                    e.preventDefault(); alert('This guest is banned and cannot be checked in.'); return;
+                }
+                showToast('Checking in guest...', 'info', true);
             });
-            ['res-in', 'res-out'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.addEventListener('change', () => autoRefreshRooms('res'));
+
+            document.getElementById('reservationForm').addEventListener('submit', (e) => {
+                if (!document.getElementById('res-in').value || !document.getElementById('res-out').value) {
+                    e.preventDefault(); alert('Please select check-in and check-out dates.'); return;
+                }
+                if (!document.getElementById('res-room-id').value) {
+                    e.preventDefault(); alert('Please select a room.'); return;
+                }
+                if (document.getElementById('res-banned-flag').value === 'true') {
+                    e.preventDefault(); alert('This guest is banned and cannot be reserved for.'); return;
+                }
+                showToast('Saving reservation...', 'info', true);
             });
         });
 
@@ -722,95 +712,223 @@
             if (!isOpen) menu.classList.add('open');
         }
 
-        const CHECKOUT_SHOW_BASE = "{{ url('/staff/checkout/detail') }}";
-        const RESERVATION_SHOW_BASE = "{{ url('/staff/reservation/detail') }}";
-
-        async function loadCheckoutDetails(id) {
-            try {
-                const res = await fetch(`${CHECKOUT_SHOW_BASE}/${id}`);
-                const data = await res.json();
-                showCheckoutDetails(data);
-            } catch (e) { alert('Could not load guest details.'); }
+        // ===== DEBOUNCE HELPER ("buffer load") =====
+        function debounce(fn, delay = 350) {
+            let t;
+            return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), delay); };
         }
 
-        async function loadReservationDetails(id) {
-            try {
-                const res = await fetch(`${RESERVATION_SHOW_BASE}/${id}`);
-                const data = await res.json();
-                showReservationDetails(data);
-            } catch (e) { alert('Could not load reservation details.'); }
+        // ===== SHARED INLINE CALENDAR (used by ci- and res- prefixes) =====
+        const calendars = {};
+
+        function isSameDate(a, b) {
+            return a && b && a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
         }
 
-        function autoRefreshRooms(prefix) {
-            const typeSel = document.getElementById(prefix + '-type');
-            if (typeSel && typeSel.value) {
-                findRooms(prefix + '-type', prefix + '-room-select', prefix + '-in', prefix + '-out');
+        function initRangeCalendar(prefix) {
+            calendars[prefix] = { viewDate: new Date(), start: null, end: null, hover: null, bound: false };
+            renderCalGeneric(prefix);
+        }
+
+        function calNavGeneric(prefix, dir) {
+            calendars[prefix].viewDate.setMonth(calendars[prefix].viewDate.getMonth() + dir);
+            renderCalGeneric(prefix);
+        }
+
+        function renderCalGeneric(prefix) {
+            const state = calendars[prefix];
+            const grid = document.getElementById(prefix + '-cal-grid');
+            const label = document.getElementById(prefix + '-cal-month');
+            const year = state.viewDate.getFullYear();
+            const month = state.viewDate.getMonth();
+            label.textContent = state.viewDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+
+            const today = new Date();
+            const firstDay = new Date(year, month, 1);
+            const startWeekday = firstDay.getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            let html = '';
+            ['S','M','T','W','T','F','S'].forEach(d => html += `<div class="cal-dow">${d}</div>`);
+            for (let i = 0; i < startWeekday; i++) html += `<div></div>`;
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateObj = new Date(year, month, d);
+                const iso = dateObj.toISOString().split('T')[0];
+                let cls = 'cal-day';
+
+                if (isSameDate(dateObj, today)) cls += ' cal-today';
+                if (state.start && state.end && dateObj >= state.start && dateObj <= state.end) cls += ' cal-in-range';
+                if (state.start && isSameDate(dateObj, state.start)) cls += ' cal-selected';
+                if (state.end && isSameDate(dateObj, state.end)) cls += ' cal-selected';
+
+                html += `<div class="${cls}" data-iso="${iso}">${d}</div>`;
+            }
+            grid.innerHTML = html;
+
+            if (!state.bound) {
+                grid.addEventListener('click', (e) => {
+                    const dayEl = e.target.closest('.cal-day');
+                    if (dayEl) calPickGeneric(prefix, dayEl.dataset.iso);
+                });
+                grid.addEventListener('mouseover', (e) => {
+                    const dayEl = e.target.closest('.cal-day');
+                    if (dayEl) calHoverGeneric(prefix, dayEl.dataset.iso);
+                });
+                state.bound = true;
             }
         }
 
-        function initWizard(formId, stepCount) {
-            const form = document.getElementById(formId);
-            if (!form) return;
-            let current = 1;
+        function calPickGeneric(prefix, iso) {
+            const state = calendars[prefix];
+            const picked = new Date(iso + 'T00:00:00');
 
-            function render(n) {
-                form.querySelectorAll('.step-panel').forEach(s => s.classList.remove('active'));
-                form.querySelector(`.step-panel[data-step="${n}"]`).classList.add('active');
-                form.querySelectorAll('.step-dot').forEach(d => d.classList.toggle('active', parseInt(d.dataset.step) <= n));
-                form.querySelector('.btn-back').style.visibility = n === 1 ? 'hidden' : 'visible';
-                form.querySelector('.btn-next').style.display = n === stepCount ? 'none' : 'inline-block';
-                form.querySelector('.btn-submit').style.display = n === stepCount ? 'inline-block' : 'none';
-                current = n;
+            if (!state.start || (state.start && state.end)) {
+                state.start = picked; state.end = null;
+                document.getElementById(prefix + '-cal-label').textContent = 'Select check-out date';
+            } else {
+                if (picked < state.start) { state.end = state.start; state.start = picked; }
+                else { state.end = picked; }
+
+                const fromIso = state.start.toISOString().split('T')[0];
+                const toIso = state.end.toISOString().split('T')[0];
+                document.getElementById(prefix + '-cal-label').textContent = `${fromIso} → ${toIso}`;
+                document.getElementById(prefix + '-in').value = fromIso;
+                document.getElementById(prefix + '-out').value = toIso;
+                document.getElementById(prefix + '-in').dispatchEvent(new Event('change'));
+                document.getElementById(prefix + '-out').dispatchEvent(new Event('change'));
             }
+            renderCalGeneric(prefix);
+        }
 
-            form.querySelector('.btn-next').addEventListener('click', () => {
-                const stepEl = form.querySelector(`.step-panel[data-step="${current}"]`);
-                const inputs = stepEl.querySelectorAll('input[required], select[required]');
-                for (const inp of inputs) {
-                    if (!inp.value) { inp.reportValidity(); return; }
-                }
-                if (stepEl.dataset.banned === 'true') {
-                    alert('This guest is banned and cannot proceed.');
+        function calHoverGeneric(prefix, iso) {
+            const state = calendars[prefix];
+            if (!state.start || state.end) return;
+            state.hover = new Date(iso + 'T00:00:00');
+            const lo = state.start < state.hover ? state.start : state.hover;
+            const hi = state.start < state.hover ? state.hover : state.start;
+            document.querySelectorAll(`#${prefix}-cal-grid .cal-day`).forEach(el => {
+                const d = new Date(el.dataset.iso + 'T00:00:00');
+                el.classList.toggle('cal-in-range', d >= lo && d <= hi);
+            });
+        }
+
+        // Quick chips: set dates directly and keep the calendar visually in sync
+        function setNights(prefix, nights) {
+            const inEl = document.getElementById(prefix + '-in');
+            let base;
+            if (inEl.value) base = new Date(inEl.value + 'T00:00:00');
+            else { base = new Date(); base.setHours(0, 0, 0, 0); }
+
+            const outDate = new Date(base);
+            outDate.setDate(outDate.getDate() + nights);
+
+            const fromIso = base.toISOString().split('T')[0];
+            const toIso = outDate.toISOString().split('T')[0];
+            inEl.value = fromIso;
+            document.getElementById(prefix + '-out').value = toIso;
+
+            const state = calendars[prefix];
+            if (state) {
+                state.start = base; state.end = outDate; state.viewDate = new Date(base);
+                renderCalGeneric(prefix);
+                document.getElementById(prefix + '-cal-label').textContent = `${fromIso} → ${toIso}`;
+            }
+            inEl.dispatchEvent(new Event('change'));
+            document.getElementById(prefix + '-out').dispatchEvent(new Event('change'));
+        }
+
+        // ===== ROOM AUTO-LOAD ("buffer load") =====
+        let roomPrices = {};
+        const debouncedFindRooms = {};
+
+        function autoLoadRooms(prefix) {
+            if (!debouncedFindRooms[prefix]) {
+                debouncedFindRooms[prefix] = debounce(() => doFindRooms(prefix), 350);
+            }
+            debouncedFindRooms[prefix]();
+        }
+
+        async function doFindRooms(prefix) {
+            const typeId = document.getElementById(prefix + '-type').value;
+            const box = document.getElementById(prefix + '-rooms-box');
+            const hiddenRoomId = document.getElementById(prefix + '-room-id');
+            hiddenRoomId.value = '';
+
+            if (!typeId) { box.innerHTML = ''; return; }
+
+            box.innerHTML = '<div class="rooms-loading">Finding available rooms…</div>';
+
+            let url = `{{ route('staff.rooms.available') }}?room_type_id=${encodeURIComponent(typeId)}`;
+            const inVal = document.getElementById(prefix + '-in').value;
+            const outVal = document.getElementById(prefix + '-out').value;
+            if (inVal && outVal) url += `&check_in_date=${encodeURIComponent(inVal)}&check_out_date=${encodeURIComponent(outVal)}`;
+
+            try {
+                const res = await fetch(url);
+                const rooms = await res.json();
+                box.innerHTML = '';
+
+                if (rooms.length === 0) {
+                    box.innerHTML = '<div class="rooms-empty">No rooms available for this selection.</div>';
                     return;
                 }
-                if (current < stepCount) render(current + 1);
-            });
-            form.querySelector('.btn-back').addEventListener('click', () => { if (current > 1) render(current - 1); });
 
-            render(1);
+                rooms.forEach(r => {
+                    roomPrices[r.id] = parseFloat(r.price_per_night);
+                    const chip = document.createElement('div');
+                    chip.className = 'room-chip';
+                    chip.innerHTML = `<strong>Room ${r.room_number}</strong><span>${r.price_per_night} ETB/night</span>`;
+                    chip.onclick = () => {
+                        box.querySelectorAll('.room-chip').forEach(c => c.classList.remove('selected'));
+                        chip.classList.add('selected');
+                        hiddenRoomId.value = r.id;
+                        if (prefix === 'ci') calculateCheckinPrice(); else calculateReservationPrice();
+                    };
+                    box.appendChild(chip);
+                });
+            } catch (e) {
+                box.innerHTML = '<div class="rooms-empty">Could not load rooms. Try again.</div>';
+            }
+        }
+
+        // ===== BAN CHECK ("buffer load") =====
+        const debouncedBanCheck = {};
+
+        function onPhoneInput(prefix) {
+            if (!debouncedBanCheck[prefix]) {
+                debouncedBanCheck[prefix] = debounce(() => checkGuestBan(prefix), 400);
+            }
+            debouncedBanCheck[prefix]();
         }
 
         async function checkGuestBan(prefix) {
             const fullname = document.getElementById(prefix + '-fullname').value.trim();
             const phone = document.getElementById(prefix + '-phone').value.trim();
-            const warningBox = document.getElementById(prefix + '-ban-warning');
-            const stepEl = document.querySelector(`#${prefix === 'ci' ? 'checkinForm' : 'reservationForm'} .step-panel[data-step="1"]`);
+            const box = document.getElementById(prefix + '-ban-status');
+            const flag = document.getElementById(prefix + '-banned-flag');
 
-            if (!fullname || !phone) return;
+            if (!fullname || !phone) { box.className = 'ban-indicator'; box.style.display = 'none'; flag.value = 'false'; return; }
+
+            box.className = 'ban-indicator checking';
+            box.textContent = 'Checking guest status…';
 
             try {
                 const res = await fetch(`{{ route('staff.guest.check') }}?fullname=${encodeURIComponent(fullname)}&phone_no=${encodeURIComponent(phone)}`);
                 const data = await res.json();
                 if (data.found && data.status === 'blacklisted') {
-                    warningBox.style.display = 'block';
-                    stepEl.dataset.banned = 'true';
+                    box.className = 'ban-indicator red';
+                    box.textContent = 'This guest is banned and cannot proceed.';
+                    flag.value = 'true';
                 } else {
-                    warningBox.style.display = 'none';
-                    stepEl.dataset.banned = 'false';
+                    box.className = 'ban-indicator green';
+                    box.textContent = data.found ? 'Guest recognized — clear to proceed.' : 'New guest — clear to proceed.';
+                    flag.value = 'false';
                 }
-            } catch (e) { /* fail silent, server-side check still protects on submit */ }
+            } catch (e) { box.style.display = 'none'; }
         }
 
-        function setNights(inId, outId, nights) {
-            const inEl = document.getElementById(inId);
-            if (!inEl.value) inEl.value = new Date().toISOString().split('T')[0];
-            const base = new Date(inEl.value);
-            base.setDate(base.getDate() + nights);
-            const outEl = document.getElementById(outId);
-            outEl.value = base.toISOString().split('T')[0];
-            outEl.dispatchEvent(new Event('change'));
-        }
-
+        // ===== CAMERA =====
         let activeStream = null;
         async function startCamera(videoId, btnId) {
             try {
@@ -840,45 +958,9 @@
             if (activeStream) activeStream.getTracks().forEach(t => t.stop());
         }
 
-        let roomPrices = {};
-        async function findRooms(typeSelectId, roomSelectId, inDateId, outDateId, btn) {
-            const typeId = document.getElementById(typeSelectId).value;
-            if (!typeId) return alert('Select a room type first.');
-
-            let url = `{{ route('staff.rooms.available') }}?room_type_id=${encodeURIComponent(typeId)}`;
-            if (inDateId && outDateId) {
-                const inVal = document.getElementById(inDateId).value;
-                const outVal = document.getElementById(outDateId).value;
-                if (inVal && outVal) {
-                    url += `&check_in_date=${encodeURIComponent(inVal)}&check_out_date=${encodeURIComponent(outVal)}`;
-                }
-            }
-
-            const originalText = btn ? btn.textContent : null;
-            if (btn) { btn.disabled = true; btn.textContent = 'Searching...'; }
-
-            try {
-                const res = await fetch(url);
-                const rooms = await res.json();
-                const sel = document.getElementById(roomSelectId);
-                sel.innerHTML = '<option value="">-- select room --</option>';
-                if (rooms.length === 0) {
-                    sel.innerHTML = '<option value="">-- none available for these dates --</option>';
-                }
-                rooms.forEach(r => {
-                    roomPrices[r.id] = parseFloat(r.price_per_night);
-                    const opt = document.createElement('option');
-                    opt.value = r.id;
-                    opt.textContent = `Room ${r.room_number} — ${r.price_per_night} ETB`;
-                    sel.appendChild(opt);
-                });
-            } finally {
-                if (btn) { btn.disabled = false; btn.textContent = originalText; }
-            }
-        }
-
+        // ===== PRICE CALC =====
         function calculateCheckinPrice() {
-            const rid = document.getElementById('ci-room-select').value;
+            const rid = document.getElementById('ci-room-id').value;
             const d1 = new Date(document.getElementById('ci-in').value);
             const d2 = new Date(document.getElementById('ci-out').value);
             const payWay = document.getElementById('ci-pay-way').value;
@@ -905,7 +987,7 @@
         }
 
         function calculateReservationPrice() {
-            const rid = document.getElementById('res-room-select').value;
+            const rid = document.getElementById('res-room-id').value;
             const d1 = new Date(document.getElementById('res-in').value);
             const d2 = new Date(document.getElementById('res-out').value);
             if (!rid || isNaN(d1) || isNaN(d2)) return;
@@ -915,6 +997,18 @@
             const pLine = document.getElementById('res-price-line');
             pLine.style.display = 'block';
             pLine.innerHTML = `${nights} night(s) × ${roomPrices[rid]} ETB = <strong>${total.toFixed(2)} ETB total</strong>`;
+        }
+
+        // ===== CHECK OUT =====
+        const CHECKOUT_SHOW_BASE = "{{ url('/staff/checkout/detail') }}";
+        const RESERVATION_SHOW_BASE = "{{ url('/staff/reservation/detail') }}";
+
+        async function loadCheckoutDetails(id) {
+            try {
+                const res = await fetch(`${CHECKOUT_SHOW_BASE}/${id}`);
+                const data = await res.json();
+                showCheckoutDetails(data);
+            } catch (e) { alert('Could not load guest details.'); }
         }
 
         function showCheckoutDetails(r) {
@@ -966,6 +1060,15 @@
             } else { results.style.display = 'none'; }
         }
 
+        // ===== RESERVATION LIST =====
+        async function loadReservationDetails(id) {
+            try {
+                const res = await fetch(`${RESERVATION_SHOW_BASE}/${id}`);
+                const data = await res.json();
+                showReservationDetails(data);
+            } catch (e) { alert('Could not load reservation details.'); }
+        }
+
         function showReservationDetails(r) {
             document.getElementById('rl-box').style.display = 'block';
             document.getElementById('rl-res-id').value = r.id;
@@ -995,6 +1098,7 @@
             } else { results.style.display = 'none'; }
         }
 
+        // ===== BAN / UNBAN MODAL =====
         function openBanModal(guestId, guestName) {
             document.getElementById('banModalTitle').textContent = 'Ban ' + guestName + '?';
             document.getElementById('banModalText').textContent = 'This guest will be blocked from future check-ins. Enter your staff password to confirm.';

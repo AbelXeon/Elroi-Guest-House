@@ -13,15 +13,6 @@ class RoomTypeSeeder extends Seeder
      */
     public function run(): void
     {
-        $roomTypes = [
-            ['name' => 'Single'],
-            ['name' => 'Double'],
-            ['name' => 'Suite'],
-            ['name' => 'Presidential'],
-        ];
-
-        foreach ($roomTypes as $type) {
-            RoomType::firstOrCreate($type);
-        }
+        
     }
 }

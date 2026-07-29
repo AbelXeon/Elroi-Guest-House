@@ -1219,7 +1219,7 @@
                     labels: ['Available', 'Booked', 'Reserved', 'Maintenance', 'Cleaning'],
                     datasets: [{
                         data: roomStatusData,
-                        backgroundColor: ['#3f6b52', '#3855a8', '#c98a2c', '#b3413a', '#8a938f']
+                        backgroundColor: ['#3f6b52', '#3855a8', '#c98a2c', '#cf1208', '#8a938f']
                     }]
                 },
                 options: { 
