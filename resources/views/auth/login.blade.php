@@ -49,17 +49,18 @@
         }
         .brand-mark svg{ flex-shrink:0; }
         .brand-mark span{
-            font-family:'Fraunces', serif;
-            font-weight:600;
-            font-size:18px;
-            letter-spacing:0.01em;
+            font-family:'Bebas Neue', sans-serif;
+            font-weight:400;
+            font-size:22px;
+            letter-spacing:0.03em;
         }
 
         .brand-copy h1{
-            font-family:'Fraunces', serif;
-            font-weight:500;
-            font-size:clamp(28px, 3vw, 38px);
-            line-height:1.25;
+            font-family:'Bebas Neue', sans-serif;
+            font-weight:400;
+            font-size:clamp(34px, 3.5vw, 44px);
+            line-height:1.15;
+            letter-spacing:0.5px;
             max-width:380px;
             margin-bottom:16px;
         }
@@ -95,9 +96,10 @@
         }
 
         .form-wrap h2{
-            font-family:'Fraunces', serif;
-            font-weight:500;
-            font-size:24px;
+            font-family:'Bebas Neue', sans-serif;
+            font-weight:400;
+            font-size:30px;
+            letter-spacing:0.5px;
             margin-bottom:6px;
         }
         .form-wrap .subtext{
@@ -190,9 +192,10 @@
                 padding:24px 24px 0;
             }
             .mobile-brand span{
-                font-family:'Fraunces', serif;
-                font-weight:600;
-                font-size:17px;
+                font-family:'Bebas Neue', sans-serif;
+                font-weight:400;
+                font-size:22px;
+                letter-spacing:0.03em;
                 color:var(--ink);
             }
 

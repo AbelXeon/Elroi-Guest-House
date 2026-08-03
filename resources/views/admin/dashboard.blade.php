@@ -48,7 +48,7 @@
             overflow:hidden;
         }
 
-        h1,h2,h3{ font-family:'Fraunces', serif; font-weight:500; color:var(--ink); }
+        h1,h2,h3{ font-family:'Bebas Neue', sans-serif; font-weight:400; color:var(--ink); letter-spacing:0.5px; }
 
         /* ================= SIDEBAR ================= */
         .sidebar{
@@ -70,7 +70,7 @@
             border-bottom:1px solid rgba(244,242,236,0.1);
             margin-bottom:16px;
         }
-        .brand span{ font-family:'Fraunces', serif; font-weight:600; font-size:16px; }
+        .brand span{ font-family:'Bebas Neue', sans-serif; font-weight:400; font-size:19px; letter-spacing:0.5px; }
 
         .nav-link{
             display:flex;
@@ -122,7 +122,7 @@
             flex-wrap:wrap;
             gap:10px;
         }
-        .topline h1{ font-size:26px; }
+        .topline h1{ font-size:30px; }
         .topline .datestamp{ font-size:13px; color:var(--muted); }
 
         .panel{ display:none; }
@@ -155,10 +155,11 @@
             text-overflow: ellipsis;
         }
         .stat-card .value{
-            font-family:'Fraunces', serif;
-            font-size:24px;
+            font-family:'Bebas Neue', sans-serif;
+            font-size:28px;
             color:var(--ink);
-            font-weight:600;
+            font-weight:400;
+            letter-spacing:0.5px;
             word-break: break-word;
         }
         .stat-card .sub{ font-size:12px; color:var(--muted); margin-top:4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -181,13 +182,13 @@
             min-width: 0;
             overflow: hidden;
         }
-        .chart-card h3{ font-size:15px; margin-bottom:14px; }
+        .chart-card h3{ font-size:18px; margin-bottom:14px; }
         .chart-card canvas{ max-height:230px; width: 100% !important; }
         .chart-row{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px; }
 
         /* ---- Recent activity ---- */
         .list-header{ display:flex; justify-content:space-between; align-items:center; margin:26px 0 12px; flex-wrap:wrap; gap:10px; }
-        .list-header h3{ font-size:16px; }
+        .list-header h3{ font-size:20px; }
         .plain-table-wrap{ background:var(--card-bg); border:1px solid var(--border); border-radius:12px; box-shadow:var(--shadow); overflow-x:auto; }
         table.plain-table{ width:100%; border-collapse:collapse; min-width:640px; }
         table.plain-table thead th{ background:var(--ink); color:#f4f2ec; padding:11px 12px; text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; }
@@ -205,7 +206,7 @@
             margin-bottom:20px;
             min-width: 0;
         }
-        .card h2{ font-size:18px; margin-bottom:4px; }
+        .card h2{ font-size:22px; margin-bottom:4px; }
         .card .hint{ font-size:12.5px; color:var(--muted); margin-bottom:18px; }
 
         .form-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:16px; align-items:end; }
@@ -395,8 +396,8 @@
                 max-width:100%;
             }
             .mobile-topbar span{
-                font-family:'Fraunces', serif; font-weight:600; font-size:16px; color:var(--ink);
-                overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+                font-family:'Bebas Neue', sans-serif; font-weight:400; font-size:19px; color:var(--ink);
+                overflow:hidden; text-overflow:ellipsis; white-space:nowrap; letter-spacing:0.5px;
             }
 
             .chart-grid, .chart-row{ grid-template-columns:1fr; }
@@ -529,19 +530,19 @@
                     <div class="stat-grid" style="grid-template-columns:1fr 1fr; margin-bottom:0;">
                         <div>
                             <div class="label" style="margin-bottom:4px;">Booked</div>
-                            <div class="value" style="font-size:19px;">{{ $roomStats['booked'] }}</div>
+                            <div class="value" style="font-size:22px;">{{ $roomStats['booked'] }}</div>
                         </div>
                         <div>
                             <div class="label" style="margin-bottom:4px;">Reserved</div>
-                            <div class="value" style="font-size:19px;">{{ $roomStats['reserved'] }}</div>
+                            <div class="value" style="font-size:22px;">{{ $roomStats['reserved'] }}</div>
                         </div>
                         <div>
                             <div class="label" style="margin-bottom:4px;">Maintenance</div>
-                            <div class="value" style="font-size:19px;">{{ $roomStats['maintenance'] }}</div>
+                            <div class="value" style="font-size:22px;">{{ $roomStats['maintenance'] }}</div>
                         </div>
                         <div>
                             <div class="label" style="margin-bottom:4px;">Cleaning</div>
-                            <div class="value" style="font-size:19px;">{{ $roomStats['cleaning'] }}</div>
+                            <div class="value" style="font-size:22px;">{{ $roomStats['cleaning'] }}</div>
                         </div>
                     </div>
                 </div>
