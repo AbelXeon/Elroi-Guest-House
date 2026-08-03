@@ -53,4 +53,6 @@ Route::middleware(['auth'])->prefix('staff')->group(function () {
 
     Route::get('/checkout/detail/{reservation}', [StaffController::class, 'checkoutShow'])->name('staff.checkout.show');
     Route::get('/reservation/detail/{reservation}', [StaffController::class, 'reservationShow'])->name('staff.reservation.show');
-});
+
+    Route::post('/reservation/cancel', [StaffController::class, 'cancelReservation'])->name('staff.reservation.cancel');
+    });

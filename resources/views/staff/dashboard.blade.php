@@ -51,24 +51,17 @@
         .fd-view{ display:none; }
         .fd-view.active{ display:block; }
 
-        .stat-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:14px; margin-bottom:22px; }
-        .stat-card{ background:var(--card-bg); border:1px solid var(--border); border-radius:12px; padding:18px; box-shadow:var(--shadow); min-width: 0; overflow: hidden; }
-        .stat-card .icon-badge{ width:34px; height:34px; border-radius:9px; background:var(--accent-soft); color:var(--accent);
-            display:flex; align-items:center; justify-content:center; margin-bottom:10px; }
-        .stat-card .label{ font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .stat-card .value{ font-family:'Fraunces', serif; font-size:24px; color:var(--ink); font-weight:600; word-break: break-word; }
-
         .empty-panel{ background:var(--card-bg); border:1px dashed var(--border); border-radius:12px; padding:40px 24px;
             text-align:center; color:var(--muted); }
         .empty-panel h3{ margin-bottom:6px; color:var(--text); }
 
         .card{ background:var(--card-bg); border:1px solid var(--border); border-radius:12px; padding:26px;
-            box-shadow:var(--shadow); margin-bottom:20px; min-width: 0; }
+            box-shadow:var(--shadow); margin-bottom:20px; min-width:0; }
         label{ display:block; font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:0 0 6px; }
         input, select{ width:100%; padding:11px 12px; font-size:14px; color:var(--text); background:#fff;
-            border:1px solid var(--border); border-radius:8px; outline:none; transition:border-color .15s; min-width: 0; }
+            border:1px solid var(--border); border-radius:8px; outline:none; transition:border-color .15s; min-width:0; }
         input:focus, select:focus{ border-color:var(--accent); }
-        .field{ margin-bottom:16px; min-width: 0; }
+        .field{ margin-bottom:16px; min-width:0; }
 
         .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:26px; align-items:start; }
         @media (max-width:900px){ .two-col{ grid-template-columns:1fr; } }
@@ -94,18 +87,18 @@
         .chip:hover{ border-color:var(--accent); color:var(--accent); }
 
         .cam-box{ display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap; margin-bottom:10px; }
-        video, .preview-img{ width:220px; height:165px; background:#0e1a17; border-radius:10px; object-fit:cover; border:1px solid var(--border); max-width: 100%; }
-        .cam-actions{ display:flex; gap:8px; flex-wrap: wrap; }
+        video, .preview-img{ width:220px; height:165px; background:#0e1a17; border-radius:10px; object-fit:cover; border:1px solid var(--border); max-width:100%; }
+        .cam-actions{ display:flex; gap:8px; flex-wrap:wrap; }
         canvas{ display:none; }
 
         .price-line{ font-weight:600; color:var(--ink); margin-top:12px; padding:12px 14px; background:var(--accent-soft);
             border-radius:8px; border-left:4px solid var(--accent); font-size:13.5px; }
-        .bal-box{ font-weight:600; margin-top:10px; padding:12px 14px; border-radius:8px; border-left:4px solid; font-size:13.5px; word-break: break-word; }
+        .bal-box{ font-weight:600; margin-top:10px; padding:12px 14px; border-radius:8px; border-left:4px solid; font-size:13.5px; word-break:break-word; }
         .bal-red{ background:var(--error-bg); color:var(--error); border-color:var(--error); }
         .bal-green{ background:var(--accent-soft); color:var(--accent); border-color:var(--accent); }
 
         /* ---- Inline calendar ---- */
-        .calendar-inline{ border:1px solid var(--border); border-radius:12px; padding:14px; background:#fff; margin-top:6px; max-width: 100%; overflow: hidden; }
+        .calendar-inline{ border:1px solid var(--border); border-radius:12px; padding:14px; background:#fff; margin-top:6px; max-width:100%; overflow:hidden; }
         .cal-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-size:13.5px; font-weight:600; color:var(--ink); }
         .cal-header button{ padding:4px 9px; background:var(--accent-soft); color:var(--accent); font-size:14px; }
         .cal-grid{ display:grid; grid-template-columns:repeat(7, 1fr); gap:2px; }
@@ -128,23 +121,23 @@
         .rooms-empty{ font-size:12.5px; color:var(--error); padding:10px 0; }
         @keyframes pulse{ 0%,100%{ opacity:.5; } 50%{ opacity:1; } }
 
-        .search-container{ position:relative; max-width:420px; margin-bottom:6px; width: 100%; }
+        .search-container{ position:relative; max-width:420px; margin-bottom:6px; width:100%; }
         .search-results{ position:absolute; background:#fff; border:1px solid var(--border); width:100%;
             z-index:100; border-radius:0 0 10px 10px; max-height:220px; overflow-y:auto; display:none; box-shadow:var(--shadow); }
         .search-item{ padding:12px 14px; cursor:pointer; border-bottom:1px solid var(--border); font-size:13.5px; }
         .search-item:hover{ background:var(--accent-soft); color:var(--accent); }
 
-        .list-header{ display:flex; justify-content:space-between; align-items:center; margin:22px 0 12px; flex-wrap: wrap; gap: 8px; }
+        .list-header{ display:flex; justify-content:space-between; align-items:center; margin:22px 0 12px; flex-wrap:wrap; gap:8px; }
         .list-header h3{ font-size:15px; }
         .list-header span{ font-size:12px; color:var(--muted); }
 
         .card-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:14px; }
         .list-card{ background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:16px;
-            box-shadow:var(--shadow); cursor:pointer; transition:.15s; position:relative; min-width: 0; overflow: hidden; }
+            box-shadow:var(--shadow); cursor:pointer; transition:.15s; position:relative; min-width:0; overflow:hidden; }
         .list-card:hover{ border-color:var(--accent); transform:translateY(-2px); }
         .list-card .top-row{ display:flex; justify-content:space-between; align-items:flex-start; }
-        .list-card .name{ font-weight:600; font-size:14.5px; color:var(--ink); margin-bottom:4px; word-break: break-word; }
-        .list-card .meta{ font-size:12.5px; color:var(--muted); margin-bottom:3px; word-break: break-word; }
+        .list-card .name{ font-weight:600; font-size:14.5px; color:var(--ink); margin-bottom:4px; word-break:break-word; }
+        .list-card .meta{ font-size:12.5px; color:var(--muted); margin-bottom:3px; word-break:break-word; }
         .list-card .tag{ display:inline-block; font-size:10.5px; text-transform:uppercase; padding:3px 9px;
             border-radius:20px; background:var(--accent-soft); color:var(--accent); font-weight:600; margin-top:6px; }
         .list-card .tag.banned{ background:var(--error-bg); color:var(--error); }
@@ -153,14 +146,14 @@
             cursor:pointer; border-radius:6px; margin:0; }
         .dots-btn:hover{ background:#f1f0ec; }
         .dots-menu{ position:absolute; top:36px; right:14px; background:#fff; border:1px solid var(--border);
-            border-radius:8px; box-shadow:var(--shadow); z-index:20; display:none; min-width:130px; overflow:hidden; }
+            border-radius:8px; box-shadow:var(--shadow); z-index:20; display:none; min-width:150px; overflow:hidden; }
         .dots-menu.open{ display:block; }
         .dots-menu button{ width:100%; text-align:left; background:none; color:var(--error); border:none;
             border-radius:0; padding:10px 14px; font-size:12.5px; font-weight:600; margin:0; }
         .dots-menu button:hover{ background:var(--error-bg); }
 
         .guest-profile{ display:flex; gap:18px; margin-top:14px; align-items:center; flex-wrap:wrap; }
-        .guest-info p{ margin-bottom:5px; font-size:13.5px; word-break: break-word; }
+        .guest-info p{ margin-bottom:5px; font-size:13.5px; word-break:break-word; }
 
         .modal-overlay{ position:fixed; inset:0; background:rgba(28,43,41,0.5); display:none; align-items:center;
             justify-content:center; z-index:200; padding:16px; }
@@ -188,7 +181,7 @@
         .hamburger-btn{ display:none; background:none; border:none; color:var(--ink); cursor:pointer; padding:6px; }
         .sidebar-overlay{ display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:39; }
         .sidebar-overlay.open{ display:block; }
-        .mobile-topbar{ display: none; }
+        .mobile-topbar{ display:none; }
 
         @media (max-width:900px){
             body{ display:block; height:auto; overflow:visible; }
@@ -202,29 +195,18 @@
             .main{ height:auto; overflow-y:visible; overflow-x:hidden; max-width:100vw; padding:76px 16px 40px; }
 
             .mobile-topbar{
-                display:flex;
-                align-items:center;
-                gap:12px;
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 60px;
-                padding: 0 16px;
-                background: rgba(246, 245, 242, 0.85);
-                backdrop-filter: blur(8px);
-                -webkit-backdrop-filter: blur(8px);
-                border-bottom: 1px solid var(--border);
-                z-index: 38;
-                max-width: 100%;
+                display:flex; align-items:center; gap:12px;
+                position:fixed; top:0; left:0; right:0; height:60px; padding:0 16px;
+                background:rgba(246, 245, 242, 0.85);
+                backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+                border-bottom:1px solid var(--border); z-index:38; max-width:100%;
             }
             .mobile-topbar span{ font-family:'Fraunces', serif; font-weight:600; font-size:16px; color:var(--ink);
                 overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
-            video, .preview-img{ width:100%; max-width: 100%; }
+            video, .preview-img{ width:100%; max-width:100%; }
         }
         @media (max-width:480px){
-            .stat-grid{ grid-template-columns:1fr 1fr; }
             .card-grid{ grid-template-columns:1fr; }
         }
     </style>
@@ -238,10 +220,6 @@
             </svg>
             <span>Elroi — Staff</span>
         </div>
-        <a class="nav-link" data-panel="dashboard" onclick="showPanel('dashboard')">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>
-            Dashboard
-        </a>
         <a class="nav-link" data-panel="frontdesk" onclick="showPanel('frontdesk')">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>
             Front Desk
@@ -281,34 +259,8 @@
             <script>document.addEventListener('DOMContentLoaded', () => showToast(@json($errors->first()), 'error'));</script>
         @endif
 
-        <!-- ===== DASHBOARD ===== -->
-        <div id="panel-dashboard" class="panel active">
-            <div class="topline"><h1>Good to see you</h1></div>
-
-            <div class="list-header"><h3>Currently Staying</h3></div>
-            @isset($activeStays)
-                @if ($activeStays->count())
-                    <div class="card-grid">
-                        @foreach ($activeStays->take(6) as $r)
-                            <div class="list-card" onclick="showPanel('frontdesk'); showFrontDesk('checkout')">
-                                <div class="name">{{ $r->guest->fullname }}</div>
-                                <div class="meta">Room {{ $r->room->room_number }}</div>
-                                <div class="meta">{{ $r->guest->phone_no }}</div>
-                                <div class="meta">Out: {{ \Carbon\Carbon::parse($r->check_out_date)->format('M j') }}</div>
-                                <span class="tag">In House</span>
-                            </div>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="empty-panel"><h3>No guests currently staying</h3><p>Checked-in guests will appear here.</p></div>
-                @endif
-            @else
-                <div class="empty-panel"><h3>Nothing to show yet</h3><p>Once you start checking guests in, activity will appear here.</p></div>
-            @endisset
-        </div>
-
         <!-- ===== FRONT DESK (Check In / Check Out / Reservation) ===== -->
-        <div id="panel-frontdesk" class="panel">
+        <div id="panel-frontdesk" class="panel active">
             <div class="topline">
                 <h1>Front Desk</h1>
                 <div class="segmented">
@@ -370,16 +322,16 @@
                                     <div class="cal-footer" id="ci-cal-label">Select check-in date</div>
                                 </div>
                                 <div class="chip-row">
-                                    <span class="chip" onclick="setNights('ci',1)">1 night</span>
-                                    <span class="chip" onclick="setNights('ci',2)">2 nights</span>
-                                    <span class="chip" onclick="setNights('ci',3)">3 nights</span>
-                                    <span class="chip" onclick="setNights('ci',7)">1 week</span>
+                                    <span class="chip" onclick="setNights('ci',1)">+1 night</span>
+                                    <span class="chip" onclick="setNights('ci',2)">+2 nights</span>
+                                    <span class="chip" onclick="setNights('ci',3)">+3 nights</span>
+                                    <span class="chip" onclick="setNights('ci',7)">+1 week</span>
                                 </div>
                             </div>
 
                             <div class="field">
                                 <label>Room Type</label>
-                                <select id="ci-type" onchange="autoLoadRooms('ci')">
+                                <select id="ci-type" onchange="doFindRooms('ci')">
                                     <option value="">-- select --</option>
                                     @foreach ($roomTypes as $type) <option value="{{ $type->id }}">{{ $type->name }}</option> @endforeach
                                 </select>
@@ -509,16 +461,16 @@
                                     <div class="cal-footer" id="res-cal-label">Select check-in date</div>
                                 </div>
                                 <div class="chip-row">
-                                    <span class="chip" onclick="setNights('res',1)">1 night</span>
-                                    <span class="chip" onclick="setNights('res',2)">2 nights</span>
-                                    <span class="chip" onclick="setNights('res',3)">3 nights</span>
-                                    <span class="chip" onclick="setNights('res',7)">1 week</span>
+                                    <span class="chip" onclick="setNights('res',1)">+1 night</span>
+                                    <span class="chip" onclick="setNights('res',2)">+2 nights</span>
+                                    <span class="chip" onclick="setNights('res',3)">+3 nights</span>
+                                    <span class="chip" onclick="setNights('res',7)">+1 week</span>
                                 </div>
                             </div>
 
                             <div class="field">
                                 <label>Room Type</label>
-                                <select id="res-type" onchange="autoLoadRooms('res')">
+                                <select id="res-type" onchange="doFindRooms('res')">
                                     <option value="">-- select --</option>
                                     @foreach ($roomTypes as $type) <option value="{{ $type->id }}">{{ $type->name }}</option> @endforeach
                                 </select>
@@ -583,11 +535,19 @@
                 @if ($pendingArrivals->count())
                     <div class="card-grid">
                         @foreach ($pendingArrivals as $r)
-                            <div class="list-card" onclick="loadReservationDetails({{ $r->id }})">
-                                <div class="name">{{ $r->guest->fullname }}</div>
-                                <div class="meta">{{ $r->guest->phone_no }}</div>
-                                <div class="meta">Room {{ $r->room->room_number }}</div>
-                                <span class="tag">Reserved</span>
+                            <div class="list-card">
+                                <div class="top-row">
+                                    <div onclick="loadReservationDetails({{ $r->id }})" style="flex:1; cursor:pointer;">
+                                        <div class="name">{{ $r->guest->fullname }}</div>
+                                        <div class="meta">{{ $r->guest->phone_no }}</div>
+                                        <div class="meta">Room {{ $r->room->room_number }}</div>
+                                        <span class="tag">Reserved</span>
+                                    </div>
+                                    <button type="button" class="dots-btn" onclick="event.stopPropagation(); toggleDots(this)">⋮</button>
+                                </div>
+                                <div class="dots-menu">
+                                    <button type="button" onclick="event.stopPropagation(); openCancelReservationModal({{ $r->id }}, '{{ addslashes($r->guest->fullname) }}')">Cancel Reservation</button>
+                                </div>
                             </div>
                         @endforeach
                     </div>
@@ -630,6 +590,7 @@
             <form id="banModalForm" method="POST" onsubmit="showToast('Processing...', 'info', true)">
                 @csrf
                 <input type="hidden" name="guest_id" id="banModalGuestId">
+                <input type="hidden" name="reservation_id" id="banModalReservationId">
                 <div class="field">
                     <label>Your Password</label>
                     <input type="password" name="password" required autofocus>
@@ -686,9 +647,19 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            showPanel(sessionStorage.getItem('staffActivePanel') || 'dashboard');
+            showPanel(sessionStorage.getItem('staffActivePanel') || 'frontdesk');
             initRangeCalendar('ci');
             initRangeCalendar('res');
+
+            // Refresh rooms instantly when dates change (no artificial delay — these are discrete actions)
+            ['ci', 'res'].forEach(prefix => {
+                document.getElementById(prefix + '-in').addEventListener('change', () => {
+                    if (document.getElementById(prefix + '-type').value) doFindRooms(prefix);
+                });
+                document.getElementById(prefix + '-out').addEventListener('change', () => {
+                    if (document.getElementById(prefix + '-type').value) doFindRooms(prefix);
+                });
+            });
 
             document.getElementById('checkinForm').addEventListener('submit', (e) => {
                 if (!document.getElementById('ci-in').value || !document.getElementById('ci-out').value) {
@@ -729,10 +700,24 @@
             if (!isOpen) menu.classList.add('open');
         }
 
-        // ===== DEBOUNCE HELPER ("buffer load") =====
-        function debounce(fn, delay = 350) {
+        function debounce(fn, delay = 250) {
             let t;
             return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), delay); };
+        }
+
+        // ===== TIMEZONE-SAFE DATE HELPERS =====
+        // toISOString() converts to UTC and shifts the date backward in any timezone
+        // ahead of UTC (like Ethiopia, UTC+3) — that was the root cause of the
+        // calendar highlight/drift bug. These two helpers work in LOCAL time only.
+        function toLocalISO(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+        function parseLocalDate(isoStr) {
+            const [y, m, d] = isoStr.split('-').map(Number);
+            return new Date(y, m - 1, d);
         }
 
         // ===== SHARED INLINE CALENDAR (used by ci- and res- prefixes) =====
@@ -771,7 +756,7 @@
 
             for (let d = 1; d <= daysInMonth; d++) {
                 const dateObj = new Date(year, month, d);
-                const iso = dateObj.toISOString().split('T')[0];
+                const iso = toLocalISO(dateObj);
                 let cls = 'cal-day';
 
                 if (isSameDate(dateObj, today)) cls += ' cal-today';
@@ -798,7 +783,7 @@
 
         function calPickGeneric(prefix, iso) {
             const state = calendars[prefix];
-            const picked = new Date(iso + 'T00:00:00');
+            const picked = parseLocalDate(iso);
 
             if (!state.start || (state.start && state.end)) {
                 state.start = picked; state.end = null;
@@ -807,8 +792,8 @@
                 if (picked < state.start) { state.end = state.start; state.start = picked; }
                 else { state.end = picked; }
 
-                const fromIso = state.start.toISOString().split('T')[0];
-                const toIso = state.end.toISOString().split('T')[0];
+                const fromIso = toLocalISO(state.start);
+                const toIso = toLocalISO(state.end);
                 document.getElementById(prefix + '-cal-label').textContent = `${fromIso} → ${toIso}`;
                 document.getElementById(prefix + '-in').value = fromIso;
                 document.getElementById(prefix + '-out').value = toIso;
@@ -821,50 +806,44 @@
         function calHoverGeneric(prefix, iso) {
             const state = calendars[prefix];
             if (!state.start || state.end) return;
-            state.hover = new Date(iso + 'T00:00:00');
+            state.hover = parseLocalDate(iso);
             const lo = state.start < state.hover ? state.start : state.hover;
             const hi = state.start < state.hover ? state.hover : state.start;
             document.querySelectorAll(`#${prefix}-cal-grid .cal-day`).forEach(el => {
-                const d = new Date(el.dataset.iso + 'T00:00:00');
+                const d = parseLocalDate(el.dataset.iso);
                 el.classList.toggle('cal-in-range', d >= lo && d <= hi);
             });
         }
 
-        // Quick chips: set dates directly and keep the calendar visually in sync
+        // Quick chips: ADD nights to the current selection (cumulative).
+        // First click with nothing selected: check-in = today, check-out = today + N.
+        // Clicking the same or another chip again extends the existing check-out
+        // by N more days, so "+1 week" twice = 2 weeks total.
         function setNights(prefix, nights) {
             const inEl = document.getElementById(prefix + '-in');
-            let base;
-            if (inEl.value) base = new Date(inEl.value + 'T00:00:00');
-            else { base = new Date(); base.setHours(0, 0, 0, 0); }
+            const outEl = document.getElementById(prefix + '-out');
 
-            const outDate = new Date(base);
-            outDate.setDate(outDate.getDate() + nights);
+            let checkIn = inEl.value ? parseLocalDate(inEl.value) : (() => { const d = new Date(); d.setHours(0,0,0,0); return d; })();
+            let checkOut = outEl.value ? parseLocalDate(outEl.value) : new Date(checkIn);
+            checkOut.setDate(checkOut.getDate() + nights);
 
-            const fromIso = base.toISOString().split('T')[0];
-            const toIso = outDate.toISOString().split('T')[0];
+            const fromIso = toLocalISO(checkIn);
+            const toIso = toLocalISO(checkOut);
             inEl.value = fromIso;
-            document.getElementById(prefix + '-out').value = toIso;
+            outEl.value = toIso;
 
             const state = calendars[prefix];
             if (state) {
-                state.start = base; state.end = outDate; state.viewDate = new Date(base);
+                state.start = checkIn; state.end = checkOut; state.viewDate = new Date(checkOut);
                 renderCalGeneric(prefix);
                 document.getElementById(prefix + '-cal-label').textContent = `${fromIso} → ${toIso}`;
             }
             inEl.dispatchEvent(new Event('change'));
-            document.getElementById(prefix + '-out').dispatchEvent(new Event('change'));
+            outEl.dispatchEvent(new Event('change'));
         }
 
-        // ===== ROOM AUTO-LOAD ("buffer load") =====
+        // ===== ROOM AUTO-LOAD — instant, no debounce (discrete select/calendar actions) =====
         let roomPrices = {};
-        const debouncedFindRooms = {};
-
-        function autoLoadRooms(prefix) {
-            if (!debouncedFindRooms[prefix]) {
-                debouncedFindRooms[prefix] = debounce(() => doFindRooms(prefix), 350);
-            }
-            debouncedFindRooms[prefix]();
-        }
 
         async function doFindRooms(prefix) {
             const typeId = document.getElementById(prefix + '-type').value;
@@ -909,12 +888,12 @@
             }
         }
 
-        // ===== BAN CHECK ("buffer load") =====
+        // ===== BAN CHECK (debounced — this one is genuinely continuous typing) =====
         const debouncedBanCheck = {};
 
         function onPhoneInput(prefix) {
             if (!debouncedBanCheck[prefix]) {
-                debouncedBanCheck[prefix] = debounce(() => checkGuestBan(prefix), 400);
+                debouncedBanCheck[prefix] = debounce(() => checkGuestBan(prefix), 250);
             }
             debouncedBanCheck[prefix]();
         }
@@ -1115,11 +1094,12 @@
             } else { results.style.display = 'none'; }
         }
 
-        // ===== BAN / UNBAN MODAL =====
+        // ===== BAN / UNBAN / CANCEL MODAL (shared) =====
         function openBanModal(guestId, guestName) {
             document.getElementById('banModalTitle').textContent = 'Ban ' + guestName + '?';
             document.getElementById('banModalText').textContent = 'This guest will be blocked from future check-ins. Enter your staff password to confirm.';
             document.getElementById('banModalGuestId').value = guestId;
+            document.getElementById('banModalReservationId').value = '';
             document.getElementById('banModalForm').action = "{{ route('staff.guest.ban') }}";
             document.getElementById('banModalSubmit').textContent = 'Confirm Ban';
             document.getElementById('banModalOverlay').classList.add('open');
@@ -1128,8 +1108,18 @@
             document.getElementById('banModalTitle').textContent = 'Unban ' + guestName + '?';
             document.getElementById('banModalText').textContent = 'This guest will be allowed to check in again. Enter your staff password to confirm.';
             document.getElementById('banModalGuestId').value = guestId;
+            document.getElementById('banModalReservationId').value = '';
             document.getElementById('banModalForm').action = "{{ route('staff.guest.unban') }}";
             document.getElementById('banModalSubmit').textContent = 'Confirm Unban';
+            document.getElementById('banModalOverlay').classList.add('open');
+        }
+        function openCancelReservationModal(reservationId, guestName) {
+            document.getElementById('banModalTitle').textContent = 'Cancel reservation for ' + guestName + '?';
+            document.getElementById('banModalText').textContent = 'This will cancel the reservation and free the room. Enter your staff password to confirm.';
+            document.getElementById('banModalGuestId').value = '';
+            document.getElementById('banModalReservationId').value = reservationId;
+            document.getElementById('banModalForm').action = "{{ route('staff.reservation.cancel') }}";
+            document.getElementById('banModalSubmit').textContent = 'Confirm Cancel';
             document.getElementById('banModalOverlay').classList.add('open');
         }
         function closeBanModal() {

@@ -388,4 +388,22 @@ class StaffController extends Controller
 
         return back()->with('success', "{$guest->fullname} has been unbanned.");
     }
+
+    public function cancelReservation(Request $request)
+{
+    $request->validate([
+        'reservation_id' => 'required|exists:reservations,id',
+        'password'       => 'required|string',
+    ]);
+
+    if (!Hash::check($request->password, auth()->user()->password)) {
+        return back()->withErrors(['password' => 'Incorrect password.']);
+    }
+
+    $res = Reservation::findOrFail($request->reservation_id);
+    $res->update(['status' => 'cancelled']);
+    Room::where('id', $res->room_id)->update(['status' => 'available']);
+
+    return back()->with('success', 'Reservation cancelled and room is now available.');
+}
 }
