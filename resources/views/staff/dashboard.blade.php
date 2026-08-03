@@ -767,6 +767,16 @@
                     const dayEl = e.target.closest('.cal-day:not(.disabled)');
                     if (dayEl) calHoverGeneric(prefix, dayEl.dataset.iso);
                 });
+                grid.addEventListener('mouseleave', () => {
+                    if (state.start && !state.end) {
+                        const lbl = document.getElementById(prefix + '-cal-label');
+                        if (lbl) lbl.textContent = 'Select check-out date';
+                        document.querySelectorAll(`#${prefix}-cal-grid .cal-day:not(.disabled)`).forEach(el => {
+                            const d = parseLocalDate(el.dataset.iso);
+                            el.classList.toggle('cal-in-range', isSameDate(d, state.start));
+                        });
+                    }
+                });
                 state.bound = true;
             }
         }
@@ -811,6 +821,14 @@
                 const d = parseLocalDate(el.dataset.iso);
                 el.classList.toggle('cal-in-range', d >= lo && d <= hi);
             });
+
+            const fromIso = toLocalISO(lo);
+            const toIso = toLocalISO(hi);
+            const nights = Math.max(1, Math.round((hi - lo) / 86400000));
+            const labelEl = document.getElementById(prefix + '-cal-label');
+            if (labelEl) {
+                labelEl.textContent = `${fromIso} → ${toIso} (${nights} ${nights === 1 ? 'night' : 'nights'})`;
+            }
         }
 
         // ===== ROOM AUTO-LOAD =====
