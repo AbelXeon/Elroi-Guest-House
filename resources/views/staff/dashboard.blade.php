@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="shortcut icon" href="{{ asset('favicon.ico') }}?v=2">
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root{
             --ink:#1c2b29; --panel:#20342f; --accent:#3f6b52; --accent-light:#57876a;
@@ -18,14 +18,14 @@
         *{ margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
         html,body{ height:100%; overflow-x:hidden; }
         body{ background:var(--bg); color:var(--text); display:flex; height:100vh; overflow:hidden; }
-        h1,h2,h3{ font-family:'Fraunces', serif; font-weight:500; color:var(--ink); }
+        h1,h2,h3{ font-family:'Bebas Neue', sans-serif; font-weight:400; color:var(--ink); letter-spacing:0.5px; }
 
         /* ===== Sidebar ===== */
         .sidebar{ width:230px; flex-shrink:0; background:linear-gradient(160deg, var(--ink) 0%, var(--panel) 100%);
             color:#f4f2ec; display:flex; flex-direction:column; padding:26px 0; height:100vh; overflow-y:auto; }
         .brand{ display:flex; align-items:center; gap:10px; padding:0 22px 22px;
             border-bottom:1px solid rgba(244,242,236,0.1); margin-bottom:14px; }
-        .brand span{ font-family:'Fraunces', serif; font-weight:600; font-size:15px; }
+        .brand span{ font-family:'Bebas Neue', sans-serif; font-weight:400; font-size:18px; letter-spacing:0.5px; }
         .nav-link{ display:flex; align-items:center; gap:11px; padding:11px 22px; color:#c7cec8;
             text-decoration:none; cursor:pointer; font-size:13.5px; border-left:3px solid transparent;
             transition:background .15s, color .15s; }
@@ -40,7 +40,7 @@
         .main{ flex:1; height:100vh; overflow-y:auto; overflow-x:hidden; padding:30px 34px 100px; }
         .topline{ position:sticky; top:0; z-index:15; background:var(--bg); padding:0 0 16px; margin-bottom:6px;
             display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; }
-        .topline h1{ font-size:24px; }
+        .topline h1{ font-size:28px; }
 
         .segmented{ display:flex; gap:5px; background:#eceae4; padding:4px; border-radius:10px; }
         .seg-btn{ padding:9px 16px; background:transparent; color:var(--muted); border:none; border-radius:8px;
@@ -130,7 +130,7 @@
         .search-item:hover{ background:var(--accent-soft); color:var(--accent); }
 
         .list-header{ display:flex; justify-content:space-between; align-items:center; margin:22px 0 12px; flex-wrap:wrap; gap:8px; }
-        .list-header h3{ font-size:15px; }
+        .list-header h3{ font-size:18px; }
         .list-header span{ font-size:12px; color:var(--muted); }
 
         .card-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:14px; }
@@ -161,7 +161,7 @@
             justify-content:center; z-index:200; padding:16px; }
         .modal-overlay.open{ display:flex; }
         .modal-box{ background:#fff; border-radius:12px; padding:26px; max-width:360px; width:100%; box-shadow:0 10px 40px rgba(0,0,0,.25); }
-        .modal-box h3{ font-size:17px; margin-bottom:6px; }
+        .modal-box h3{ font-size:20px; margin-bottom:6px; }
         .modal-box p{ font-size:13px; color:var(--muted); margin-bottom:16px; }
         .modal-actions{ display:flex; gap:10px; margin-top:16px; }
         .modal-actions button{ flex:1; }
@@ -203,7 +203,7 @@
                 backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
                 border-bottom:1px solid var(--border); z-index:38; max-width:100%;
             }
-            .mobile-topbar span{ font-family:'Fraunces', serif; font-weight:600; font-size:16px; color:var(--ink);
+            .mobile-topbar span{ font-family:'Bebas Neue', sans-serif; font-weight:400; font-size:18px; color:var(--ink);
                 overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
             video, .preview-img{ width:100%; max-width:100%; }
