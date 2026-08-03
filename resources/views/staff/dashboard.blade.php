@@ -6,6 +6,7 @@
     <title>Staff Dashboard — Elroi Guest House</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="shortcut icon" href="{{ asset('favicon.ico') }}?v=2">
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root{
@@ -108,6 +109,7 @@
         .cal-day.cal-in-range{ background:var(--accent-soft); color:var(--accent); }
         .cal-day.cal-selected{ background:var(--accent); color:#fff; font-weight:700; }
         .cal-day.cal-today{ box-shadow:inset 0 0 0 2px var(--accent); font-weight:700; }
+        .cal-day.disabled, .cal-day.disabled:hover{ opacity:.35; cursor:not-allowed; background:transparent !important; color:var(--muted); }
         .cal-footer{ margin-top:10px; font-size:12px; color:var(--muted); text-align:center; }
 
         /* ---- Room chips ---- */
@@ -321,12 +323,6 @@
                                     <div class="cal-grid" id="ci-cal-grid"></div>
                                     <div class="cal-footer" id="ci-cal-label">Select check-in date</div>
                                 </div>
-                                <div class="chip-row">
-                                    <span class="chip" onclick="setNights('ci',1)">+1 night</span>
-                                    <span class="chip" onclick="setNights('ci',2)">+2 nights</span>
-                                    <span class="chip" onclick="setNights('ci',3)">+3 nights</span>
-                                    <span class="chip" onclick="setNights('ci',7)">+1 week</span>
-                                </div>
                             </div>
 
                             <div class="field">
@@ -459,12 +455,6 @@
                                     </div>
                                     <div class="cal-grid" id="res-cal-grid"></div>
                                     <div class="cal-footer" id="res-cal-label">Select check-in date</div>
-                                </div>
-                                <div class="chip-row">
-                                    <span class="chip" onclick="setNights('res',1)">+1 night</span>
-                                    <span class="chip" onclick="setNights('res',2)">+2 nights</span>
-                                    <span class="chip" onclick="setNights('res',3)">+3 nights</span>
-                                    <span class="chip" onclick="setNights('res',7)">+1 week</span>
                                 </div>
                             </div>
 
@@ -651,7 +641,7 @@
             initRangeCalendar('ci');
             initRangeCalendar('res');
 
-            // Refresh rooms instantly when dates change (no artificial delay — these are discrete actions)
+            // Refresh rooms instantly when dates change
             ['ci', 'res'].forEach(prefix => {
                 document.getElementById(prefix + '-in').addEventListener('change', () => {
                     if (document.getElementById(prefix + '-type').value) doFindRooms(prefix);
@@ -706,9 +696,6 @@
         }
 
         // ===== TIMEZONE-SAFE DATE HELPERS =====
-        // toISOString() converts to UTC and shifts the date backward in any timezone
-        // ahead of UTC (like Ethiopia, UTC+3) — that was the root cause of the
-        // calendar highlight/drift bug. These two helpers work in LOCAL time only.
         function toLocalISO(date) {
             const y = date.getFullYear();
             const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -746,6 +733,7 @@
             label.textContent = state.viewDate.toLocaleString('default', { month: 'long', year: 'numeric' });
 
             const today = new Date();
+            today.setHours(0,0,0,0);
             const firstDay = new Date(year, month, 1);
             const startWeekday = firstDay.getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -756,9 +744,11 @@
 
             for (let d = 1; d <= daysInMonth; d++) {
                 const dateObj = new Date(year, month, d);
+                dateObj.setHours(0,0,0,0);
                 const iso = toLocalISO(dateObj);
                 let cls = 'cal-day';
 
+                if (dateObj < today) cls += ' disabled';
                 if (isSameDate(dateObj, today)) cls += ' cal-today';
                 if (state.start && state.end && dateObj >= state.start && dateObj <= state.end) cls += ' cal-in-range';
                 if (state.start && isSameDate(dateObj, state.start)) cls += ' cal-selected';
@@ -770,11 +760,11 @@
 
             if (!state.bound) {
                 grid.addEventListener('click', (e) => {
-                    const dayEl = e.target.closest('.cal-day');
+                    const dayEl = e.target.closest('.cal-day:not(.disabled)');
                     if (dayEl) calPickGeneric(prefix, dayEl.dataset.iso);
                 });
                 grid.addEventListener('mouseover', (e) => {
-                    const dayEl = e.target.closest('.cal-day');
+                    const dayEl = e.target.closest('.cal-day:not(.disabled)');
                     if (dayEl) calHoverGeneric(prefix, dayEl.dataset.iso);
                 });
                 state.bound = true;
@@ -784,6 +774,8 @@
         function calPickGeneric(prefix, iso) {
             const state = calendars[prefix];
             const picked = parseLocalDate(iso);
+            const today = new Date(); today.setHours(0,0,0,0);
+            if (picked < today) return;
 
             if (!state.start || (state.start && state.end)) {
                 state.start = picked; state.end = null;
@@ -794,7 +786,9 @@
 
                 const fromIso = toLocalISO(state.start);
                 const toIso = toLocalISO(state.end);
-                document.getElementById(prefix + '-cal-label').textContent = `${fromIso} → ${toIso}`;
+                const nights = Math.max(1, Math.round((state.end - state.start) / 86400000));
+
+                document.getElementById(prefix + '-cal-label').textContent = `${fromIso} → ${toIso} (${nights} ${nights === 1 ? 'night' : 'nights'})`;
                 document.getElementById(prefix + '-in').value = fromIso;
                 document.getElementById(prefix + '-out').value = toIso;
                 document.getElementById(prefix + '-in').dispatchEvent(new Event('change'));
@@ -806,43 +800,20 @@
         function calHoverGeneric(prefix, iso) {
             const state = calendars[prefix];
             if (!state.start || state.end) return;
-            state.hover = parseLocalDate(iso);
+            const picked = parseLocalDate(iso);
+            const today = new Date(); today.setHours(0,0,0,0);
+            if (picked < today) return;
+
+            state.hover = picked;
             const lo = state.start < state.hover ? state.start : state.hover;
             const hi = state.start < state.hover ? state.hover : state.start;
-            document.querySelectorAll(`#${prefix}-cal-grid .cal-day`).forEach(el => {
+            document.querySelectorAll(`#${prefix}-cal-grid .cal-day:not(.disabled)`).forEach(el => {
                 const d = parseLocalDate(el.dataset.iso);
                 el.classList.toggle('cal-in-range', d >= lo && d <= hi);
             });
         }
 
-        // Quick chips: ADD nights to the current selection (cumulative).
-        // First click with nothing selected: check-in = today, check-out = today + N.
-        // Clicking the same or another chip again extends the existing check-out
-        // by N more days, so "+1 week" twice = 2 weeks total.
-        function setNights(prefix, nights) {
-            const inEl = document.getElementById(prefix + '-in');
-            const outEl = document.getElementById(prefix + '-out');
-
-            let checkIn = inEl.value ? parseLocalDate(inEl.value) : (() => { const d = new Date(); d.setHours(0,0,0,0); return d; })();
-            let checkOut = outEl.value ? parseLocalDate(outEl.value) : new Date(checkIn);
-            checkOut.setDate(checkOut.getDate() + nights);
-
-            const fromIso = toLocalISO(checkIn);
-            const toIso = toLocalISO(checkOut);
-            inEl.value = fromIso;
-            outEl.value = toIso;
-
-            const state = calendars[prefix];
-            if (state) {
-                state.start = checkIn; state.end = checkOut; state.viewDate = new Date(checkOut);
-                renderCalGeneric(prefix);
-                document.getElementById(prefix + '-cal-label').textContent = `${fromIso} → ${toIso}`;
-            }
-            inEl.dispatchEvent(new Event('change'));
-            outEl.dispatchEvent(new Event('change'));
-        }
-
-        // ===== ROOM AUTO-LOAD — instant, no debounce (discrete select/calendar actions) =====
+        // ===== ROOM AUTO-LOAD =====
         let roomPrices = {};
 
         async function doFindRooms(prefix) {
@@ -888,7 +859,7 @@
             }
         }
 
-        // ===== BAN CHECK (debounced — this one is genuinely continuous typing) =====
+        // ===== BAN CHECK =====
         const debouncedBanCheck = {};
 
         function onPhoneInput(prefix) {
