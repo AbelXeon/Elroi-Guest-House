@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class RoomType extends Model
 {
-    /** @use HasFactory<\Database\Factories\RoomTypesFactory> */
     use HasFactory;
 
      protected $fillable = ['name'];
