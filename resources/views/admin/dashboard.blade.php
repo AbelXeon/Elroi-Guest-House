@@ -313,23 +313,19 @@
 
         .empty-note{ color:var(--muted); font-size:13.5px; padding:20px 0; }
 
-        /* ---- Custom calendar range picker ---- */
-        .calendar-popup{
-            position:absolute; top:calc(100% + 6px); left:0; z-index:60;
-            background:#fff; border:1px solid var(--border); border-radius:12px;
-            box-shadow:0 10px 30px rgba(0,0,0,.15); padding:14px; width:270px;
-        }
+        /* ---- Inline calendar (Same as Staff Dashboard) ---- */
+        .calendar-inline{ border:1px solid var(--border); border-radius:12px; padding:14px; background:#fff; margin-top:6px; max-width:100%; overflow:hidden; }
         .cal-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-size:13.5px; font-weight:600; color:var(--ink); }
         .cal-header button{ padding:4px 9px; background:var(--accent-soft); color:var(--accent); font-size:14px; }
         .cal-grid{ display:grid; grid-template-columns:repeat(7, 1fr); gap:2px; }
         .cal-dow{ font-size:10px; text-transform:uppercase; color:var(--muted); text-align:center; padding:4px 0; }
-        .cal-day{ text-align:center; padding:7px 0; font-size:12.5px; border-radius:6px; cursor:pointer; color:var(--text); }
+        .cal-day{ text-align:center; padding:8px 0; font-size:12.5px; border-radius:6px; cursor:pointer; color:var(--text); }
         .cal-day:hover{ background:var(--accent-soft); }
         .cal-day.cal-in-range{ background:var(--accent-soft); color:var(--accent); }
         .cal-day.cal-selected{ background:var(--accent); color:#fff; font-weight:700; }
         .cal-day.cal-today{ box-shadow:inset 0 0 0 2px var(--accent); font-weight:700; }
+        .cal-day.disabled, .cal-day.disabled:hover{ opacity:.35; cursor:not-allowed; background:transparent !important; color:var(--muted); }
         .cal-footer{ margin-top:10px; font-size:12px; color:var(--muted); text-align:center; }
-        .range-field-wrap{ position:relative; }
 
         /* ---- Mobile overflow hardening ---- */
         html, body{ overflow-x:hidden; }
@@ -406,7 +402,6 @@
 
         @media (max-width:480px){
             .stat-grid{ grid-template-columns:1fr 1fr; }
-            .calendar-popup{ width:230px; }
         }
     </style>
 </head>
@@ -768,17 +763,16 @@
                             <option value="custom">Custom Range</option>
                         </select>
                     </div>
-                    <div class="field range-field-wrap" id="customRangeWrap" style="display:none;">
+                    <div class="field" id="customRangeWrap" style="display:none;">
                         <label class="field-label">Custom Range</label>
-                        <button type="button" class="btn-ghost" onclick="toggleRangeCalendar()">Pick Dates</button>
-                        <div id="rangeCalendarPopup" class="calendar-popup" style="display:none;">
+                        <div class="calendar-inline">
                             <div class="cal-header">
-                                <button type="button" onclick="calNav(-1)">‹</button>
-                                <span id="calMonthLabel"></span>
-                                <button type="button" onclick="calNav(1)">›</button>
+                                <button type="button" onclick="calNavGeneric('rpt',-1)">‹</button>
+                                <span id="rpt-cal-month"></span>
+                                <button type="button" onclick="calNavGeneric('rpt',1)">›</button>
                             </div>
-                            <div class="cal-grid" id="calGrid"></div>
-                            <div class="cal-footer" id="calRangeLabel">Select start date</div>
+                            <div class="cal-grid" id="rpt-cal-grid"></div>
+                            <div class="cal-footer" id="rpt-cal-label">Select start date</div>
                         </div>
                         <input type="hidden" id="reportFrom">
                         <input type="hidden" id="reportTo">
@@ -1068,37 +1062,46 @@
             });
         }
 
-        // ---- Custom calendar range picker ----
-        let calViewDate = new Date();
-        let rangeStart = null, rangeEnd = null, rangeHoverDate = null;
-        let calEventsBound = false;
-
-        function toggleRangeCalendar() {
-            const popup = document.getElementById('rangeCalendarPopup');
-            const isOpen = popup.style.display === 'block';
-            popup.style.display = isOpen ? 'none' : 'block';
-            if (!isOpen) renderCalendar();
+        // ===== TIMEZONE-SAFE DATE HELPERS =====
+        function toLocalISO(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+        function parseLocalDate(isoStr) {
+            const [y, m, d] = isoStr.split('-').map(Number);
+            return new Date(y, m - 1, d);
         }
 
-        function calNav(dir) {
-            calViewDate.setMonth(calViewDate.getMonth() + dir);
-            renderCalendar();
-        }
+        // ===== SHARED INLINE CALENDAR (Same as Staff Dashboard) =====
+        const calendars = {};
 
         function isSameDate(a, b) {
             return a && b && a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
         }
 
-        // Builds the grid HTML once. Does NOT get called on every hover — only on
-        // open/navigate/pick — so a click target never gets swapped out from under the user.
-        function renderCalendar() {
-            const grid = document.getElementById('calGrid');
-            const label = document.getElementById('calMonthLabel');
-            const year = calViewDate.getFullYear();
-            const month = calViewDate.getMonth();
-            label.textContent = calViewDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+        function initRangeCalendar(prefix) {
+            calendars[prefix] = { viewDate: new Date(), start: null, end: null, hover: null, bound: false };
+            renderCalGeneric(prefix);
+        }
+
+        function calNavGeneric(prefix, dir) {
+            calendars[prefix].viewDate.setMonth(calendars[prefix].viewDate.getMonth() + dir);
+            renderCalGeneric(prefix);
+        }
+
+        function renderCalGeneric(prefix) {
+            const state = calendars[prefix];
+            const grid = document.getElementById(prefix + '-cal-grid');
+            const label = document.getElementById(prefix + '-cal-month');
+            if (!grid || !label) return;
+            const year = state.viewDate.getFullYear();
+            const month = state.viewDate.getMonth();
+            label.textContent = state.viewDate.toLocaleString('default', { month: 'long', year: 'numeric' });
 
             const today = new Date();
+            today.setHours(0,0,0,0);
             const firstDay = new Date(year, month, 1);
             const startWeekday = firstDay.getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -1109,71 +1112,101 @@
 
             for (let d = 1; d <= daysInMonth; d++) {
                 const dateObj = new Date(year, month, d);
-                const iso = dateObj.toISOString().split('T')[0];
+                dateObj.setHours(0,0,0,0);
+                const iso = toLocalISO(dateObj);
                 let cls = 'cal-day';
 
+                if (prefix === 'rpt' && dateObj > today) cls += ' disabled';
                 if (isSameDate(dateObj, today)) cls += ' cal-today';
-                if (rangeStart && rangeEnd && dateObj >= rangeStart && dateObj <= rangeEnd) cls += ' cal-in-range';
-                if (rangeStart && isSameDate(dateObj, rangeStart)) cls += ' cal-selected';
-                if (rangeEnd && isSameDate(dateObj, rangeEnd)) cls += ' cal-selected';
+                if (state.start && state.end && dateObj >= state.start && dateObj <= state.end) cls += ' cal-in-range';
+                if (state.start && isSameDate(dateObj, state.start)) cls += ' cal-selected';
+                if (state.end && isSameDate(dateObj, state.end)) cls += ' cal-selected';
 
                 html += `<div class="${cls}" data-iso="${iso}">${d}</div>`;
             }
             grid.innerHTML = html;
 
-            if (!calEventsBound) {
-                // Event delegation: listeners live on the container, not on individual day
-                // cells, so re-rendering the grid later never detaches them.
+            if (!state.bound) {
                 grid.addEventListener('click', (e) => {
-                    const dayEl = e.target.closest('.cal-day');
-                    if (dayEl) calPick(dayEl.dataset.iso);
+                    const dayEl = e.target.closest('.cal-day:not(.disabled)');
+                    if (dayEl) calPickGeneric(prefix, dayEl.dataset.iso);
                 });
                 grid.addEventListener('mouseover', (e) => {
-                    const dayEl = e.target.closest('.cal-day');
-                    if (dayEl) calHover(dayEl.dataset.iso);
+                    const dayEl = e.target.closest('.cal-day:not(.disabled)');
+                    if (dayEl) calHoverGeneric(prefix, dayEl.dataset.iso);
                 });
-                calEventsBound = true;
+                grid.addEventListener('mouseleave', () => {
+                    if (state.start && !state.end) {
+                        const lbl = document.getElementById(prefix + '-cal-label');
+                        if (lbl) lbl.textContent = 'Select end date';
+                        document.querySelectorAll(`#${prefix}-cal-grid .cal-day:not(.disabled)`).forEach(el => {
+                            const d = parseLocalDate(el.dataset.iso);
+                            el.classList.toggle('cal-in-range', isSameDate(d, state.start));
+                        });
+                    }
+                });
+                state.bound = true;
             }
         }
 
-        function calPick(iso) {
-            const picked = new Date(iso + 'T00:00:00');
-            if (!rangeStart || (rangeStart && rangeEnd)) {
-                rangeStart = picked; rangeEnd = null; rangeHoverDate = null;
-                document.getElementById('calRangeLabel').textContent = 'Select end date';
-                renderCalendar();
+        function calPickGeneric(prefix, iso) {
+            const state = calendars[prefix];
+            const picked = parseLocalDate(iso);
+            const today = new Date(); today.setHours(0,0,0,0);
+            if (prefix === 'rpt' && picked > today) return;
+
+            if (!state.start || (state.start && state.end)) {
+                state.start = picked; state.end = null;
+                document.getElementById(prefix + '-cal-label').textContent = 'Select end date';
             } else {
-                if (picked < rangeStart) { rangeEnd = rangeStart; rangeStart = picked; }
-                else { rangeEnd = picked; }
+                if (picked < state.start) { state.end = state.start; state.start = picked; }
+                else { state.end = picked; }
 
-                const fromIso = rangeStart.toISOString().split('T')[0];
-                const toIso = rangeEnd.toISOString().split('T')[0];
-                document.getElementById('calRangeLabel').textContent = `${fromIso} → ${toIso}`;
-                document.getElementById('reportFrom').value = fromIso;
-                document.getElementById('reportTo').value = toIso;
-                renderCalendar();
-                document.getElementById('rangeCalendarPopup').style.display = 'none';
-                runReport();
+                const fromIso = toLocalISO(state.start);
+                const toIso = toLocalISO(state.end);
+                const days = Math.max(1, Math.round((state.end - state.start) / 86400000));
+
+                document.getElementById(prefix + '-cal-label').textContent = `${fromIso} → ${toIso} (${days} ${days === 1 ? 'day' : 'days'})`;
+
+                if (prefix === 'rpt') {
+                    document.getElementById('reportFrom').value = fromIso;
+                    document.getElementById('reportTo').value = toIso;
+                    runReport();
+                }
             }
+            renderCalGeneric(prefix);
         }
 
-        // Only toggles a CSS class on already-existing elements — no rebuild, so it
-        // can't interrupt a click gesture in progress.
-        function calHover(iso) {
-            if (!rangeStart || rangeEnd) return;
-            rangeHoverDate = new Date(iso + 'T00:00:00');
-            const lo = rangeStart < rangeHoverDate ? rangeStart : rangeHoverDate;
-            const hi = rangeStart < rangeHoverDate ? rangeHoverDate : rangeStart;
-            document.querySelectorAll('#calGrid .cal-day').forEach(el => {
-                const d = new Date(el.dataset.iso + 'T00:00:00');
+        function calHoverGeneric(prefix, iso) {
+            const state = calendars[prefix];
+            if (!state.start || state.end) return;
+            const picked = parseLocalDate(iso);
+            const today = new Date(); today.setHours(0,0,0,0);
+            if (prefix === 'rpt' && picked > today) return;
+
+            state.hover = picked;
+            const lo = state.start < state.hover ? state.start : state.hover;
+            const hi = state.start < state.hover ? state.hover : state.start;
+            document.querySelectorAll(`#${prefix}-cal-grid .cal-day:not(.disabled)`).forEach(el => {
+                const d = parseLocalDate(el.dataset.iso);
                 el.classList.toggle('cal-in-range', d >= lo && d <= hi);
             });
+
+            const fromIso = toLocalISO(lo);
+            const toIso = toLocalISO(hi);
+            const days = Math.max(1, Math.round((hi - lo) / 86400000));
+            const labelEl = document.getElementById(prefix + '-cal-label');
+            if (labelEl) {
+                labelEl.textContent = `${fromIso} → ${toIso} (${days} ${days === 1 ? 'day' : 'days'})`;
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             const params = new URLSearchParams(window.location.search);
             const panel = params.get('panel') || sessionStorage.getItem('activePanel') || 'overview';
             showPanel(panel, false);
+
+            initRangeCalendar('rpt');
 
             const main = document.getElementById('mainContent');
             const savedScroll = sessionStorage.getItem('scrollPos');
